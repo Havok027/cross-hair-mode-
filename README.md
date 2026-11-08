@@ -1,73 +1,69 @@
-# Crosshair Plugin
+# 🎯 Crosshair Plugin para Decky Loader
 
-Plugin do Decky Loader que desenha um crosshair na tela usando a configuração do MangoHud.
+[![Releases](https://img.shields.io/github/v/release/Havok027/cross-hair-mode-?label=Baixar%20Release)](https://github.com/Havok027/cross-hair-mode-/releases)
 
-## Novidades da 1.3.0
+Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que desenha uma mira (crosshair) personalizada na tela utilizando a infraestrutura do **MangoHud**.
 
-- **Modelo em lista suspensa**, igual à resolução.
-- **Posição por sliders** (X e Y, de -200 a 200) e botão para zerar o ajuste.
-- **Perfil por jogo:** com um jogo rodando, abra o plugin e salve modelo, cor, tamanho e posição só para ele. Ao abrir o jogo de novo, o perfil é aplicado sozinho (dá para desligar).
-- Interface renovada, com preview da mira em tempo real.
+> 📦 **Download:** Acesse a [Página de Releases](https://github.com/Havok027/cross-hair-mode-/releases) para baixar a versão mais recente.
 
-## Novidades da 1.2.0
+---
 
-- Suporte à **Legion Go S (1920x1200)**. Também há a Legion Go (2560x1600), o Steam Deck, 1080p e 4K.
-- Interface nova, com preview, cartões de modelo e seletor de cores, toda navegável pelo controle.
-- **Cor ajustável**: 8 cores prontas ou RGB personalizado.
-- **Tamanho ajustável** de 50% a 300%.
-- **Novos modelos**: Anel, X, Estrela, Colchetes e Traços, além de Caixa e Ponto.
-- Configurações salvas entre sessões; o ajuste fino de posição é salvo por modelo.
+## 📸 Recursos Principais
 
-## Uso
+- **Visualização em Tempo Real:** Prévia instantânea da mira na interface de configuração.
+- **Navegação 100% por Controle:** Interface otimizada para o modo Gamepad.
+- **Perfis por Jogo:** Salve configurações (modelo, cor, tamanho e posição) exclusivas para cada jogo. O perfil é carregado automaticamente ao iniciar a partida (opção configurável).
+- **Ajuste Fino de Posição:** Sliders de offset X e Y (de -200 a +200) com botão de reset rápido. O ajuste fica salvo por modelo.
+- **Cores e Tamanhos:** 8 cores pré-definidas, seletor de RGB personalizado e escala de 50% a 300%.
+- **Múltiplos Modelos:** Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços.
+- **Suporte a Resoluções:** Steam Deck, Legion Go S (1920x1200), Legion Go (2560x1600), 1080p e 4K.
 
-1. Abra o plugin no Decky Loader.
-2. Escolha a **resolução** da sua tela.
-3. Escolha o **modelo**, a **cor** e o **tamanho**.
-4. Ligue **Mostrar crosshair**.
-5. Se a mira não estiver no centro, ajuste com os sliders Horizontal e Vertical. O ajuste vale para o modelo atual.
-6. Para um jogo específico, abra o plugin com ele rodando e use **Salvar perfil deste jogo**.
+---
 
-## Como funciona
+## 🚀 Como Usar
 
-- O plugin escreve uma configuração do MangoHud com a mira como texto (`custom_text`), a cor (`text_color`), o tamanho (`font_size`) e a posição (`offset_x`, `offset_y`).
-- A posição é calculada a partir do centro da tela da resolução escolhida, com uma correção pelo tamanho do símbolo.
-- Os modelos Caixa e Ponto usam os valores originais do plugin. Os novos modelos têm centralização estimada e podem precisar de um ajuste fino.
-- Isso pode conflitar com outros ajustes do MangoHud ou com plugins como o MangoPeel. Não dá para usar o overlay de desempenho ao mesmo tempo.
+1. Abra o menu do **Decky Loader** no seu portátil.
+2. Acesse o **Crosshair Plugin**.
+3. Selecione a **Resolução** nativa da sua tela.
+4. Escolha o **Modelo**, a **Cor** e o **Tamanho** desejados.
+5. Ative a opção **Mostrar Crosshair**.
+6. *(Opcional)* Caso a mira precise de centralização, utilize os sliders **Horizontal (X)** e **Vertical (Y)**.
+7. *(Opcional)* Com um jogo aberto, ative a opção **Salvar perfil deste jogo** para aplicar automaticamente essas configurações sempre que o jogo for executado.
 
-## Adicionar um modelo ou uma tela
+---
 
-Tudo fica no começo do `main.py`:
+## 🛠️ Como Funciona & Limitações
 
-- `MODELS`: três linhas de texto (o símbolo na linha do meio) e `half_w`, a metade da largura do símbolo em px.
-- `RESOLUTIONS`: nome, largura e altura.
+- **Infraestrutura:** O plugin gera dinamicamente uma configuração para o MangoHud, renderizando a mira via texto personalizado (`custom_text`), aplicando a cor (`text_color`), o tamanho da fonte (`font_size`) e o deslocamento (`offset_x`, `offset_y`).
+- **Cálculo de Posição:** O ponto central é calculado com base na resolução selecionada, compensando as dimensões do caractere. Os modelos adicionais têm centralização estimada e podem exigir um pequeno ajuste manual.
+- ⚠️ **Incompatibilidades Conhecidas:** 
+  - Pode conflitar com outras modificações manuais do MangoHud ou com plugins semelhantes (como o *MangoPeel*).
+  - **Não é possível** utilizar o overlay de desempenho padrão do SteamOS/MangoHud simultaneamente com o crosshair.
 
-A interface lê as duas listas do backend, então não é preciso mexer no TypeScript.
+---
 
-## Compilar
+## 📜 Histórico de Versões
 
-O Decky só carrega o plugin compilado (pasta `dist/`), então este passo é obrigatório.
+### 🟢 Versão 1.3.0
+- Seleção de **Modelo via lista suspensa** (dropdown).
+- **Posição por sliders** (X e Y de -200 a 200) com botão de zerar.
+- **Sistema de Perfis por Jogo** com detecção e aplicação automática.
+- Interface totalmente reformulada com preview em tempo real.
 
-**No PC:**
+### 🔵 Versão 1.2.0
+- Adicionado suporte à **Legion Go S** (1920x1200), além do Steam Deck, Legion Go, 1080p e 4K.
+- Nova interface navegável por controle com cartões de modelo e seletor de cores.
+- **Ajuste de Cores:** 8 predefinições + RGB customizado.
+- **Ajuste de Tamanho:** Escala de 50% a 300%.
+- **Novos Modelos:** Anel, X, Estrela, Colchetes e Traços.
+- Persistência de configurações entre sessões e por modelo.
 
-```
-pnpm install
-pnpm build
-```
+---
 
-Depois copie `dist/`, `main.py`, `plugin.json` e `package.json` para uma pasta `Crosshair` em `~/homebrew/plugins/` e reinicie o Decky.
+## 💡 Créditos e Agradecimentos
 
-**Sem instalar nada:** suba o projeto para o GitHub. A aba Actions compila sozinha (arquivo `.github/workflows/build.yml`) e gera o artefato `Crosshair`, já com a pasta pronta.
+Este projeto foi desenvolvido utilizando como base o trabalho original de **[xXJSONDeruloXx](https://github.com/xXJSONDeruloXx)**.
 
-## Release (download fácil)
+- **Projeto de Origem:** [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) por [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx).
 
-A cada compilação, o GitHub publica o `Crosshair.zip` na página **Releases** do repositório (versão `latest`). O link direto da versão mais nova é:
-
-```
-https://github.com/SEU-USUARIO/SEU-REPOSITORIO/releases/latest/download/Crosshair.zip
-```
-
-**Mensagem da release:** vem do arquivo `RELEASE_NOTES.md` na raiz do repositório. Para mudar o texto, edite esse arquivo antes de enviar a atualização. Se ele não existir, o fluxo usa uma mensagem padrão.
-
-Como a release é apagada e recriada a cada compilação, editar a mensagem direto na página da release não vale para a próxima versão.
-
-O título usa a versão do `package.json`, então atualize `version` a cada mudança.
+Agradecimentos à comunidade do Decky Loader pelo suporte e desenvolvimento de ferramentas para portáteis!
