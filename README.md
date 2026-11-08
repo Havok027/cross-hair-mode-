@@ -5,7 +5,7 @@ Plugin do Decky Loader que desenha um crosshair na tela usando a configuração 
 ## Novidades da 1.3.0
 
 - **Modelo em lista suspensa**, igual à resolução.
-- **Posição por sliders** (X e Y, de -200 a 200) e também pelos botões Cima, Esquerda, Direita e Baixo.
+- **Posição por sliders** (X e Y, de -200 a 200) e botão para zerar o ajuste.
 - **Perfil por jogo:** com um jogo rodando, abra o plugin e salve modelo, cor, tamanho e posição só para ele. Ao abrir o jogo de novo, o perfil é aplicado sozinho (dá para desligar).
 - Interface renovada, com preview da mira em tempo real.
 
@@ -24,7 +24,7 @@ Plugin do Decky Loader que desenha um crosshair na tela usando a configuração 
 2. Escolha a **resolução** da sua tela.
 3. Escolha o **modelo**, a **cor** e o **tamanho**.
 4. Ligue **Mostrar crosshair**.
-5. Se a mira não estiver no centro, ajuste com os sliders ou com os botões (passo de 1 ou 5 px). O ajuste vale para o modelo atual.
+5. Se a mira não estiver no centro, ajuste com os sliders Horizontal e Vertical. O ajuste vale para o modelo atual.
 6. Para um jogo específico, abra o plugin com ele rodando e use **Salvar perfil deste jogo**.
 
 ## Como funciona
@@ -57,3 +57,17 @@ pnpm build
 Depois copie `dist/`, `main.py`, `plugin.json` e `package.json` para uma pasta `Crosshair` em `~/homebrew/plugins/` e reinicie o Decky.
 
 **Sem instalar nada:** suba o projeto para o GitHub. A aba Actions compila sozinha (arquivo `.github/workflows/build.yml`) e gera o artefato `Crosshair`, já com a pasta pronta.
+
+## Release (download fácil)
+
+A cada compilação, o GitHub publica o `Crosshair.zip` na página **Releases** do repositório (versão `latest`). O link direto da versão mais nova é:
+
+```
+https://github.com/SEU-USUARIO/SEU-REPOSITORIO/releases/latest/download/Crosshair.zip
+```
+
+**Mensagem da release:** vem do arquivo `RELEASE_NOTES.md` na raiz do repositório. Para mudar o texto, edite esse arquivo antes de enviar a atualização. Se ele não existir, o fluxo usa uma mensagem padrão.
+
+Como a release é apagada e recriada a cada compilação, editar a mensagem direto na página da release não vale para a próxima versão.
+
+O título usa a versão do `package.json`, então atualize `version` a cada mudança.

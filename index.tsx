@@ -43,7 +43,6 @@ interface GameInfo {
 
 const getState = callable<[], PluginState>("get_state");
 const updateSettings = callable<[Record<string, unknown>], PluginState>("update_settings");
-const nudge = callable<[number, number], PluginState>("nudge");
 const resetNudge = callable<[], PluginState>("reset_nudge");
 const saveProfile = callable<[string, string], PluginState>("save_profile");
 const deleteProfile = callable<[string], PluginState>("delete_profile");
@@ -136,7 +135,6 @@ function Content() {
   const [status, setStatus] = useState("");
   const [game] = useState<GameInfo | null>(() => getRunningGame());
   const [customColor, setCustomColor] = useState(false);
-  const [bigStep, setBigStep] = useState(false);
 
   // Junta alterações rápidas (sliders) e envia ao backend de uma vez
   const pending = useRef<Record<string, unknown>>({});
@@ -194,7 +192,6 @@ function Content() {
   const { settings, models, resolutions, profiles } = state;
   const currentModel = models.find((m) => m.id === settings.model) ?? models[0];
   const [r, g, b] = hexToRgb(settings.color);
-  const step = bigStep ? 5 : 1;
   const hasProfile = game !== null && profiles.some((p) => p.appid === game.appid);
 
   return (
@@ -335,27 +332,6 @@ function Content() {
             showValue
             onChange={(v: number) => patchSettings({ nudge_y: v })}
           />
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <ToggleField
-            label="Botões com passo grande (5 px)"
-            checked={bigStep}
-            onChange={(value: boolean) => setBigStep(value)}
-          />
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <ButtonItem layout="below" onClick={() => run(() => nudge(0, -step), "Posição ajustada")}>
-            Cima
-          </ButtonItem>
-          <ButtonItem layout="below" onClick={() => run(() => nudge(-step, 0), "Posição ajustada")}>
-            Esquerda
-          </ButtonItem>
-          <ButtonItem layout="below" onClick={() => run(() => nudge(step, 0), "Posição ajustada")}>
-            Direita
-          </ButtonItem>
-          <ButtonItem layout="below" onClick={() => run(() => nudge(0, step), "Posição ajustada")}>
-            Baixo
-          </ButtonItem>
         </PanelSectionRow>
         <PanelSectionRow>
           <ButtonItem layout="below" onClick={() => run(() => resetNudge(), "Ajuste zerado")}>
