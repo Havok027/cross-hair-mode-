@@ -1,4 +1,4 @@
-## Crosshair v1.4.1
+## Crosshair v1.4.0
 
 ### Novidades
 - Compatível com o Direct Updater: o plugin agora é reconhecido pelo repositório e as atualizações aparecem lá. Cada versão tem a sua release (v1.4.1, v1.5.0...).
