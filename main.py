@@ -43,6 +43,8 @@ DEFAULTS = {
     "color": "FF007B",  # rosa, igual ao plugin original
     "size": 100,  # porcentagem do tamanho padrão
     "nudge": {},  # ajuste fino por modelo: {"box": [dx, dy]}
+    "auto_apply": True,  # aplicar o perfil do jogo quando ele abrir
+    "profiles": {},  # perfis por jogo: {"<appid>": {...}}
 }
 
 # Valores exatos do plugin original (tamanho 100%). A diferença para a fórmula
@@ -61,6 +63,29 @@ HEX_RE = re.compile(r"^[0-9A-Fa-f]{6}$")
 
 def _clamp(value, low, high):
     return max(low, min(high, value))
+
+
+def sanitize_profile(raw, name):
+    """Valida um perfil de jogo (modelo, cor, tamanho, posição e se aparece)."""
+    color = str(raw.get("color", DEFAULTS["color"])).lstrip("#")
+    try:
+        size = _clamp(int(raw.get("size", 100)), 50, 300)
+    except (TypeError, ValueError):
+        size = 100
+    try:
+        nudge_x = _clamp(int(raw.get("nudge_x", 0)), -600, 600)
+        nudge_y = _clamp(int(raw.get("nudge_y", 0)), -600, 600)
+    except (TypeError, ValueError):
+        nudge_x, nudge_y = 0, 0
+    return {
+        "name": str(name)[:80],
+        "enabled": bool(raw.get("enabled", True)),
+        "model": raw.get("model") if raw.get("model") in MODELS else DEFAULTS["model"],
+        "color": color.upper() if HEX_RE.match(color) else DEFAULTS["color"],
+        "size": size,
+        "nudge_x": nudge_x,
+        "nudge_y": nudge_y,
+    }
 
 
 class Plugin:
@@ -110,6 +135,14 @@ class Plugin:
                     except (TypeError, ValueError):
                         continue
         out["nudge"] = nudge
+        out["auto_apply"] = bool(s.get("auto_apply", True))
+        profiles = {}
+        raw_profiles = s.get("profiles", {})
+        if isinstance(raw_profiles, dict):
+            for appid, prof in raw_profiles.items():
+                if isinstance(prof, dict):
+                    profiles[str(appid)[:20]] = sanitize_profile(prof, prof.get("name", appid))
+        out["profiles"] = profiles
         return out
 
     # ------------------------------------------------------------------
@@ -142,7 +175,9 @@ class Plugin:
                 "size": s["size"],
                 "nudge_x": nx,
                 "nudge_y": ny,
+                "auto_apply": s["auto_apply"],
             },
+            "profiles": [{"appid": k, "name": v["name"]} for k, v in s["profiles"].items()],
             "models": [{"id": k, "label": v["label"], "lines": v["lines"]} for k, v in MODELS.items()],
             "resolutions": [{"id": k, "label": v["label"]} for k, v in RESOLUTIONS.items()],
             "offset_x": x,
@@ -227,7 +262,7 @@ class Plugin:
 
     async def update_settings(self, patch: dict) -> dict:
         merged = dict(self.settings)
-        for key in ("enabled", "model", "resolution", "color", "size"):
+        for key in ("enabled", "model", "resolution", "color", "size", "auto_apply"):
             if key in patch:
                 merged[key] = patch[key]
         merged["nudge"] = dict(self.settings["nudge"])
@@ -251,6 +286,49 @@ class Plugin:
 
     async def reset_nudge(self) -> dict:
         return await self.update_settings({"nudge_x": 0, "nudge_y": 0})
+
+    async def save_profile(self, appid: str, name: str) -> dict:
+        """Salva as configurações atuais como perfil do jogo."""
+        s = self.settings
+        nx, ny = s["nudge"].get(s["model"], [0, 0])
+        s["profiles"][str(appid)[:20]] = sanitize_profile(
+            {
+                "enabled": s["enabled"],
+                "model": s["model"],
+                "color": s["color"],
+                "size": s["size"],
+                "nudge_x": nx,
+                "nudge_y": ny,
+            },
+            name or appid,
+        )
+        self.save_settings()
+        return self.state()
+
+    async def delete_profile(self, appid: str) -> dict:
+        self.settings["profiles"].pop(str(appid), None)
+        self.save_settings()
+        return self.state()
+
+    async def game_started(self, appid: str) -> dict:
+        """Chamado quando um jogo abre: aplica o perfil dele, se existir."""
+        prof = self.settings["profiles"].get(str(appid))
+        if not self.settings["auto_apply"] or not prof:
+            return self.state()
+        merged = dict(self.settings)
+        merged["enabled"] = prof["enabled"]
+        merged["model"] = prof["model"]
+        merged["color"] = prof["color"]
+        merged["size"] = prof["size"]
+        merged["nudge"] = dict(self.settings["nudge"])
+        merged["nudge"][prof["model"]] = [prof["nudge_x"], prof["nudge_y"]]
+        self.settings = self.sanitize(merged)
+        self.save_settings()
+        try:
+            self.apply()
+        except Exception as e:
+            decky.logger.error(f"Erro ao aplicar o perfil do jogo {appid}: {e}")
+        return self.state()
 
     async def _main(self):
         self.load_settings()

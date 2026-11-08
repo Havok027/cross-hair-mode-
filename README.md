@@ -2,6 +2,13 @@
 
 Plugin do Decky Loader que desenha um crosshair na tela usando a configuração do MangoHud.
 
+## Novidades da 1.3.0
+
+- **Modelo em lista suspensa**, igual à resolução.
+- **Posição por sliders** (X e Y, de -200 a 200) e também pelos botões Cima, Esquerda, Direita e Baixo.
+- **Perfil por jogo:** com um jogo rodando, abra o plugin e salve modelo, cor, tamanho e posição só para ele. Ao abrir o jogo de novo, o perfil é aplicado sozinho (dá para desligar).
+- Interface renovada, com preview da mira em tempo real.
+
 ## Novidades da 1.2.0
 
 - Suporte à **Legion Go S (1920x1200)**. Também há a Legion Go (2560x1600), o Steam Deck, 1080p e 4K.
@@ -17,7 +24,8 @@ Plugin do Decky Loader que desenha um crosshair na tela usando a configuração 
 2. Escolha a **resolução** da sua tela.
 3. Escolha o **modelo**, a **cor** e o **tamanho**.
 4. Ligue **Mostrar crosshair**.
-5. Se a mira não estiver no centro, ajuste com as setas (passo de 1 ou 5 px). O ajuste vale para o modelo atual.
+5. Se a mira não estiver no centro, ajuste com os sliders ou com os botões (passo de 1 ou 5 px). O ajuste vale para o modelo atual.
+6. Para um jogo específico, abra o plugin com ele rodando e use **Salvar perfil deste jogo**.
 
 ## Como funciona
 
