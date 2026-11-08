@@ -80,6 +80,11 @@ A cada atualização no branch `main`, o **GitHub Actions** compila o plugin e p
 
 ## 📜 Histórico de Versões
 
+### 🟠 Versão 1.4.0
+- A mira cresce a partir do centro, sem mudar de posição ao alterar o tamanho (com calibração opcional por modelo).
+- Interface renovada, com prévia com guias de centro e atalhos de tamanho.
+- Código organizado em módulos e pastas, com arrumação automática do repositório.
+- 
 ### 🟣 Versão 1.3.1
 - Removidos os botões de direção (Cima, Esquerda, Direita e Baixo); a posição agora é ajustada apenas pelos sliders.
 - A mensagem da release passa a vir do arquivo `RELEASE_NOTES.md`.
