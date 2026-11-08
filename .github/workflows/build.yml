@@ -43,8 +43,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          [ -f RELEASE_NOTES.md ] || echo "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)." > RELEASE_NOTES.md
           gh release delete latest --cleanup-tag -y || true
           gh release create latest Crosshair.zip \
             --target "${{ github.sha }}" \
             --title "Crosshair v$VERSION" \
-            --notes "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)."
+            --notes-file RELEASE_NOTES.md
