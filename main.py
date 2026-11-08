@@ -36,6 +36,14 @@ MODELS = {
 REF_FONT_SIZE = 24  # tamanho de fonte padrão do MangoHud (100%)
 HALF_H = 20  # metade da altura do bloco de 3 linhas, em px (valor original)
 
+# Compensação de escala (px). Parte do deslocamento da mira em relação à borda
+# da janela do MangoHud NÃO cresce com a fonte (margens internas). Para a mira
+# crescer a partir do centro, só a parte que cresce com a fonte é escalada:
+#   offset = centro - pad - (meia_largura - pad) * escala
+# Com escala 100% o resultado é idêntico ao anterior. Os valores abaixo são
+# estimativas; dá para calibrar por modelo na interface (Calibrar escala).
+DEFAULT_COMP = (2, -16)
+
 DEFAULTS = {
     "enabled": False,
     "model": "box",
@@ -43,6 +51,7 @@ DEFAULTS = {
     "color": "FF007B",  # rosa, igual ao plugin original
     "size": 100,  # porcentagem do tamanho padrão
     "nudge": {},  # ajuste fino por modelo: {"box": [dx, dy]}
+    "comp": {},  # compensação de escala por modelo: {"box": [px, py]}
     "auto_apply": True,  # aplicar o perfil do jogo quando ele abrir
     "profiles": {},  # perfis por jogo: {"<appid>": {...}}
 }
@@ -135,6 +144,16 @@ class Plugin:
                     except (TypeError, ValueError):
                         continue
         out["nudge"] = nudge
+        comp = {}
+        raw_comp = s.get("comp", {})
+        if isinstance(raw_comp, dict):
+            for model_id, pair in raw_comp.items():
+                if model_id in MODELS and isinstance(pair, (list, tuple)) and len(pair) == 2:
+                    try:
+                        comp[model_id] = [_clamp(int(pair[0]), -100, 100), _clamp(int(pair[1]), -100, 100)]
+                    except (TypeError, ValueError):
+                        continue
+        out["comp"] = comp
         out["auto_apply"] = bool(s.get("auto_apply", True))
         profiles = {}
         raw_profiles = s.get("profiles", {})
@@ -148,14 +167,20 @@ class Plugin:
     # ------------------------------------------------------------------
     # Cálculo de posição
     # ------------------------------------------------------------------
+    def effective_comp(self):
+        """Compensação de escala do modelo atual (salva ou padrão)."""
+        comp = self.settings["comp"].get(self.settings["model"])
+        return tuple(comp) if comp else DEFAULT_COMP
+
     def compute_offsets(self):
         s = self.settings
         res = RESOLUTIONS[s["resolution"]]
         model = MODELS[s["model"]]
         scale = s["size"] / 100
         dx, dy = s["nudge"].get(s["model"], [0, 0])
-        x = round(res["width"] / 2 - model["half_w"] * scale) + dx
-        y = round(res["height"] / 2 - HALF_H * scale) + dy
+        px, py = self.effective_comp()
+        x = round(res["width"] / 2 - px - (model["half_w"] - px) * scale) + dx
+        y = round(res["height"] / 2 - py - (HALF_H - py) * scale) + dy
         legacy = LEGACY_OFFSETS.get((s["resolution"], s["model"]))
         if legacy:
             x += legacy[0] - round(res["width"] / 2 - model["half_w"])
@@ -166,6 +191,7 @@ class Plugin:
         x, y = self.compute_offsets()
         s = self.settings
         nx, ny = s["nudge"].get(s["model"], [0, 0])
+        cx, cy = self.effective_comp()
         return {
             "settings": {
                 "enabled": s["enabled"],
@@ -175,6 +201,8 @@ class Plugin:
                 "size": s["size"],
                 "nudge_x": nx,
                 "nudge_y": ny,
+                "comp_x": cx,
+                "comp_y": cy,
                 "auto_apply": s["auto_apply"],
             },
             "profiles": [{"appid": k, "name": v["name"]} for k, v in s["profiles"].items()],
@@ -270,6 +298,11 @@ class Plugin:
             model_id = merged["model"] if merged["model"] in MODELS else self.settings["model"]
             ox, oy = merged["nudge"].get(model_id, [0, 0])
             merged["nudge"][model_id] = [patch.get("nudge_x", ox), patch.get("nudge_y", oy)]
+        merged["comp"] = dict(self.settings["comp"])
+        if "comp_x" in patch or "comp_y" in patch:
+            model_id = merged["model"] if merged["model"] in MODELS else self.settings["model"]
+            ex, ey = merged["comp"].get(model_id, list(DEFAULT_COMP))
+            merged["comp"][model_id] = [patch.get("comp_x", ex), patch.get("comp_y", ey)]
         self.settings = self.sanitize(merged)
         self.save_settings()
         try:
@@ -286,6 +319,16 @@ class Plugin:
 
     async def reset_nudge(self) -> dict:
         return await self.update_settings({"nudge_x": 0, "nudge_y": 0})
+
+    async def reset_comp(self) -> dict:
+        """Volta a compensação de escala do modelo atual para o padrão."""
+        self.settings["comp"].pop(self.settings["model"], None)
+        self.save_settings()
+        try:
+            self.apply()
+        except Exception as e:
+            decky.logger.error(f"Erro ao aplicar o crosshair: {e}")
+        return self.state()
 
     async def save_profile(self, appid: str, name: str) -> dict:
         """Salva as configurações atuais como perfil do jogo."""

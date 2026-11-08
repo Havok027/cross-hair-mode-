@@ -1,12 +1,13 @@
-## Crosshair v1.3.1
+## Crosshair v1.4.0
 
 ### Novidades
-- Modelo do crosshair em lista suspensa (Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços).
-- Posição ajustada por sliders (horizontal e vertical) e botão para zerar o ajuste.
-- Perfil por jogo: salva modelo, cor, tamanho e posição, e aplica ao abrir o jogo.
-- Suporte à Legion Go S (1920x1200), além do Steam Deck e de outras resoluções.
-- Cor ajustável (cores prontas ou RGB) e tamanho ajustável.
-- Interface renovada, com preview da mira.
+- A mira agora cresce a partir do centro: mudar o tamanho não desloca mais a posição. Para ajustar o centro por modelo, use "Calibrar escala (avançado)".
+- Interface renovada: prévia com guias de centro, atalhos de tamanho (50% a 300%), cartão de perfil do jogo e seção de calibração.
+- Código organizado em módulos e pastas, com compilação e publicação automáticas.
+
+### Mantido
+- Modelo em lista suspensa, cores prontas ou RGB, sliders de posição e perfil por jogo.
+- Suporte à Legion Go S (1920x1200), Legion Go, Steam Deck, 1080p e 4K.
 
 ### Como instalar
 1. No Decky, ative o Modo desenvolvedor nas configurações.
