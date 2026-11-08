@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Arrumar a pasta src (envio pelo celular)
+        run: |
+          if [ -f index.tsx ]; then
+            mkdir -p src
+            mv index.tsx src/
+            [ -f types.d.ts ] && mv types.d.ts src/ || true
+          fi
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm build
+      - name: Montar a pasta do plugin
+        run: |
+          mkdir -p out/Crosshair
+          cp -r dist main.py plugin.json package.json README.md LICENSE out/Crosshair/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Crosshair
+          path: out
