@@ -1,7 +1,7 @@
 ## Crosshair v1.4.0
 
 ### Novidades
-- Compatível com o Direct Updater: o plugin agora é reconhecido pelo repositório e as atualizações aparecem lá. Cada versão tem a sua release (v1.4.1, v1.5.0...).
+- Compatível com o Direct Updater: o plugin agora é reconhecido pelo repositório e as atualizações aparecem lá. Cada versão tem a sua release (v1.4.0, v1.5.0...).
 - A mira agora cresce a partir do centro: mudar o tamanho não desloca mais a posição. Para ajustar o centro por modelo, use "Calibrar escala (avançado)".
 - Interface renovada: prévia com guias de centro, atalhos de tamanho (50% a 300%), cartão de perfil do jogo e seção de calibração.
 - Código organizado em módulos e pastas, com compilação e publicação automáticas.
