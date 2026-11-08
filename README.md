@@ -53,17 +53,6 @@ Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que des
 
 ---
 
-## 🧩 Adicionar um Modelo ou uma Tela
-
-Tudo fica no começo do arquivo `main.py`:
-
-- `MODELS`: três linhas de texto (o símbolo na linha do meio) e `half_w`, a metade da largura do símbolo em px.
-- `RESOLUTIONS`: nome, largura e altura.
-
-A interface lê as duas listas do backend, então não é preciso mexer no TypeScript.
-
----
-
 ## 📜 Histórico de Versões
 
 ### 🟠 Versão 1.4.0
