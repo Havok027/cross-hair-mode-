@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,7 +33,18 @@ jobs:
         run: |
           mkdir -p out/Crosshair
           cp -r dist main.py plugin.json package.json README.md LICENSE out/Crosshair/
+          cd out && zip -r ../Crosshair.zip Crosshair
       - uses: actions/upload-artifact@v4
         with:
           name: Crosshair
           path: out
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest Crosshair.zip \
+            --target "${{ github.sha }}" \
+            --title "Crosshair v$VERSION" \
+            --notes "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)."
