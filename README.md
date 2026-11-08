@@ -1,10 +1,10 @@
 # 🎯 Crosshair Plugin para Decky Loader
 
-[![Baixar Release](https://img.shields.io/badge/Baixar-Release-2ea44f)](https://github.com/Havok027/cross-hair-mode-/releases)
+[![Baixar Release](https://img.shields.io/badge/Baixar-Release-2ea44f)](https://github.com/Havok027/crosshair-plugin/releases)
 
 Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que desenha uma mira (crosshair) personalizada na tela utilizando a infraestrutura do **MangoHud**.
 
-> 📦 **Download:** acesse a [Página de Releases](https://github.com/Havok027/cross-hair-mode-/releases) ou baixe direto a versão mais recente: [Crosshair.zip](https://github.com/Havok027/cross-hair-mode-/releases/latest/download/Crosshair.zip).
+> 📦 **Download:** acesse a [Página de Releases](https://github.com/Havok027/crosshair-plugin/releases) ou baixe direto a versão mais recente: [Crosshair.zip](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip).
 
 ---
 
@@ -22,7 +22,7 @@ Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que des
 
 ## 📥 Instalação
 
-1. Baixe o `Crosshair.zip` na [Página de Releases](https://github.com/Havok027/cross-hair-mode-/releases).
+1. Baixe o `Crosshair.zip` na [Página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
 2. No **Decky Loader**, abra as **Configurações** e ative o **Modo desenvolvedor**.
 3. Em **Desenvolvedor**, escolha **Instalar plugin de ZIP** e selecione o `Crosshair.zip`.
 4. Se o plugin não aparecer, reinicie o Decky ou o aparelho.
@@ -61,16 +61,6 @@ Tudo fica no começo do arquivo `main.py`:
 - `RESOLUTIONS`: nome, largura e altura.
 
 A interface lê as duas listas do backend, então não é preciso mexer no TypeScript.
-
----
-
-## 📦 Release e Compilação
-
-A cada atualização no branch `main`, o **GitHub Actions** compila o plugin e publica o `Crosshair.zip` na página de Releases (versão `latest`).
-
-- A mensagem da release vem do arquivo `RELEASE_NOTES.md`. Para mudar o texto, edite esse arquivo antes de enviar a atualização.
-- O título da release usa a versão do `package.json`.
-- Para compilar manualmente: `pnpm install` e depois `pnpm build`.
 
 ---
 
