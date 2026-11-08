@@ -1,10 +1,6 @@
 # 🎯 Crosshair Plugin para Decky Loader
 
-[
-
-![Baixar Release](https://img.shields.io/badge/Baixar-Release-2ea44f)
-
-](https://github.com/Havok027/cross-hair-mode-/releases)
+[![Baixar Release](https://img.shields.io/badge/Baixar-Release-2ea44f)](https://github.com/Havok027/cross-hair-mode-/releases)
 
 Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que desenha uma mira (crosshair) personalizada na tela utilizando a infraestrutura do **MangoHud**.
 
