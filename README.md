@@ -59,6 +59,10 @@ Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que des
 
 ## 📜 Histórico de Versões
 
+### 🔴 Versão 1.5.0
+- Atalho de botões: grave 2 botões do controle e segure-os juntos para ligar ou desligar a mira.
+- Visual renovado, com prévia com grade e brilho, cartões com destaque e teclas estilizadas.
+
 ### 🟠 Versão 1.4.0
 - A mira cresce a partir do centro, sem mudar de posição ao alterar o tamanho (com calibração opcional por modelo).
 - Interface renovada, com prévia com guias de centro e atalhos de tamanho.
