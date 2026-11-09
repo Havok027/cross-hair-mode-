@@ -1,6 +1,12 @@
+import asyncio
 import json
+import math
 import os
 import re
+import select
+import struct
+import threading
+import time
 
 import decky
 
@@ -52,6 +58,7 @@ DEFAULTS = {
     "size": 100,  # porcentagem do tamanho padrão
     "nudge": {},  # ajuste fino por modelo: {"box": [dx, dy]}
     "comp": {},  # compensação de escala por modelo: {"box": [px, py]}
+    "hotkey": {"enabled": False, "buttons": [], "hold_ms": 250},  # atalho liga/desliga
     "auto_apply": True,  # aplicar o perfil do jogo quando ele abrir
     "profiles": {},  # perfis por jogo: {"<appid>": {...}}
 }
@@ -70,8 +77,395 @@ LEGACY_OFFSETS = {
 HEX_RE = re.compile(r"^[0-9A-Fa-f]{6}$")
 
 
+# ---------------------------------------------------------------------------
+# Atalho de botões do controle (liga/desliga o crosshair)
+#
+# O plugin lê os eventos do controle direto do sistema (/dev/input/event*), o
+# mesmo que os jogos enxergam. Isso não precisa de permissão extra e não mexe
+# no controle. Tudo aqui fica isolado: se algo falhar, só o atalho para de
+# funcionar e o restante do plugin segue normal.
+# ---------------------------------------------------------------------------
+EV_KEY = 1
+EV_ABS = 3
+ABS_HAT0X = 16
+ABS_HAT0Y = 17
+TRIGGER_AXES = (2, 5)  # ABS_Z / ABS_RZ: gatilhos LT / RT em controles estilo Xbox
+TRIGGER_THRESHOLD = 100
+BTN_SOUTH = 0x130  # primeiro botão de gamepad (A)
+EVENT_FORMAT = "llHHi"  # struct input_event do kernel
+EVENT_SIZE = struct.calcsize(EVENT_FORMAT)
+LEARN_SECONDS = 15
+BUTTON_ID_RE = re.compile(r"^(k\d{1,4}|a\d{1,2}|d[lrud])$")
+
+BUTTON_LABELS = {
+    "k304": "A",
+    "k305": "B",
+    "k307": "X",
+    "k308": "Y",
+    "k310": "LB",
+    "k311": "RB",
+    "k312": "LT",
+    "k313": "RT",
+    "k314": "View",
+    "k315": "Menu",
+    "k316": "Guia",
+    "k317": "L3",
+    "k318": "R3",
+    "k544": "D-pad cima",
+    "k545": "D-pad baixo",
+    "k546": "D-pad esquerda",
+    "k547": "D-pad direita",
+    "a2": "LT",
+    "a5": "RT",
+    "du": "D-pad cima",
+    "dd": "D-pad baixo",
+    "dl": "D-pad esquerda",
+    "dr": "D-pad direita",
+}
+
+
+def label_for(button_id):
+    """Nome amigável de um botão (ex.: "k310" -> "LB")."""
+    if button_id in BUTTON_LABELS:
+        return BUTTON_LABELS[button_id]
+    if button_id.startswith("k"):
+        try:
+            code = int(button_id[1:])
+        except ValueError:
+            return button_id
+        if 0x2C0 <= code <= 0x2E7:  # botões extras (ex.: botões traseiros)
+            return f"Extra {code - 0x2C0 + 1}"
+        return f"Botão {code}"
+    return button_id
+
+
+def decode_event(etype, code, value, xinput):
+    """Converte um evento do kernel em [(id_do_botão, pressionado)]."""
+    if etype == EV_KEY:
+        if code < 0x100 or value == 2:  # ignora teclado e auto-repetição
+            return []
+        return [(f"k{code}", value == 1)]
+    if etype == EV_ABS:
+        if code == ABS_HAT0X:
+            return [("dl", value < 0), ("dr", value > 0)]
+        if code == ABS_HAT0Y:
+            return [("du", value < 0), ("dd", value > 0)]
+        if xinput and code in TRIGGER_AXES:
+            return [(f"a{code}", value > TRIGGER_THRESHOLD)]
+    return []
+
+
+def _has_bit(words, bit, word_bits):
+    """Confere um bit no mapa de teclas do /proc (palavras em hex, da mais alta para a mais baixa)."""
+    try:
+        index = len(words) - 1 - bit // word_bits
+        if index < 0:
+            return False
+        return bool((int(words[index], 16) >> (bit % word_bits)) & 1)
+    except ValueError:
+        return False
+
+
+def parse_proc_devices(text):
+    """Lista [(caminho, nome)] dos dispositivos que parecem controles de jogo."""
+    found = []
+    word_bits = struct.calcsize("P") * 8
+    for block in text.strip().split("\n\n"):
+        name, handlers, key_words = "", [], []
+        for line in block.splitlines():
+            if line.startswith("N: Name="):
+                name = line.split("=", 1)[1].strip().strip('"')
+            elif line.startswith("H: Handlers="):
+                handlers = line.split("=", 1)[1].split()
+            elif line.startswith("B: KEY="):
+                key_words = line.split("=", 1)[1].split()
+        event = next((h for h in handlers if h.startswith("event")), None)
+        if event and key_words and _has_bit(key_words, BTN_SOUTH, word_bits):
+            found.append(("/dev/input/" + event, name))
+    return found
+
+
+def discover_gamepads():
+    with open("/proc/bus/input/devices", "r", errors="replace") as f:
+        return parse_proc_devices(f.read())
+
+
+def _open_device(path):
+    return os.open(path, os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0))
+
+
+def _is_xinput(name):
+    lowered = name.lower()
+    return "x-box" in lowered or "xbox" in lowered or "x360" in lowered
+
+
+class HotkeyMonitor:
+    """Lê os controles em uma thread própria e avisa quando a combinação é segurada."""
+
+    def __init__(self, log, on_fire, on_learned, discover=None, opener=None):
+        self.log = log
+        self.on_fire = on_fire
+        self.on_learned = on_learned
+        self.discover = discover or discover_gamepads
+        self.opener = opener or _open_device
+        self.lock = threading.RLock()
+        self.thread = None
+        self.stop_event = threading.Event()
+        self.combo = []
+        self.hold = 0.25
+        self.active = False
+        self.devices = {}
+        self.denied = 0
+        self.order = []
+        self.pressed_since = None
+        self.fired = False
+        self.require_release = False
+        self.learn_deadline = 0.0
+        self.learn_since = None
+        self.message = ""
+        self.last_button = ""
+
+    # --- usado pelo plugin -------------------------------------------------
+    def configure(self, combo, hold_ms, active):
+        with self.lock:
+            self.combo = list(combo)
+            self.hold = max(0, hold_ms) / 1000.0
+            self.active = bool(active) and len(self.combo) == 2
+            self.pressed_since = None
+            self.fired = False
+
+    def start_learning(self, seconds=LEARN_SECONDS):
+        with self.lock:
+            self.learn_deadline = time.monotonic() + seconds
+            self.learn_since = None
+            self.message = ""
+        self.ensure_running()
+
+    def cancel_learning(self, message=""):
+        with self.lock:
+            self.learn_deadline = 0.0
+            self.learn_since = None
+            self.message = message
+
+    def is_learning(self):
+        return time.monotonic() < self.learn_deadline
+
+    def ensure_running(self):
+        with self.lock:
+            if self.thread is not None:
+                return
+            self.stop_event = threading.Event()
+            self.thread = threading.Thread(
+                target=self._run, args=(self.stop_event,), name="crosshair-hotkey", daemon=True
+            )
+            self.thread.start()
+
+    def stop(self):
+        with self.lock:
+            thread = self.thread
+            self.stop_event.set()
+            self.thread = None
+        if thread is not None and thread is not threading.current_thread():
+            thread.join(timeout=2)
+
+    def status(self):
+        now = time.monotonic()
+        with self.lock:
+            return {
+                "running": self.thread is not None,
+                "devices": len(self.devices),
+                "denied": self.denied,
+                "learning": now < self.learn_deadline,
+                "learn_left": max(0, math.ceil(self.learn_deadline - now)) if now < self.learn_deadline else 0,
+                "message": self.message,
+                "last_button": label_for(self.last_button) if self.last_button else "",
+            }
+
+    # --- thread de leitura -------------------------------------------------
+    def _needed(self):
+        return self.active or time.monotonic() < self.learn_deadline
+
+    def _run(self, stop_event):
+        last_scan = 0.0
+        try:
+            while not stop_event.is_set():
+                with self.lock:
+                    if not self._needed():
+                        if self.thread is threading.current_thread():
+                            self.thread = None
+                        return
+                try:
+                    now = time.monotonic()
+                    if now - last_scan >= 2.0:
+                        self._rescan()
+                        last_scan = now
+                    by_fd = {d["fd"]: d for d in list(self.devices.values())}
+                    if by_fd:
+                        try:
+                            ready, _, _ = select.select(list(by_fd), [], [], 0.05)
+                        except (OSError, ValueError):
+                            self._close_all()
+                            last_scan = 0.0
+                            ready = []
+                        for fd in ready:
+                            self._read(by_fd[fd])
+                    else:
+                        stop_event.wait(0.1)
+                    self._tick(time.monotonic())
+                except Exception as e:  # nunca derruba a thread por um erro isolado
+                    self.log.error(f"Erro no monitor de atalho: {e}")
+                    stop_event.wait(0.5)
+        finally:
+            self._close_all()
+            with self.lock:
+                if self.thread is threading.current_thread():
+                    self.thread = None
+
+    def _rescan(self):
+        try:
+            found = self.discover()
+        except Exception as e:
+            self.log.error(f"Erro ao procurar controles: {e}")
+            return
+        paths = {path for path, _ in found}
+        with self.lock:
+            for path in list(self.devices):
+                if path not in paths:
+                    self._drop(path)
+            denied = 0
+            for path, name in found:
+                if path in self.devices:
+                    continue
+                try:
+                    fd = self.opener(path)
+                except PermissionError:
+                    denied += 1
+                    continue
+                except OSError:
+                    continue
+                self.devices[path] = {"path": path, "name": name, "fd": fd, "held": set(), "xinput": _is_xinput(name)}
+            self.denied = denied
+
+    def _drop(self, path):
+        with self.lock:
+            device = self.devices.pop(path, None)
+        if device is not None:
+            try:
+                os.close(device["fd"])
+            except OSError:
+                pass
+
+    def _close_all(self):
+        for path in list(self.devices):
+            self._drop(path)
+
+    def _held(self):
+        held = set()
+        for device in self.devices.values():
+            held |= device["held"]
+        return held
+
+    def _read(self, device):
+        try:
+            data = os.read(device["fd"], EVENT_SIZE * 64)
+        except BlockingIOError:
+            return
+        except OSError:
+            self._drop(device["path"])
+            return
+        if not data:
+            self._drop(device["path"])
+            return
+        for offset in range(0, len(data) - EVENT_SIZE + 1, EVENT_SIZE):
+            _, _, etype, code, value = struct.unpack_from(EVENT_FORMAT, data, offset)
+            for button, down in decode_event(etype, code, value, device["xinput"]):
+                self._set_button(device, button, down)
+
+    def _set_button(self, device, button, down):
+        with self.lock:
+            if down:
+                device["held"].add(button)
+                if button not in self.order:
+                    self.order.append(button)
+                self.last_button = button
+            else:
+                device["held"].discard(button)
+                if button not in self._held() and button in self.order:
+                    self.order.remove(button)
+
+    def _tick(self, now):
+        """Controla a gravação da combinação e o disparo do atalho."""
+        learned = None
+        fire = False
+        with self.lock:
+            held = self._held()
+            if self.learn_deadline and now >= self.learn_deadline:
+                self.learn_deadline = 0.0
+                self.learn_since = None
+                self.message = "Tempo esgotado. Nenhuma combinação foi gravada."
+            if now < self.learn_deadline:
+                if len(held) >= 2:
+                    if self.learn_since is None:
+                        self.learn_since = now
+                    elif now - self.learn_since >= 0.4:
+                        pressed = [b for b in self.order if b in held]
+                        if len(held) == 2 and len(pressed) == 2:
+                            learned = pressed
+                            self.learn_deadline = 0.0
+                            self.learn_since = None
+                            self.require_release = True
+                            self.message = ""
+                        else:
+                            self.message = "Aperte só 2 botões ao mesmo tempo."
+                            self.learn_since = None
+                else:
+                    self.learn_since = None
+            elif self.require_release:
+                # logo após gravar, espera soltar os botões para não disparar sem querer
+                if not held:
+                    self.require_release = False
+            elif self.active and set(self.combo) <= held:
+                if self.pressed_since is None:
+                    self.pressed_since = now
+                if not self.fired and now - self.pressed_since >= self.hold:
+                    self.fired = True
+                    fire = True
+            else:
+                self.pressed_since = None
+                self.fired = False
+        if learned is not None:
+            self._call(self.on_learned, learned)
+        if fire:
+            self._call(self.on_fire)
+
+    def _call(self, callback, *args):
+        try:
+            callback(*args)
+        except Exception as e:
+            self.log.error(f"Erro no atalho: {e}")
+
+
 def _clamp(value, low, high):
     return max(low, min(high, value))
+
+
+def sanitize_hotkey(raw):
+    """Valida o atalho: ativo ou não, os 2 botões e quanto tempo segurar (ms)."""
+    if not isinstance(raw, dict):
+        raw = {}
+    buttons = raw.get("buttons", [])
+    if (
+        not isinstance(buttons, (list, tuple))
+        or len(buttons) != 2
+        or buttons[0] == buttons[1]
+        or not all(isinstance(b, str) and BUTTON_ID_RE.match(b) for b in buttons)
+    ):
+        buttons = []
+    try:
+        hold_ms = _clamp(int(raw.get("hold_ms", 250)), 0, 1000)
+    except (TypeError, ValueError):
+        hold_ms = 250
+    return {"enabled": bool(raw.get("enabled", False)) and len(buttons) == 2, "buttons": list(buttons), "hold_ms": hold_ms}
 
 
 def sanitize_profile(raw, name):
@@ -101,6 +495,8 @@ class Plugin:
     def __init__(self):
         self.settings = json.loads(json.dumps(DEFAULTS))
         self.settings_path = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "settings.json")
+        self.monitor = None  # monitor do atalho (criado só quando necessário)
+        self.loop = None
 
     # ------------------------------------------------------------------
     # Persistência
@@ -162,6 +558,7 @@ class Plugin:
                 if isinstance(prof, dict):
                     profiles[str(appid)[:20]] = sanitize_profile(prof, prof.get("name", appid))
         out["profiles"] = profiles
+        out["hotkey"] = sanitize_hotkey(s.get("hotkey", {}))
         return out
 
     # ------------------------------------------------------------------
@@ -206,6 +603,7 @@ class Plugin:
                 "auto_apply": s["auto_apply"],
             },
             "profiles": [{"appid": k, "name": v["name"]} for k, v in s["profiles"].items()],
+            "hotkey": self.hotkey_state(),
             "models": [{"id": k, "label": v["label"], "lines": v["lines"]} for k, v in MODELS.items()],
             "resolutions": [{"id": k, "label": v["label"]} for k, v in RESOLUTIONS.items()],
             "offset_x": x,
@@ -253,9 +651,10 @@ class Plugin:
             decky.logger.error(f"Erro ao procurar a config do MangoHud: {e}")
             return "/tmp/mangohud_crosshair.conf"
 
-    def build_config(self):
+    def build_config(self, force_enabled=None):
         s = self.settings
-        if s["enabled"]:
+        show = s["enabled"] if force_enabled is None else force_enabled
+        if show:
             lines = MODELS[s["model"]]["lines"]
             x, y = self.compute_offsets()
         else:
@@ -276,10 +675,10 @@ class Plugin:
             f"offset_y={y}"
         )
 
-    def apply(self):
+    def apply(self, force_enabled=None):
         config_path = self.find_mangohud_config_path()
         with open(config_path, "w") as f:
-            f.write(self.build_config())
+            f.write(self.build_config(force_enabled))
         decky.logger.info(f"Crosshair escrito em {config_path}")
 
     # ------------------------------------------------------------------
@@ -303,7 +702,13 @@ class Plugin:
             model_id = merged["model"] if merged["model"] in MODELS else self.settings["model"]
             ex, ey = merged["comp"].get(model_id, list(DEFAULT_COMP))
             merged["comp"][model_id] = [patch.get("comp_x", ex), patch.get("comp_y", ey)]
+        merged["hotkey"] = dict(self.settings["hotkey"])
+        if "hotkey_enabled" in patch:
+            merged["hotkey"]["enabled"] = bool(patch["hotkey_enabled"])
+        if "hotkey_hold" in patch:
+            merged["hotkey"]["hold_ms"] = patch["hotkey_hold"]
         self.settings = self.sanitize(merged)
+        self.sync_monitor()
         self.save_settings()
         try:
             self.apply()
@@ -373,12 +778,114 @@ class Plugin:
             decky.logger.error(f"Erro ao aplicar o perfil do jogo {appid}: {e}")
         return self.state()
 
+    # ------------------------------------------------------------------
+    # Atalho de botões (liga/desliga)
+    # ------------------------------------------------------------------
+    def ensure_monitor(self):
+        if self.monitor is None:
+            self.monitor = HotkeyMonitor(decky.logger, self._schedule_fire, self._schedule_learned)
+        return self.monitor
+
+    def sync_monitor(self):
+        """Liga o monitor só quando o atalho está ativo e com 2 botões gravados."""
+        try:
+            hk = self.settings["hotkey"]
+            active = hk["enabled"] and len(hk["buttons"]) == 2
+            monitor = self.ensure_monitor() if active else self.monitor
+            if monitor is None:
+                return
+            monitor.configure(hk["buttons"], hk["hold_ms"], active)
+            if active:
+                monitor.ensure_running()
+        except Exception as e:
+            decky.logger.error(f"Erro ao configurar o atalho: {e}")
+
+    def hotkey_state(self):
+        hk = self.settings["hotkey"]
+        info = {}
+        if self.monitor is not None:
+            try:
+                info = self.monitor.status()
+            except Exception as e:
+                decky.logger.error(f"Erro ao ler o estado do atalho: {e}")
+        return {
+            "enabled": hk["enabled"],
+            "buttons": [label_for(b) for b in hk["buttons"]],
+            "hold_ms": hk["hold_ms"],
+            "running": info.get("running", False),
+            "devices": info.get("devices", 0),
+            "denied": info.get("denied", 0),
+            "learning": info.get("learning", False),
+            "learn_left": info.get("learn_left", 0),
+            "message": info.get("message", ""),
+            "last_button": info.get("last_button", ""),
+        }
+
+    def _schedule_fire(self):
+        if self.loop is not None:
+            asyncio.run_coroutine_threadsafe(self._hotkey_fire(), self.loop)
+
+    def _schedule_learned(self, buttons):
+        if self.loop is not None:
+            asyncio.run_coroutine_threadsafe(self._hotkey_learned(buttons), self.loop)
+
+    async def _hotkey_fire(self):
+        self.settings["enabled"] = not self.settings["enabled"]
+        self.save_settings()
+        try:
+            self.apply()
+        except Exception as e:
+            decky.logger.error(f"Erro ao aplicar o crosshair pelo atalho: {e}")
+
+    async def _hotkey_learned(self, buttons):
+        hotkey = {**self.settings["hotkey"], "buttons": list(buttons), "enabled": True}
+        self.settings = self.sanitize({**self.settings, "hotkey": hotkey})
+        self.save_settings()
+        self.sync_monitor()
+        await self._blink()
+
+    async def _blink(self):
+        """Pisca o crosshair duas vezes para confirmar que a combinação foi gravada."""
+        original = self.settings["enabled"]
+        try:
+            for _ in range(2):
+                self.apply(force_enabled=not original)
+                await asyncio.sleep(0.2)
+                self.apply(force_enabled=original)
+                await asyncio.sleep(0.2)
+        except Exception as e:
+            decky.logger.error(f"Erro ao piscar o crosshair: {e}")
+
+    async def start_hotkey_learning(self) -> dict:
+        self.loop = asyncio.get_running_loop()
+        self.ensure_monitor().start_learning()
+        return self.state()
+
+    async def cancel_hotkey_learning(self) -> dict:
+        if self.monitor is not None:
+            self.monitor.cancel_learning("Gravação cancelada.")
+        return self.state()
+
+    async def clear_hotkey(self) -> dict:
+        hotkey = {**self.settings["hotkey"], "buttons": [], "enabled": False}
+        self.settings = self.sanitize({**self.settings, "hotkey": hotkey})
+        self.save_settings()
+        self.sync_monitor()
+        return self.state()
+
     async def _main(self):
         self.load_settings()
         # A config do MangoHud não é reaplicada ao iniciar (como no plugin
         # original), então o crosshair sempre começa desligado.
         self.settings["enabled"] = False
+        self.loop = asyncio.get_running_loop()
+        self.sync_monitor()
         decky.logger.info("Crosshair Plugin iniciado!")
 
     async def _unload(self):
+        try:
+            if self.monitor is not None:
+                self.monitor.stop()
+        except Exception as e:
+            decky.logger.error(f"Erro ao parar o atalho: {e}")
         decky.logger.info("Crosshair Plugin finalizado!")

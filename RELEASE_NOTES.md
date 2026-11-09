@@ -1,13 +1,18 @@
-## Crosshair v1.4.0
+## Crosshair v1.5.0
 
 ### Novidades
-- Compatível com o Direct Updater: o plugin agora é reconhecido pelo repositório e as atualizações aparecem lá. Cada versão tem a sua release (v1.4.0, v1.5.0...).
-- A mira agora cresce a partir do centro: mudar o tamanho não desloca mais a posição. Para ajustar o centro por modelo, use "Calibrar escala (avançado)".
-- Interface renovada: prévia com guias de centro, atalhos de tamanho (50% a 300%), cartão de perfil do jogo e seção de calibração.
-- Código organizado em módulos e pastas, com compilação e publicação automáticas.
+- Atalho de botões: grave 2 botões do controle e segure-os juntos para ligar ou desligar a mira, sem abrir o menu. O tempo de segurar é ajustável.
+- Visual renovado: prévia com grade e brilho da cor, cartões com destaque, teclas estilizadas para a combinação gravada e indicador animado durante a gravação.
+
+### Como usar o atalho
+1. Em "Atalho de botões", toque em "Gravar combinação".
+2. Feche o menu e aperte os 2 botões juntos (em até 15 segundos).
+3. A mira pisca duas vezes quando a combinação for gravada.
+4. Daí em diante, segurar os 2 botões liga ou desliga a mira.
 
 ### Mantido
-- Modelo em lista suspensa, cores prontas ou RGB, sliders de posição e perfil por jogo.
+- A mira cresce a partir do centro, com calibração opcional por modelo.
+- Modelo em lista suspensa, cores prontas ou RGB, tamanho, sliders de posição e perfil por jogo.
 - Suporte à Legion Go S (1920x1200), Legion Go, Steam Deck, 1080p e 4K.
 
 ### Como instalar
