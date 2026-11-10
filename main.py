@@ -41,6 +41,11 @@ MODELS = {
     "dash": {"label": "Traços", "lines": [" ", "- + -", " "], "half_w": 23},
 }
 
+# Marca no fim do arquivo do MangoHud que foi o plugin quem o escreveu. Assim ele
+# sabe quando pode devolver o overlay de antes e quando o Steam já o trocou.
+CONFIG_MARKER = "# crosshair-plugin: configuracao gerada pelo plugin"
+MAX_BACKUPS = 5
+
 REF_FONT_SIZE = 24  # tamanho de fonte padrão do MangoHud (100%)
 HALF_H = 20  # metade da altura do bloco de 3 linhas, em px (valor original)
 
@@ -101,17 +106,30 @@ VENDOR_VALVE = 0x28DE
 STEAM_VIRTUAL_GAMEPAD = 0x11FF  # controle virtual que o Steam cria para os jogos
 _EVENT = struct.Struct("llHHi")  # struct input_event do kernel
 
-# Botões do controle virtual/clássico (evdev) -> ID de botão do Steam
+# Botões do controle virtual/clássico (evdev) -> IDs de botão do Steam. Um botão
+# pode valer mais de um ID, porque o Steam numera alguns botões de forma diferente
+# conforme a versão (ex.: Menu aparece como 8 ou 36).
 EVDEV_TO_STEAM = {
-    0x130: 0,  # A
-    0x131: 1,  # B
-    0x134: 2,  # X
-    0x133: 3,  # Y
-    0x220: 20,  # direcional cima
-    0x221: 21,  # direcional baixo
-    0x222: 22,  # direcional esquerda
-    0x223: 23,  # direcional direita
+    0x130: (0,),  # A
+    0x131: (1,),  # B
+    0x134: (2,),  # X
+    0x133: (3,),  # Y
+    0x220: (20,),  # direcional cima
+    0x221: (21,),  # direcional baixo
+    0x222: (22,),  # direcional esquerda
+    0x223: (23,),  # direcional direita
+    0x136: (30,),  # LB
+    0x137: (31,),  # RB
+    0x13A: (9, 35),  # View / Select
+    0x13B: (8, 36),  # Menu / Start
+    0x13C: (34,),  # Guia
 }
+# Gatilhos (eixos). Só valem em controles estilo Xbox, como o controle virtual do Steam.
+EVDEV_TRIGGERS = {0x02: 28, 0x05: 29}  # ABS_Z -> LT, ABS_RZ -> RT
+TRIGGER_THRESHOLD = 100
+XBOX_VENDORS = {0x045E}  # Microsoft
+EVDEV_IDS = frozenset(i for ids in EVDEV_TO_STEAM.values() for i in ids)
+EVDEV_TRIGGER_IDS = frozenset(EVDEV_TRIGGERS.values())
 
 # Controles Valve lidos direto (hidraw): Steam Controller (2026) e Steam Deck
 HID_TRITON_PRODUCTS = {0x1302, 0x1303, 0x1304, 0x1305}
@@ -130,9 +148,10 @@ HID_DECK_TO_STEAM = {
     0x00000100: 20, 0x00000800: 21, 0x00000400: 22, 0x00000200: 23,
     0x00008000: 32, 0x00010000: 33, 1 << 41: 44, 1 << 42: 45,
 }
-# IDs que o backend sabe ler em jogo. Combinações com outros botões (ex.: LB/RB)
-# são lidas só pela interface do Steam.
-SUPPORTED_BUTTONS = frozenset(HID_TRITON_TO_STEAM.values()) | frozenset(HID_DECK_TO_STEAM.values())
+# IDs que o backend sabe ler em jogo. Combinações com outros botões (ex.: L3/R3)
+# são lidas só pela interface do Steam, com o menu em foco.
+HID_IDS = frozenset(HID_TRITON_TO_STEAM.values()) | frozenset(HID_DECK_TO_STEAM.values())
+SUPPORTED_BUTTONS = HID_IDS | EVDEV_IDS | EVDEV_TRIGGER_IDS
 
 
 class _InputId(ctypes.Structure):
@@ -257,7 +276,7 @@ def parse_hid_report(data):
     return None
 
 
-def apply_evdev_events(held, data):
+def apply_evdev_events(held, data, xinput=False):
     """Atualiza o conjunto de IDs Steam segurados com uma leva de eventos evdev."""
     held = set(held)
     for offset in range(0, len(data) - _EVENT.size + 1, _EVENT.size):
@@ -265,7 +284,8 @@ def apply_evdev_events(held, data):
         if etype == EV_KEY and code in EVDEV_TO_STEAM:
             if value == 2:  # auto-repetição
                 continue
-            (held.add if value else held.discard)(EVDEV_TO_STEAM[code])
+            for steam_id in EVDEV_TO_STEAM[code]:
+                (held.add if value else held.discard)(steam_id)
         elif etype == EV_ABS and code in (ABS_HAT0X, ABS_HAT0Y):
             negative, positive = (22, 23) if code == ABS_HAT0X else (20, 21)
             held.discard(negative)
@@ -274,18 +294,22 @@ def apply_evdev_events(held, data):
                 held.add(negative)
             elif value > 0:
                 held.add(positive)
+        elif etype == EV_ABS and xinput and code in EVDEV_TRIGGERS:
+            (held.add if value > TRIGGER_THRESHOLD else held.discard)(EVDEV_TRIGGERS[code])
     return frozenset(held)
 
 
 class HotkeyMonitor:
     """Lê os controles em uma thread própria e avisa quando a combinação é segurada."""
 
-    def __init__(self, log, on_fire, on_covered, discover=None, opener=None):
+    def __init__(self, log, on_fire, on_covered, discover=None, opener=None, ident=None):
         self.log = log
         self.on_fire = on_fire
         self.on_covered = on_covered
         self.discover = discover or discover_controllers
         self.opener = opener or _open_device
+        self.ident = ident or _ident
+        self.denied = 0
         self.lock = threading.RLock()
         self.thread = None
         self.stop_event = threading.Event()
@@ -329,13 +353,19 @@ class HotkeyMonitor:
             return {
                 "running": self.thread is not None,
                 "devices": len(self.devices),
+                "denied": self.denied,
                 "covered": self._covered(),
             }
 
     # --- thread de leitura -------------------------------------------------
     def _covered(self):
-        """O backend cobre a combinação quando há controle aberto e todos os botões são lidos por ele."""
-        return self.active and bool(self.devices) and set(self.combo) <= SUPPORTED_BUTTONS
+        """O backend cobre a combinação quando os controles abertos conseguem entregar todos os botões dela."""
+        if not self.active or not self.devices:
+            return False
+        provided = set()
+        for device in self.devices.values():
+            provided |= device["provides"]
+        return set(self.combo) <= provided
 
     def _run(self, stop_event):
         last_scan = 0.0
@@ -390,14 +420,28 @@ class HotkeyMonitor:
             for path in list(self.devices):
                 if path not in wanted:
                     self._drop(path)
+            denied = 0
             for path, kind in wanted.items():
                 if path in self.devices:
                     continue
                 try:
                     fd = self.opener(path)
+                except PermissionError:
+                    denied += 1
+                    continue
                 except OSError:
                     continue
-                self.devices[path] = {"path": path, "kind": kind, "fd": fd, "held": frozenset()}
+                xinput = False
+                if kind == "evdev":
+                    _bus, vendor, product = self.ident(fd)
+                    xinput = vendor in XBOX_VENDORS or (vendor, product) == (VENDOR_VALVE, STEAM_VIRTUAL_GAMEPAD)
+                    provides = EVDEV_IDS | (EVDEV_TRIGGER_IDS if xinput else frozenset())
+                else:
+                    provides = HID_IDS
+                self.devices[path] = {
+                    "path": path, "kind": kind, "fd": fd, "held": frozenset(), "xinput": xinput, "provides": provides,
+                }
+            self.denied = denied
 
     def _drop(self, path):
         with self.lock:
@@ -427,7 +471,7 @@ class HotkeyMonitor:
             if not data:
                 break
             if device["kind"] == "evdev":
-                held = apply_evdev_events(held, data)
+                held = apply_evdev_events(held, data, device.get("xinput", False))
             else:
                 parsed = parse_hid_report(data)
                 if parsed is not None:
@@ -531,11 +575,38 @@ class Plugin:
         self.settings_path = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "settings.json")
         self.monitor = None  # monitor do atalho (criado só quando necessário)
         self.loop = None
+        self.backup_path = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "mangohud_backup.json")
+        self.backups = {}  # caminho do arquivo do MangoHud -> conteúdo de antes da mira
 
     # ------------------------------------------------------------------
     # Persistência
     # ------------------------------------------------------------------
+    def load_backups(self):
+        try:
+            with open(self.backup_path, "r") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                self.backups = {str(k): v for k, v in data.items() if isinstance(v, str)}
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            decky.logger.error(f"Erro ao ler o backup do MangoHud: {e}")
+
+    def remember_config(self, path, content):
+        """Guarda o MangoHud de antes da mira para devolvê-lo quando a mira for desligada."""
+        self.backups.pop(path, None)
+        self.backups[path] = content
+        while len(self.backups) > MAX_BACKUPS:
+            self.backups.pop(next(iter(self.backups)))
+        try:
+            os.makedirs(os.path.dirname(self.backup_path), exist_ok=True)
+            with open(self.backup_path, "w") as f:
+                json.dump(self.backups, f)
+        except Exception as e:
+            decky.logger.error(f"Erro ao salvar o backup do MangoHud: {e}")
+
     def load_settings(self):
+        self.load_backups()
         try:
             with open(self.settings_path, "r") as f:
                 saved = json.load(f)
@@ -706,14 +777,39 @@ class Plugin:
             f"custom_text={lines[1]}\n"
             f"custom_text={lines[2]}\n"
             f"offset_x={x}\n"
-            f"offset_y={y}"
+            f"offset_y={y}\n"
+            f"{CONFIG_MARKER}\n"
         )
 
     def apply(self, force_enabled=None):
+        """Liga a mira (guardando o MangoHud de antes) ou a desliga (devolvendo o MangoHud de antes)."""
         config_path = self.find_mangohud_config_path()
-        with open(config_path, "w") as f:
-            f.write(self.build_config(force_enabled))
-        decky.logger.info(f"Crosshair escrito em {config_path}")
+        show = self.settings["enabled"] if force_enabled is None else force_enabled
+        try:
+            with open(config_path, "r", errors="replace") as f:
+                current = f.read()
+        except OSError:
+            current = None
+        ours = current is not None and CONFIG_MARKER in current
+        if show:
+            if current is not None and not ours:
+                self.remember_config(config_path, current)
+            with open(config_path, "w") as f:
+                f.write(self.build_config(True))
+            decky.logger.info(f"Crosshair escrito em {config_path}")
+        elif ours:
+            backup = self.backups.get(config_path)
+            with open(config_path, "w") as f:
+                f.write(backup if backup is not None else self.build_config(False))
+            decky.logger.info(f"MangoHud restaurado em {config_path}")
+        # Se o arquivo não é do plugin, o Steam já o trocou: não mexe.
+
+    def restore_overlay(self):
+        """Tira a mira do arquivo do MangoHud e devolve o overlay que existia antes."""
+        try:
+            self.apply(force_enabled=False)
+        except Exception as e:
+            decky.logger.error(f"Erro ao restaurar o MangoHud: {e}")
 
     # ------------------------------------------------------------------
     # API chamada pelo frontend
@@ -848,7 +944,9 @@ class Plugin:
             "hold_ms": hk["hold_ms"],
             "running": info.get("running", False),
             "devices": info.get("devices", 0),
+            "denied": info.get("denied", 0),
             "covered": info.get("covered", False),
+            "supported": len(hk["buttons"]) == 2 and set(hk["buttons"]) <= SUPPORTED_BUTTONS,
         }
 
     def _schedule_fire(self):
@@ -914,9 +1012,10 @@ class Plugin:
 
     async def _main(self):
         self.load_settings()
-        # A config do MangoHud não é reaplicada ao iniciar (como no plugin
-        # original), então o crosshair sempre começa desligado.
+        # O crosshair sempre começa desligado: se uma mira ficou no arquivo do
+        # MangoHud (ex.: depois de reiniciar o Decky), devolve o overlay de antes.
         self.settings["enabled"] = False
+        self.restore_overlay()
         self.loop = asyncio.get_running_loop()
         self.sync_monitor()
         decky.logger.info("Crosshair Plugin iniciado!")
@@ -927,4 +1026,5 @@ class Plugin:
                 self.monitor.stop()
         except Exception as e:
             decky.logger.error(f"Erro ao parar o atalho: {e}")
+        self.restore_overlay()  # não deixa a mira presa na tela se o plugin for descarregado
         decky.logger.info("Crosshair Plugin finalizado!")
