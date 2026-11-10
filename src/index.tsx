@@ -3,6 +3,7 @@ import { staticClasses } from "@decky/ui";
 import { FaCrosshairs } from "react-icons/fa";
 import { gameStarted } from "./api";
 import { Content } from "./Content";
+import { disposeHotkey, initHotkey } from "./hotkey";
 
 export default definePlugin(() => {
   // Ao abrir um jogo, aplica o perfil salvo dele (se houver)
@@ -20,6 +21,13 @@ export default definePlugin(() => {
     console.error(error);
   }
 
+  // Atalho de botões (liga/desliga a mira); se falhar, o resto do plugin segue normal
+  try {
+    initHotkey();
+  } catch (error) {
+    console.error(error);
+  }
+
   return {
     name: "Crosshair Plugin",
     titleView: <div className={staticClasses.Title}>Crosshair</div>,
@@ -28,6 +36,11 @@ export default definePlugin(() => {
     onDismount() {
       try {
         unregister?.unregister?.();
+      } catch (error) {
+        console.error(error);
+      }
+      try {
+        disposeHotkey();
       } catch (error) {
         console.error(error);
       }

@@ -9,20 +9,22 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { FaGamepad } from "react-icons/fa";
 import {
-  cancelHotkeyLearning,
   clearHotkey,
   deleteProfile,
   getState,
   resetComp,
   resetNudge,
   saveProfile,
-  startHotkeyLearning,
+  setHotkey,
   updateSettings,
 } from "./api";
 import type { GameInfo, PluginState, Settings } from "./api";
-import { ColorSwatches, HotkeyCard, Preview, SizeChips } from "./components";
+import { ColorStrip, HotkeyCard, SizeChips, StatusChips } from "./components";
+import { applyHotkeyState, captureButtons } from "./hotkey";
 import { STYLES } from "./styles";
-import { getRunningGame, hexToRgb, rgbToHex } from "./utils";
+import { COLORS, getRunningGame, hexToRgb, rgbToHex } from "./utils";
+
+const CAPTURE_SECONDS = 12;
 
 export function Content() {
   const [state, setState] = useState<PluginState | null>(null);
@@ -30,6 +32,10 @@ export function Content() {
   const [game] = useState<GameInfo | null>(() => getRunningGame());
   const [customColor, setCustomColor] = useState(false);
   const [calibrate, setCalibrate] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [captureMessage, setCaptureMessage] = useState("");
+  const captureRef = useRef<{ cancel: () => void } | null>(null);
 
   // Junta alterações rápidas (sliders) e envia ao backend de uma vez
   const pending = useRef<Record<string, unknown>>({});
@@ -57,17 +63,46 @@ export function Content() {
     }
   };
 
-  // Enquanto grava a combinação, acompanha o andamento (contagem e resultado)
-  const learning = state?.hotkey.learning ?? false;
+  // Mantém o ouvinte global do atalho em dia com o que está salvo no backend
   useEffect(() => {
-    if (!learning) return undefined;
-    const id = window.setInterval(() => {
-      getState()
-        .then(setState)
-        .catch((error) => console.error(error));
-    }, 1000);
+    if (state) applyHotkeyState(state.hotkey);
+  }, [state]);
+
+  // Contagem regressiva da gravação; ao sair do painel, cancela a gravação
+  useEffect(() => {
+    if (!capturing) return undefined;
+    const id = window.setInterval(() => setSecondsLeft((left) => Math.max(0, left - 1)), 1000);
     return () => window.clearInterval(id);
-  }, [learning]);
+  }, [capturing]);
+  useEffect(
+    () => () => {
+      captureRef.current?.cancel();
+    },
+    [],
+  );
+
+  // Grava a combinação pela interface (o Steam entrega os botões com o menu aberto)
+  const toggleCapture = async () => {
+    if (captureRef.current) {
+      captureRef.current.cancel();
+      return;
+    }
+    setCaptureMessage("");
+    setSecondsLeft(CAPTURE_SECONDS);
+    setCapturing(true);
+    const handle = captureButtons(CAPTURE_SECONDS * 1000);
+    captureRef.current = handle;
+    const result = await handle.promise;
+    captureRef.current = null;
+    setCapturing(false);
+    if (result.ok) {
+      await run(() => setHotkey(result.buttons), "Combinação gravada");
+    } else if (result.reason === "count") {
+      setCaptureMessage("Aperte exatamente 2 botões juntos. Tente de novo.");
+    } else if (result.reason === "timeout") {
+      setCaptureMessage("Tempo esgotado. Nenhuma combinação foi gravada.");
+    }
+  };
 
   const queue = (patch: Record<string, unknown>) => {
     pending.current = { ...pending.current, ...patch };
@@ -120,6 +155,10 @@ export function Content() {
   const currentModel = models.find((m) => m.id === settings.model) ?? models[0];
   const [r, g, b] = hexToRgb(settings.color);
   const hasProfile = game !== null && profiles.some((p) => p.appid === game.appid);
+  const colorIndex = Math.max(
+    0,
+    COLORS.findIndex((c) => c.hex === settings.color),
+  );
 
   return (
     <>
@@ -127,7 +166,7 @@ export function Content() {
 
       <PanelSection title="Crosshair">
         <PanelSectionRow>
-          <Preview settings={settings} lines={currentModel.lines} modelLabel={currentModel.label} />
+          <StatusChips settings={settings} modelLabel={currentModel.label} />
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
@@ -149,7 +188,17 @@ export function Content() {
           />
         </PanelSectionRow>
         <PanelSectionRow>
-          <ColorSwatches value={settings.color} onSelect={(hex) => patchSettings({ color: hex })} />
+          <ColorStrip value={settings.color} onSelect={(hex) => patchSettings({ color: hex })} />
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <SliderField
+            label="Cor"
+            value={colorIndex}
+            min={0}
+            max={COLORS.length - 1}
+            step={1}
+            onChange={(index: number) => patchSettings({ color: COLORS[index].hex })}
+          />
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
@@ -315,19 +364,16 @@ export function Content() {
           />
         </PanelSectionRow>
         <PanelSectionRow>
-          <HotkeyCard hotkey={hotkey} />
+          <HotkeyCard
+            hotkey={hotkey}
+            capturing={capturing}
+            secondsLeft={secondsLeft}
+            message={captureMessage}
+          />
         </PanelSectionRow>
         <PanelSectionRow>
-          <ButtonItem
-            layout="below"
-            onClick={() =>
-              run(
-                () => (hotkey.learning ? cancelHotkeyLearning() : startHotkeyLearning()),
-                hotkey.learning ? "Gravação cancelada" : "Gravando: feche o menu e aperte os 2 botões",
-              )
-            }
-          >
-            {hotkey.learning
+          <ButtonItem layout="below" onClick={() => toggleCapture()}>
+            {capturing
               ? "Cancelar gravação"
               : hotkey.buttons.length === 2
                 ? "Gravar outra combinação"

@@ -25,15 +25,11 @@ export interface ModelInfo {
 // Estado do atalho de botões (liga/desliga a mira)
 export interface HotkeyState {
   enabled: boolean;
-  buttons: string[]; // nomes amigáveis, ex.: ["LB", "RB"]
+  buttons: number[]; // IDs de botão do Steam (2 botões) ou vazio
   hold_ms: number; // quanto tempo segurar (ms)
-  running: boolean; // monitor de controles ativo
-  devices: number; // controles que estão sendo monitorados
-  denied: number; // controles sem permissão de leitura
-  learning: boolean; // gravando uma combinação
-  learn_left: number; // segundos restantes da gravação
-  message: string; // aviso da última gravação
-  last_button: string; // último botão detectado
+  running: boolean; // o backend está lendo o controle em jogo
+  devices: number; // controles que o backend está lendo
+  covered: boolean; // o backend cobre esta combinação (a interface se cala)
 }
 
 export interface PluginState {
@@ -61,6 +57,6 @@ export const resetComp = callable<[], PluginState>("reset_comp");
 export const saveProfile = callable<[string, string], PluginState>("save_profile");
 export const deleteProfile = callable<[string], PluginState>("delete_profile");
 export const gameStarted = callable<[string], PluginState>("game_started");
-export const startHotkeyLearning = callable<[], PluginState>("start_hotkey_learning");
-export const cancelHotkeyLearning = callable<[], PluginState>("cancel_hotkey_learning");
+export const hotkeyToggle = callable<[], PluginState>("hotkey_toggle");
+export const setHotkey = callable<[number[]], PluginState>("set_hotkey");
 export const clearHotkey = callable<[], PluginState>("clear_hotkey");

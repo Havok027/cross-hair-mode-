@@ -3,36 +3,10 @@
 export const STYLES = `
 @keyframes xh-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
 @keyframes xh-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,80,80,0.0); } 50% { box-shadow: 0 0 14px 2px rgba(255,80,80,0.45); } }
-@keyframes xh-shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-.xh-hero { width: 100%; }
-.xh-stage {
-  position: relative; display: flex; align-items: center; justify-content: center;
-  height: 132px; width: 100%; border-radius: 18px; overflow: hidden; box-sizing: border-box;
-  background-color: #11142a;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
-    radial-gradient(circle at 50% 30%, #3a4778 0%, #181b2e 62%, #0d0f1a 100%);
-  background-size: 22px 22px, 22px 22px, 100% 100%;
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: inset 0 0 34px rgba(0,0,0,0.55), 0 8px 22px rgba(0,0,0,0.4);
-}
-.xh-stage::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: linear-gradient(90deg, #1a9fff, #9b5cff, #ff007b, #1a9fff);
-  background-size: 200% 100%; animation: xh-shimmer 6s linear infinite; opacity: 0.85;
-}
-.xh-guide-h, .xh-guide-v { position: absolute; background: rgba(255,255,255,0.10); }
-.xh-guide-h { left: 0; right: 0; top: 50%; height: 1px; }
-.xh-guide-v { top: 0; bottom: 0; left: 50%; width: 1px; }
-.xh-preview-text {
-  position: relative; font-family: monospace; white-space: pre; text-align: center; line-height: 1.15;
-  transition: opacity 0.15s;
-}
-.xh-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+.xh-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; width: 100%; }
 .xh-chip, .xh-pill {
-  display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px;
   font-size: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
 }
 .xh-pill.xh-on { background: rgba(60,200,120,0.22); border-color: rgba(60,200,120,0.75); }
@@ -42,14 +16,16 @@ export const STYLES = `
 .xh-pill.xh-blue { background: rgba(26,159,255,0.22); border-color: rgba(26,159,255,0.65); }
 .xh-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
-.xh-swatches { display: flex; flex-wrap: wrap; gap: 12px; padding: 6px 2px; }
-.xh-swatch {
-  display: flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border-radius: 50%; box-sizing: border-box;
-  border: 3px solid rgba(255,255,255,0.20); transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+.xh-strip-wrap { width: 100%; padding: 4px 0 2px 0; }
+.xh-strip { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 54px; }
+.xh-strip-swatch {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  width: 24px; height: 24px; border-radius: 50%; opacity: 0.5;
+  border: 2px solid rgba(255,255,255,0.18); transition: all 0.15s;
 }
-.xh-swatch.xh-active { border-color: #ffffff; }
-.xh-swatch.gpfocus { transform: scale(1.2); box-shadow: 0 0 0 3px #1a9fff; }
+.xh-strip-swatch.xh-near { width: 32px; height: 32px; opacity: 0.8; }
+.xh-strip-swatch.xh-center { width: 48px; height: 48px; opacity: 1; border: 3px solid #ffffff; }
+.xh-strip-name { text-align: center; font-size: 13px; font-weight: 600; margin-top: 6px; opacity: 0.9; }
 
 .xh-sizes { display: flex; gap: 6px; width: 100%; }
 .xh-size {
