@@ -77,7 +77,7 @@ export function SizeChips(props: { value: number; onSelect: (size: number) => vo
 
 // Explica de onde o atalho está sendo lido e, se for o caso, por que só funciona com o menu aberto
 function readingNote(hotkey: HotkeyState): string {
-  if (hotkey.covered) return "Leitura em jogo ativa (" + hotkey.devices + " controle(s)).";
+  if (hotkey.covered) return "Lendo pela interface do Steam e em jogo (" + hotkey.devices + " controle(s)).";
   if (!hotkey.supported) {
     return "Esta combinação só funciona com o menu do Steam em foco. Para usar em jogo, grave outra com A, B, X, Y, direcional, LB, RB, LT, RT, Menu ou View.";
   }
@@ -122,6 +122,15 @@ export function HotkeyCard(props: {
       )}
       {message && !capturing && <div className="xh-warn">{message}</div>}
       {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey)}</div>}
+      {hasCombo && hotkey.enabled && !capturing && hotkey.running && (
+        <div className="xh-hint xh-diag">
+          {hotkey.last_seen.length > 0
+            ? "Último botão lido em jogo: " +
+              hotkey.last_seen.map((id) => buttonName(id) + "(" + id + ")").join(" + ") +
+              (hotkey.last_seen_age !== null ? ", há " + hotkey.last_seen_age + " s" : "")
+            : "Nenhum botão lido em jogo ainda."}
+        </div>
+      )}
       {hasCombo && hotkey.enabled && !capturing && hotkey.denied > 0 && (
         <div className="xh-warn">Sem permissão para ler {hotkey.denied} controle(s).</div>
       )}

@@ -32,6 +32,8 @@ export interface HotkeyState {
   denied: number; // controles sem permissão de leitura
   covered: boolean; // o backend cobre esta combinação (a interface se cala)
   supported: boolean; // o backend sabe ler os botões desta combinação em jogo
+  last_seen: number[]; // último grupo de botões que o backend leu em jogo (IDs do Steam)
+  last_seen_age: number | null; // há quantos segundos
 }
 
 export interface PluginState {
@@ -59,6 +61,6 @@ export const resetComp = callable<[], PluginState>("reset_comp");
 export const saveProfile = callable<[string, string], PluginState>("save_profile");
 export const deleteProfile = callable<[string], PluginState>("delete_profile");
 export const gameStarted = callable<[string], PluginState>("game_started");
-export const hotkeyToggle = callable<[], PluginState>("hotkey_toggle");
+export const hotkeyToggle = callable<[string], PluginState>("hotkey_toggle");
 export const setHotkey = callable<[number[]], PluginState>("set_hotkey");
 export const clearHotkey = callable<[], PluginState>("clear_hotkey");

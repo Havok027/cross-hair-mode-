@@ -7,9 +7,8 @@
 //     botão do Steam.
 //   * USAR: a interface escuta o controle e liga/desliga a mira. Em jogo, alguns
 //     builds do Steam não entregam botões à interface; por isso o backend também
-//     lê o controle direto. Quando o backend cobre a combinação, a interface se
-//     cala para não alternar duas vezes.
-import { addEventListener, removeEventListener } from "@decky/api";
+//     lê o controle direto. Os dois caminhos ficam sempre ativos: se a mesma
+//     apertada chegar pelos dois, o backend conta como uma só (deduplicação).
 import { getState, hotkeyToggle } from "./api";
 import type { HotkeyState } from "./api";
 
@@ -66,28 +65,24 @@ const CAPTURE_GRACE_MS = 250;
 
 const held = new Set<number>(); // botões apertados agora
 let cfg = { enabled: false, buttons: [] as number[], holdMs: 0 };
-let backendCovers = false; // o backend já lê esta combinação em jogo
 let comboActive = false;
 let holdTimer: number | undefined;
 let capture: CaptureSession | null = null;
 let inputReg: any = null;
-let coveredListener: any = null;
 let resumeTimer: number | undefined;
 
 function fire() {
-  hotkeyToggle().catch((error) => console.warn("[Crosshair] falha ao alternar a mira:", error));
+  hotkeyToggle("ui").catch((error) => console.warn("[Crosshair] falha ao alternar a mira:", error));
 }
 
 function evaluate() {
   const active = cfg.enabled && cfg.buttons.length === 2 && cfg.buttons.every((b) => held.has(b));
   if (active && !comboActive) {
     comboActive = true;
-    if (!backendCovers) {
-      holdTimer = window.setTimeout(() => {
-        holdTimer = undefined;
-        if (comboActive && !backendCovers) fire();
-      }, cfg.holdMs);
-    }
+    holdTimer = window.setTimeout(() => {
+      holdTimer = undefined;
+      if (comboActive) fire();
+    }, cfg.holdMs);
   } else if (!active && comboActive) {
     comboActive = false;
     if (holdTimer !== undefined) {
@@ -100,7 +95,6 @@ function evaluate() {
 // Atualiza a configuração vinda do backend (chamado ao abrir o painel e a cada mudança)
 export function applyHotkeyState(state: HotkeyState) {
   cfg = { enabled: state.enabled, buttons: state.buttons, holdMs: state.hold_ms };
-  backendCovers = state.covered;
   evaluate();
 }
 
@@ -246,14 +240,6 @@ export function initHotkey() {
   getState()
     .then((state) => applyHotkeyState(state.hotkey))
     .catch((error) => console.warn("[Crosshair] falha ao ler o atalho:", error));
-  try {
-    coveredListener = (addEventListener as any)("hotkey_covered", (value: boolean) => {
-      backendCovers = !!value;
-      evaluate();
-    });
-  } catch (error) {
-    console.warn("[Crosshair] falha ao ouvir o aviso do backend:", error);
-  }
   registerControllerListener();
   watchForResume();
 }
@@ -267,14 +253,6 @@ export function disposeHotkey() {
   if (holdTimer !== undefined) {
     window.clearTimeout(holdTimer);
     holdTimer = undefined;
-  }
-  if (coveredListener) {
-    try {
-      (removeEventListener as any)("hotkey_covered", coveredListener);
-    } catch (error) {
-      console.warn("[Crosshair] falha ao remover o aviso do backend:", error);
-    }
-    coveredListener = null;
   }
   held.clear();
   comboActive = false;
