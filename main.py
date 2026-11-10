@@ -1,6 +1,8 @@
 import asyncio
+import ctypes
+import fcntl
+import glob
 import json
-import math
 import os
 import re
 import select
@@ -58,7 +60,7 @@ DEFAULTS = {
     "size": 100,  # porcentagem do tamanho padrão
     "nudge": {},  # ajuste fino por modelo: {"box": [dx, dy]}
     "comp": {},  # compensação de escala por modelo: {"box": [px, py]}
-    "hotkey": {"enabled": False, "buttons": [], "hold_ms": 250},  # atalho liga/desliga
+    "hotkey": {"enabled": False, "buttons": [], "hold_ms": 0, "v": 2},  # atalho liga/desliga
     "auto_apply": True,  # aplicar o perfil do jogo quando ele abrir
     "profiles": {},  # perfis por jogo: {"<appid>": {...}}
 }
@@ -80,150 +82,220 @@ HEX_RE = re.compile(r"^[0-9A-Fa-f]{6}$")
 # ---------------------------------------------------------------------------
 # Atalho de botões do controle (liga/desliga o crosshair)
 #
-# O plugin lê os eventos do controle direto do sistema (/dev/input/event*), o
-# mesmo que os jogos enxergam. Isso não precisa de permissão extra e não mexe
-# no controle. Tudo aqui fica isolado: se algo falhar, só o atalho para de
-# funcionar e o restante do plugin segue normal.
+# Como funciona: a combinação é gravada pela interface (que recebe os botões do
+# Steam com o menu aberto) e fica salva como IDs de botão do Steam. Em jogo, o
+# backend lê o controle direto do sistema e compara com esses mesmos IDs.
+#
+# As tabelas de botões e os formatos dos controles Valve vêm do projeto
+# Steamcord (Necrosiak, BSD-3-Clause, https://github.com/Necrosiak/Steamcord),
+# que foi validado no aparelho. Tudo aqui é isolado: se algo falhar, só o atalho
+# para de funcionar e o restante do plugin segue normal.
 # ---------------------------------------------------------------------------
-EV_KEY = 1
-EV_ABS = 3
-ABS_HAT0X = 16
-ABS_HAT0Y = 17
-TRIGGER_AXES = (2, 5)  # ABS_Z / ABS_RZ: gatilhos LT / RT em controles estilo Xbox
-TRIGGER_THRESHOLD = 100
+EV_KEY = 0x01
+EV_ABS = 0x03
+EV_MAX = 0x1F
+KEY_MAX = 0x2FF
 BTN_SOUTH = 0x130  # primeiro botão de gamepad (A)
-EVENT_FORMAT = "llHHi"  # struct input_event do kernel
-EVENT_SIZE = struct.calcsize(EVENT_FORMAT)
-LEARN_SECONDS = 15
-BUTTON_ID_RE = re.compile(r"^(k\d{1,4}|a\d{1,2}|d[lrud])$")
+ABS_HAT0X, ABS_HAT0Y = 0x10, 0x11
+VENDOR_VALVE = 0x28DE
+STEAM_VIRTUAL_GAMEPAD = 0x11FF  # controle virtual que o Steam cria para os jogos
+_EVENT = struct.Struct("llHHi")  # struct input_event do kernel
 
-BUTTON_LABELS = {
-    "k304": "A",
-    "k305": "B",
-    "k307": "X",
-    "k308": "Y",
-    "k310": "LB",
-    "k311": "RB",
-    "k312": "LT",
-    "k313": "RT",
-    "k314": "View",
-    "k315": "Menu",
-    "k316": "Guia",
-    "k317": "L3",
-    "k318": "R3",
-    "k544": "D-pad cima",
-    "k545": "D-pad baixo",
-    "k546": "D-pad esquerda",
-    "k547": "D-pad direita",
-    "a2": "LT",
-    "a5": "RT",
-    "du": "D-pad cima",
-    "dd": "D-pad baixo",
-    "dl": "D-pad esquerda",
-    "dr": "D-pad direita",
+# Botões do controle virtual/clássico (evdev) -> ID de botão do Steam
+EVDEV_TO_STEAM = {
+    0x130: 0,  # A
+    0x131: 1,  # B
+    0x134: 2,  # X
+    0x133: 3,  # Y
+    0x220: 20,  # direcional cima
+    0x221: 21,  # direcional baixo
+    0x222: 22,  # direcional esquerda
+    0x223: 23,  # direcional direita
 }
 
-
-def label_for(button_id):
-    """Nome amigável de um botão (ex.: "k310" -> "LB")."""
-    if button_id in BUTTON_LABELS:
-        return BUTTON_LABELS[button_id]
-    if button_id.startswith("k"):
-        try:
-            code = int(button_id[1:])
-        except ValueError:
-            return button_id
-        if 0x2C0 <= code <= 0x2E7:  # botões extras (ex.: botões traseiros)
-            return f"Extra {code - 0x2C0 + 1}"
-        return f"Botão {code}"
-    return button_id
-
-
-def decode_event(etype, code, value, xinput):
-    """Converte um evento do kernel em [(id_do_botão, pressionado)]."""
-    if etype == EV_KEY:
-        if code < 0x100 or value == 2:  # ignora teclado e auto-repetição
-            return []
-        return [(f"k{code}", value == 1)]
-    if etype == EV_ABS:
-        if code == ABS_HAT0X:
-            return [("dl", value < 0), ("dr", value > 0)]
-        if code == ABS_HAT0Y:
-            return [("du", value < 0), ("dd", value > 0)]
-        if xinput and code in TRIGGER_AXES:
-            return [(f"a{code}", value > TRIGGER_THRESHOLD)]
-    return []
+# Controles Valve lidos direto (hidraw): Steam Controller (2026) e Steam Deck
+HID_TRITON_PRODUCTS = {0x1302, 0x1303, 0x1304, 0x1305}
+HID_TRITON_STATE_REPORTS = {0x42, 0x45, 0x47}
+HID_TRITON_WIRELESS = 0x79
+HID_TRITON_DISCONNECT = 1
+HID_TRITON_TO_STEAM = {
+    0x00000001: 0, 0x00000002: 1, 0x00000004: 2, 0x00000008: 3,
+    0x00002000: 20, 0x00000400: 21, 0x00001000: 22, 0x00000800: 23,
+    0x00040000: 32, 0x00000100: 33, 0x00020000: 44, 0x00000080: 45,
+}
+HID_DECK_PRODUCTS = {0x1205}
+HID_DECK_STATE = 0x09
+HID_DECK_TO_STEAM = {
+    0x00000080: 0, 0x00000020: 1, 0x00000040: 2, 0x00000010: 3,
+    0x00000100: 20, 0x00000800: 21, 0x00000400: 22, 0x00000200: 23,
+    0x00008000: 32, 0x00010000: 33, 1 << 41: 44, 1 << 42: 45,
+}
+# IDs que o backend sabe ler em jogo. Combinações com outros botões (ex.: LB/RB)
+# são lidas só pela interface do Steam.
+SUPPORTED_BUTTONS = frozenset(HID_TRITON_TO_STEAM.values()) | frozenset(HID_DECK_TO_STEAM.values())
 
 
-def _has_bit(words, bit, word_bits):
-    """Confere um bit no mapa de teclas do /proc (palavras em hex, da mais alta para a mais baixa)."""
+class _InputId(ctypes.Structure):
+    _fields_ = [
+        ("bustype", ctypes.c_ushort),
+        ("vendor", ctypes.c_ushort),
+        ("product", ctypes.c_ushort),
+        ("version", ctypes.c_ushort),
+    ]
+
+
+def _ioc(direction, typ, nr, size):
+    return (direction << 30) | (size << 16) | (typ << 8) | nr
+
+
+def _eviocgid():
+    return _ioc(2, ord("E"), 0x02, ctypes.sizeof(_InputId))
+
+
+def _eviocgbit(ev, size):
+    return _ioc(2, ord("E"), 0x20 + ev, size)
+
+
+def _test_bit(buf, bit):
+    idx = bit // 8
+    return idx < len(buf) and bool(buf[idx] & (1 << (bit % 8)))
+
+
+def _bits(fd, ev_type, max_code):
+    size = (max_code + 8) // 8
+    buf = bytearray(size)
     try:
-        index = len(words) - 1 - bit // word_bits
-        if index < 0:
-            return False
-        return bool((int(words[index], 16) >> (bit % word_bits)) & 1)
-    except ValueError:
-        return False
+        fcntl.ioctl(fd, _eviocgbit(ev_type, size), buf, True)
+    except OSError:
+        return bytearray()
+    return buf
 
 
-def parse_proc_devices(text):
-    """Lista [(caminho, nome)] dos dispositivos que parecem controles de jogo."""
-    found = []
-    word_bits = struct.calcsize("P") * 8
-    for block in text.strip().split("\n\n"):
-        name, handlers, key_words = "", [], []
-        for line in block.splitlines():
-            if line.startswith("N: Name="):
-                name = line.split("=", 1)[1].strip().strip('"')
-            elif line.startswith("H: Handlers="):
-                handlers = line.split("=", 1)[1].split()
-            elif line.startswith("B: KEY="):
-                key_words = line.split("=", 1)[1].split()
-        event = next((h for h in handlers if h.startswith("event")), None)
-        if event and key_words and _has_bit(key_words, BTN_SOUTH, word_bits):
-            found.append(("/dev/input/" + event, name))
-    return found
+def _ident(fd):
+    ident = _InputId()
+    try:
+        fcntl.ioctl(fd, _eviocgid(), ident, True)
+    except OSError:
+        return (0, 0, 0)
+    return (ident.bustype, ident.vendor, ident.product)
 
 
-def discover_gamepads():
-    with open("/proc/bus/input/devices", "r", errors="replace") as f:
-        return parse_proc_devices(f.read())
+def _node_num(path):
+    digits = re.sub(r"\D", "", os.path.basename(path))
+    return int(digits) if digits else 0
 
 
 def _open_device(path):
     return os.open(path, os.O_RDONLY | os.O_NONBLOCK | getattr(os, "O_CLOEXEC", 0))
 
 
-def _is_xinput(name):
-    lowered = name.lower()
-    return "x-box" in lowered or "xbox" in lowered or "x360" in lowered
+def list_evdev_gamepads():
+    """Controles clássicos e o controle virtual do Steam que dá para abrir de verdade."""
+    found = []
+    for path in sorted(glob.glob("/dev/input/event*"), key=_node_num):
+        try:
+            fd = _open_device(path)
+        except OSError:
+            continue
+        try:
+            if not _test_bit(_bits(fd, 0, EV_MAX), EV_KEY):
+                continue
+            if not _test_bit(_bits(fd, EV_KEY, KEY_MAX), BTN_SOUTH):
+                continue
+            _bus, vendor, product = _ident(fd)
+            if vendor == VENDOR_VALVE and product != STEAM_VIRTUAL_GAMEPAD:
+                continue  # controles Valve físicos são lidos em hidraw
+            found.append(path)
+        except OSError:
+            continue
+        finally:
+            os.close(fd)
+    return found
+
+
+def list_hid_controllers():
+    """Controles Valve (hidraw) que dá para abrir de verdade."""
+    found = []
+    for dev in sorted(glob.glob("/sys/class/hidraw/hidraw*")):
+        try:
+            with open(os.path.join(dev, "device", "uevent")) as f:
+                uevent = f.read()
+        except OSError:
+            continue
+        match = re.search(r"^HID_ID=[0-9A-Fa-f]+:([0-9A-Fa-f]+):([0-9A-Fa-f]+)$", uevent, re.M)
+        if not match or int(match.group(1), 16) != VENDOR_VALVE:
+            continue
+        product = int(match.group(2), 16)
+        if product not in HID_TRITON_PRODUCTS and product not in HID_DECK_PRODUCTS:
+            continue
+        path = "/dev/" + os.path.basename(dev)
+        try:
+            os.close(_open_device(path))
+        except OSError:
+            continue
+        found.append(path)
+    return found
+
+
+def discover_controllers():
+    """[(caminho, tipo)] com tipo "evdev" ou "hid"."""
+    return [(p, "evdev") for p in list_evdev_gamepads()] + [(p, "hid") for p in list_hid_controllers()]
+
+
+def steam_buttons(table, raw):
+    return frozenset(steam for bit, steam in table.items() if raw & bit)
+
+
+def parse_hid_report(data):
+    """IDs Steam segurados num relatório hidraw, ou None se não for um relatório de estado."""
+    if len(data) >= 16 and data[0] == 0x01 and data[2] == HID_DECK_STATE:
+        return steam_buttons(HID_DECK_TO_STEAM, int.from_bytes(data[8:16], "little"))
+    if data and data[0] in HID_TRITON_STATE_REPORTS and len(data) >= 6:
+        return steam_buttons(HID_TRITON_TO_STEAM, int.from_bytes(data[2:6], "little"))
+    if len(data) >= 2 and data[0] == HID_TRITON_WIRELESS and data[1] == HID_TRITON_DISCONNECT:
+        return frozenset()  # controle desligado: nada mais está segurado
+    return None
+
+
+def apply_evdev_events(held, data):
+    """Atualiza o conjunto de IDs Steam segurados com uma leva de eventos evdev."""
+    held = set(held)
+    for offset in range(0, len(data) - _EVENT.size + 1, _EVENT.size):
+        _s, _us, etype, code, value = _EVENT.unpack_from(data, offset)
+        if etype == EV_KEY and code in EVDEV_TO_STEAM:
+            if value == 2:  # auto-repetição
+                continue
+            (held.add if value else held.discard)(EVDEV_TO_STEAM[code])
+        elif etype == EV_ABS and code in (ABS_HAT0X, ABS_HAT0Y):
+            negative, positive = (22, 23) if code == ABS_HAT0X else (20, 21)
+            held.discard(negative)
+            held.discard(positive)
+            if value < 0:
+                held.add(negative)
+            elif value > 0:
+                held.add(positive)
+    return frozenset(held)
 
 
 class HotkeyMonitor:
     """Lê os controles em uma thread própria e avisa quando a combinação é segurada."""
 
-    def __init__(self, log, on_fire, on_learned, discover=None, opener=None):
+    def __init__(self, log, on_fire, on_covered, discover=None, opener=None):
         self.log = log
         self.on_fire = on_fire
-        self.on_learned = on_learned
-        self.discover = discover or discover_gamepads
+        self.on_covered = on_covered
+        self.discover = discover or discover_controllers
         self.opener = opener or _open_device
         self.lock = threading.RLock()
         self.thread = None
         self.stop_event = threading.Event()
         self.combo = []
-        self.hold = 0.25
+        self.hold = 0.0
         self.active = False
         self.devices = {}
-        self.denied = 0
-        self.order = []
         self.pressed_since = None
         self.fired = False
-        self.require_release = False
-        self.learn_deadline = 0.0
-        self.learn_since = None
-        self.message = ""
-        self.last_button = ""
+        self.covered_sent = False
 
     # --- usado pelo plugin -------------------------------------------------
     def configure(self, combo, hold_ms, active):
@@ -233,22 +305,6 @@ class HotkeyMonitor:
             self.active = bool(active) and len(self.combo) == 2
             self.pressed_since = None
             self.fired = False
-
-    def start_learning(self, seconds=LEARN_SECONDS):
-        with self.lock:
-            self.learn_deadline = time.monotonic() + seconds
-            self.learn_since = None
-            self.message = ""
-        self.ensure_running()
-
-    def cancel_learning(self, message=""):
-        with self.lock:
-            self.learn_deadline = 0.0
-            self.learn_since = None
-            self.message = message
-
-    def is_learning(self):
-        return time.monotonic() < self.learn_deadline
 
     def ensure_running(self):
         with self.lock:
@@ -269,34 +325,30 @@ class HotkeyMonitor:
             thread.join(timeout=2)
 
     def status(self):
-        now = time.monotonic()
         with self.lock:
             return {
                 "running": self.thread is not None,
                 "devices": len(self.devices),
-                "denied": self.denied,
-                "learning": now < self.learn_deadline,
-                "learn_left": max(0, math.ceil(self.learn_deadline - now)) if now < self.learn_deadline else 0,
-                "message": self.message,
-                "last_button": label_for(self.last_button) if self.last_button else "",
+                "covered": self._covered(),
             }
 
     # --- thread de leitura -------------------------------------------------
-    def _needed(self):
-        return self.active or time.monotonic() < self.learn_deadline
+    def _covered(self):
+        """O backend cobre a combinação quando há controle aberto e todos os botões são lidos por ele."""
+        return self.active and bool(self.devices) and set(self.combo) <= SUPPORTED_BUTTONS
 
     def _run(self, stop_event):
         last_scan = 0.0
         try:
             while not stop_event.is_set():
                 with self.lock:
-                    if not self._needed():
+                    if not self.active:
                         if self.thread is threading.current_thread():
                             self.thread = None
                         return
                 try:
                     now = time.monotonic()
-                    if now - last_scan >= 2.0:
+                    if now - last_scan >= 3.0:
                         self._rescan()
                         last_scan = now
                     by_fd = {d["fd"]: d for d in list(self.devices.values())}
@@ -320,6 +372,12 @@ class HotkeyMonitor:
             with self.lock:
                 if self.thread is threading.current_thread():
                     self.thread = None
+                notify = self.covered_sent
+                self.covered_sent = False
+                self.pressed_since = None
+                self.fired = False
+            if notify:
+                self._call(self.on_covered, False)
 
     def _rescan(self):
         try:
@@ -327,24 +385,19 @@ class HotkeyMonitor:
         except Exception as e:
             self.log.error(f"Erro ao procurar controles: {e}")
             return
-        paths = {path for path, _ in found}
+        wanted = {path: kind for path, kind in found}
         with self.lock:
             for path in list(self.devices):
-                if path not in paths:
+                if path not in wanted:
                     self._drop(path)
-            denied = 0
-            for path, name in found:
+            for path, kind in wanted.items():
                 if path in self.devices:
                     continue
                 try:
                     fd = self.opener(path)
-                except PermissionError:
-                    denied += 1
-                    continue
                 except OSError:
                     continue
-                self.devices[path] = {"path": path, "name": name, "fd": fd, "held": set(), "xinput": _is_xinput(name)}
-            self.denied = denied
+                self.devices[path] = {"path": path, "kind": kind, "fd": fd, "held": frozenset()}
 
     def _drop(self, path):
         with self.lock:
@@ -359,72 +412,42 @@ class HotkeyMonitor:
         for path in list(self.devices):
             self._drop(path)
 
+    def _read(self, device):
+        """Lê tudo o que o controle entregou e atualiza os botões segurados dele."""
+        size = _EVENT.size * 64 if device["kind"] == "evdev" else 64
+        held = device["held"]
+        for _ in range(200):
+            try:
+                data = os.read(device["fd"], size)
+            except BlockingIOError:
+                break
+            except OSError:
+                self._drop(device["path"])  # desconectado ou acordou da suspensão
+                return
+            if not data:
+                break
+            if device["kind"] == "evdev":
+                held = apply_evdev_events(held, data)
+            else:
+                parsed = parse_hid_report(data)
+                if parsed is not None:
+                    held = parsed
+        with self.lock:
+            device["held"] = held
+
     def _held(self):
         held = set()
         for device in self.devices.values():
             held |= device["held"]
         return held
 
-    def _read(self, device):
-        try:
-            data = os.read(device["fd"], EVENT_SIZE * 64)
-        except BlockingIOError:
-            return
-        except OSError:
-            self._drop(device["path"])
-            return
-        if not data:
-            self._drop(device["path"])
-            return
-        for offset in range(0, len(data) - EVENT_SIZE + 1, EVENT_SIZE):
-            _, _, etype, code, value = struct.unpack_from(EVENT_FORMAT, data, offset)
-            for button, down in decode_event(etype, code, value, device["xinput"]):
-                self._set_button(device, button, down)
-
-    def _set_button(self, device, button, down):
-        with self.lock:
-            if down:
-                device["held"].add(button)
-                if button not in self.order:
-                    self.order.append(button)
-                self.last_button = button
-            else:
-                device["held"].discard(button)
-                if button not in self._held() and button in self.order:
-                    self.order.remove(button)
-
     def _tick(self, now):
-        """Controla a gravação da combinação e o disparo do atalho."""
-        learned = None
+        """Dispara o atalho e avisa quando a cobertura do backend muda."""
         fire = False
+        covered_change = None
         with self.lock:
             held = self._held()
-            if self.learn_deadline and now >= self.learn_deadline:
-                self.learn_deadline = 0.0
-                self.learn_since = None
-                self.message = "Tempo esgotado. Nenhuma combinação foi gravada."
-            if now < self.learn_deadline:
-                if len(held) >= 2:
-                    if self.learn_since is None:
-                        self.learn_since = now
-                    elif now - self.learn_since >= 0.4:
-                        pressed = [b for b in self.order if b in held]
-                        if len(held) == 2 and len(pressed) == 2:
-                            learned = pressed
-                            self.learn_deadline = 0.0
-                            self.learn_since = None
-                            self.require_release = True
-                            self.message = ""
-                        else:
-                            self.message = "Aperte só 2 botões ao mesmo tempo."
-                            self.learn_since = None
-                else:
-                    self.learn_since = None
-            elif self.require_release:
-                # logo após gravar, espera soltar os botões para não disparar sem querer
-                if not held:
-                    self.require_release = False
-            elif self.active and set(self.combo) <= held:
+            if self.active and set(self.combo) <= held:
                 if self.pressed_since is None:
                     self.pressed_since = now
                 if not self.fired and now - self.pressed_since >= self.hold:
@@ -433,8 +456,12 @@ class HotkeyMonitor:
             else:
                 self.pressed_since = None
                 self.fired = False
-        if learned is not None:
-            self._call(self.on_learned, learned)
+            covered = self._covered()
+            if covered != self.covered_sent:
+                self.covered_sent = covered
+                covered_change = covered
+        if covered_change is not None:
+            self._call(self.on_covered, covered_change)
         if fire:
             self._call(self.on_fire)
 
@@ -450,22 +477,29 @@ def _clamp(value, low, high):
 
 
 def sanitize_hotkey(raw):
-    """Valida o atalho: ativo ou não, os 2 botões e quanto tempo segurar (ms)."""
+    """Valida o atalho: ativo ou não, os 2 IDs de botão do Steam e quanto tempo segurar (ms)."""
     if not isinstance(raw, dict):
         raw = {}
     buttons = raw.get("buttons", [])
     if (
         not isinstance(buttons, (list, tuple))
         or len(buttons) != 2
+        or not all(isinstance(b, int) and not isinstance(b, bool) and 0 <= b <= 255 for b in buttons)
         or buttons[0] == buttons[1]
-        or not all(isinstance(b, str) and BUTTON_ID_RE.match(b) for b in buttons)
     ):
         buttons = []
     try:
-        hold_ms = _clamp(int(raw.get("hold_ms", 250)), 0, 1000)
+        hold_ms = _clamp(int(raw.get("hold_ms", 0)), 0, 1000)
     except (TypeError, ValueError):
-        hold_ms = 250
-    return {"enabled": bool(raw.get("enabled", False)) and len(buttons) == 2, "buttons": list(buttons), "hold_ms": hold_ms}
+        hold_ms = 0
+    if raw.get("v") != 2:
+        hold_ms = 0  # formato antigo (1.5.0): volta ao padrão instantâneo
+    return {
+        "enabled": bool(raw.get("enabled", False)) and len(buttons) == 2,
+        "buttons": list(buttons),
+        "hold_ms": hold_ms,
+        "v": 2,
+    }
 
 
 def sanitize_profile(raw, name):
@@ -783,14 +817,14 @@ class Plugin:
     # ------------------------------------------------------------------
     def ensure_monitor(self):
         if self.monitor is None:
-            self.monitor = HotkeyMonitor(decky.logger, self._schedule_fire, self._schedule_learned)
+            self.monitor = HotkeyMonitor(decky.logger, self._schedule_fire, self._schedule_covered)
         return self.monitor
 
     def sync_monitor(self):
-        """Liga o monitor só quando o atalho está ativo e com 2 botões gravados."""
+        """Liga a leitura em jogo só quando o atalho está ativo e o backend sabe ler os 2 botões."""
         try:
             hk = self.settings["hotkey"]
-            active = hk["enabled"] and len(hk["buttons"]) == 2
+            active = hk["enabled"] and len(hk["buttons"]) == 2 and set(hk["buttons"]) <= SUPPORTED_BUTTONS
             monitor = self.ensure_monitor() if active else self.monitor
             if monitor is None:
                 return
@@ -810,39 +844,61 @@ class Plugin:
                 decky.logger.error(f"Erro ao ler o estado do atalho: {e}")
         return {
             "enabled": hk["enabled"],
-            "buttons": [label_for(b) for b in hk["buttons"]],
+            "buttons": list(hk["buttons"]),
             "hold_ms": hk["hold_ms"],
             "running": info.get("running", False),
             "devices": info.get("devices", 0),
-            "denied": info.get("denied", 0),
-            "learning": info.get("learning", False),
-            "learn_left": info.get("learn_left", 0),
-            "message": info.get("message", ""),
-            "last_button": info.get("last_button", ""),
+            "covered": info.get("covered", False),
         }
 
     def _schedule_fire(self):
         if self.loop is not None:
-            asyncio.run_coroutine_threadsafe(self._hotkey_fire(), self.loop)
+            asyncio.run_coroutine_threadsafe(self.hotkey_toggle(), self.loop)
 
-    def _schedule_learned(self, buttons):
+    def _schedule_covered(self, covered):
         if self.loop is not None:
-            asyncio.run_coroutine_threadsafe(self._hotkey_learned(buttons), self.loop)
+            asyncio.run_coroutine_threadsafe(self._emit_covered(covered), self.loop)
 
-    async def _hotkey_fire(self):
+    async def _emit_covered(self, covered):
+        """Avisa a interface se o backend está cobrindo a combinação (ela então se cala)."""
+        emit = getattr(decky, "emit", None)
+        if emit is None:
+            return
+        try:
+            await emit("hotkey_covered", bool(covered))
+        except Exception as e:
+            decky.logger.error(f"Erro ao avisar a interface do atalho: {e}")
+
+    async def hotkey_toggle(self) -> dict:
+        """Liga/desliga o crosshair (chamado pelo atalho, pela interface ou pelo backend)."""
         self.settings["enabled"] = not self.settings["enabled"]
         self.save_settings()
         try:
             self.apply()
         except Exception as e:
             decky.logger.error(f"Erro ao aplicar o crosshair pelo atalho: {e}")
+        return self.state()
 
-    async def _hotkey_learned(self, buttons):
-        hotkey = {**self.settings["hotkey"], "buttons": list(buttons), "enabled": True}
+    async def set_hotkey(self, buttons: list) -> dict:
+        """Salva a combinação gravada pela interface (2 IDs de botão do Steam) e ativa o atalho."""
+        self.loop = asyncio.get_running_loop()
+        hotkey = sanitize_hotkey(
+            {"enabled": True, "buttons": buttons, "hold_ms": self.settings["hotkey"]["hold_ms"], "v": 2}
+        )
+        if len(hotkey["buttons"]) != 2:
+            raise ValueError("A combinação precisa de exatamente 2 botões diferentes")
         self.settings = self.sanitize({**self.settings, "hotkey": hotkey})
         self.save_settings()
         self.sync_monitor()
         await self._blink()
+        return self.state()
+
+    async def clear_hotkey(self) -> dict:
+        hotkey = {**self.settings["hotkey"], "buttons": [], "enabled": False}
+        self.settings = self.sanitize({**self.settings, "hotkey": hotkey})
+        self.save_settings()
+        self.sync_monitor()
+        return self.state()
 
     async def _blink(self):
         """Pisca o crosshair duas vezes para confirmar que a combinação foi gravada."""
@@ -855,23 +911,6 @@ class Plugin:
                 await asyncio.sleep(0.2)
         except Exception as e:
             decky.logger.error(f"Erro ao piscar o crosshair: {e}")
-
-    async def start_hotkey_learning(self) -> dict:
-        self.loop = asyncio.get_running_loop()
-        self.ensure_monitor().start_learning()
-        return self.state()
-
-    async def cancel_hotkey_learning(self) -> dict:
-        if self.monitor is not None:
-            self.monitor.cancel_learning("Gravação cancelada.")
-        return self.state()
-
-    async def clear_hotkey(self) -> dict:
-        hotkey = {**self.settings["hotkey"], "buttons": [], "enabled": False}
-        self.settings = self.sanitize({**self.settings, "hotkey": hotkey})
-        self.save_settings()
-        self.sync_monitor()
-        return self.state()
 
     async def _main(self):
         self.load_settings()
