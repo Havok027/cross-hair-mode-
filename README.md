@@ -59,6 +59,11 @@ Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que des
 
 ## 📜 Histórico de Versões
 
+### 🟤 Versão 1.6.0
+- Atalho de botões refeito: a combinação é gravada pela interface e lida também em jogo.
+- Cor com carrossel e navegação por esquerda e direita.
+- Removida a prévia da mira.
+
 ### 🔴 Versão 1.5.0
 - Atalho de botões: grave 2 botões do controle e segure-os juntos para ligar ou desligar a mira.
 - Visual renovado, com prévia com grade e brilho, cartões com destaque e teclas estilizadas.
