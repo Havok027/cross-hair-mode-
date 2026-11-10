@@ -29,7 +29,9 @@ export interface HotkeyState {
   hold_ms: number; // quanto tempo segurar (ms)
   running: boolean; // o backend está lendo o controle em jogo
   devices: number; // controles que o backend está lendo
+  denied: number; // controles sem permissão de leitura
   covered: boolean; // o backend cobre esta combinação (a interface se cala)
+  supported: boolean; // o backend sabe ler os botões desta combinação em jogo
 }
 
 export interface PluginState {

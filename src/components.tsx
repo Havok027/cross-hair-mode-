@@ -75,6 +75,18 @@ export function SizeChips(props: { value: number; onSelect: (size: number) => vo
   );
 }
 
+// Explica de onde o atalho está sendo lido e, se for o caso, por que só funciona com o menu aberto
+function readingNote(hotkey: HotkeyState): string {
+  if (hotkey.covered) return "Leitura em jogo ativa (" + hotkey.devices + " controle(s)).";
+  if (!hotkey.supported) {
+    return "Esta combinação só funciona com o menu do Steam em foco. Para usar em jogo, grave outra com A, B, X, Y, direcional, LB, RB, LT, RT, Menu ou View.";
+  }
+  if (hotkey.devices === 0) {
+    return "Procurando controles para ler em jogo. O Steam cria o controle virtual quando um jogo abre.";
+  }
+  return "Estes botões não chegam pelo controle virtual do Steam. Para usar em jogo, grave A, B, X, Y, direcional, LB, RB, LT, RT, Menu ou View.";
+}
+
 // Cartão do atalho de botões: combinação gravada, gravação em andamento e situação da leitura
 export function HotkeyCard(props: {
   hotkey: HotkeyState;
@@ -109,12 +121,9 @@ export function HotkeyCard(props: {
         <div className="xh-hint">Nenhuma combinação gravada. Toque em "Gravar combinação".</div>
       )}
       {message && !capturing && <div className="xh-warn">{message}</div>}
-      {hasCombo && hotkey.enabled && !capturing && (
-        <div className="xh-hint xh-diag">
-          {hotkey.covered
-            ? "Leitura em jogo ativa (" + hotkey.devices + " controle(s))"
-            : "Leitura pela interface do Steam"}
-        </div>
+      {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey)}</div>}
+      {hasCombo && hotkey.enabled && !capturing && hotkey.denied > 0 && (
+        <div className="xh-warn">Sem permissão para ler {hotkey.denied} controle(s).</div>
       )}
     </div>
   );
