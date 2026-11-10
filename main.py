@@ -45,6 +45,9 @@ MODELS = {
 # sabe quando pode devolver o overlay de antes e quando o Steam já o trocou.
 CONFIG_MARKER = "# crosshair-plugin: configuracao gerada pelo plugin"
 MAX_BACKUPS = 5
+# A mesma apertada pode chegar pelos dois caminhos (interface e leitura em jogo).
+# Dois avisos de origens diferentes dentro desta janela contam como um só.
+TOGGLE_DEDUP_SECONDS = 1.0
 
 REF_FONT_SIZE = 24  # tamanho de fonte padrão do MangoHud (100%)
 HALF_H = 20  # metade da altura do bloco de 3 linhas, em px (valor original)
@@ -320,6 +323,8 @@ class HotkeyMonitor:
         self.pressed_since = None
         self.fired = False
         self.covered_sent = False
+        self.last_seen = []  # IDs do último grupo de botões lidos em jogo
+        self.last_seen_at = None
 
     # --- usado pelo plugin -------------------------------------------------
     def configure(self, combo, hold_ms, active):
@@ -355,6 +360,10 @@ class HotkeyMonitor:
                 "devices": len(self.devices),
                 "denied": self.denied,
                 "covered": self._covered(),
+                "last_seen": list(self.last_seen),
+                "last_seen_age": None
+                if self.last_seen_at is None
+                else int(time.monotonic() - self.last_seen_at),
             }
 
     # --- thread de leitura -------------------------------------------------
@@ -491,6 +500,11 @@ class HotkeyMonitor:
         covered_change = None
         with self.lock:
             held = self._held()
+            if held:
+                # guarda o maior grupo de botões de uma mesma apertada (para o diagnóstico)
+                if self.last_seen_at is None or now - self.last_seen_at > 1.0 or len(held) >= len(self.last_seen):
+                    self.last_seen = sorted(held)
+                self.last_seen_at = now
             if self.active and set(self.combo) <= held:
                 if self.pressed_since is None:
                     self.pressed_since = now
@@ -575,6 +589,7 @@ class Plugin:
         self.settings_path = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "settings.json")
         self.monitor = None  # monitor do atalho (criado só quando necessário)
         self.loop = None
+        self.last_toggle = None  # (origem, instante) do último liga/desliga pelo atalho
         self.backup_path = os.path.join(decky.DECKY_PLUGIN_SETTINGS_DIR, "mangohud_backup.json")
         self.backups = {}  # caminho do arquivo do MangoHud -> conteúdo de antes da mira
 
@@ -946,12 +961,14 @@ class Plugin:
             "devices": info.get("devices", 0),
             "denied": info.get("denied", 0),
             "covered": info.get("covered", False),
+            "last_seen": info.get("last_seen", []),
+            "last_seen_age": info.get("last_seen_age"),
             "supported": len(hk["buttons"]) == 2 and set(hk["buttons"]) <= SUPPORTED_BUTTONS,
         }
 
     def _schedule_fire(self):
         if self.loop is not None:
-            asyncio.run_coroutine_threadsafe(self.hotkey_toggle(), self.loop)
+            asyncio.run_coroutine_threadsafe(self.hotkey_toggle("backend"), self.loop)
 
     def _schedule_covered(self, covered):
         if self.loop is not None:
@@ -967,8 +984,13 @@ class Plugin:
         except Exception as e:
             decky.logger.error(f"Erro ao avisar a interface do atalho: {e}")
 
-    async def hotkey_toggle(self) -> dict:
-        """Liga/desliga o crosshair (chamado pelo atalho, pela interface ou pelo backend)."""
+    async def hotkey_toggle(self, source: str = "ui") -> dict:
+        """Liga/desliga o crosshair. Chamado pela interface ("ui") ou pela leitura em jogo ("backend")."""
+        now = time.monotonic()
+        last = self.last_toggle
+        if last is not None and last[0] != source and now - last[1] < TOGGLE_DEDUP_SECONDS:
+            return self.state()  # a mesma apertada já foi tratada pelo outro caminho
+        self.last_toggle = (str(source), now)
         self.settings["enabled"] = not self.settings["enabled"]
         self.save_settings()
         try:
