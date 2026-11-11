@@ -1,6 +1,10 @@
 <h1 align="center">🎯 Crosshair Plugin</h1>
 
 <p align="center">
+  <b>Idioma:</b> <a href="README.md">Português</a> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a>
+</p>
+
+<p align="center">
   <b>Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.</b>
 </p>
 

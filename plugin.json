@@ -1,10 +1,15 @@
 {
   "name": "Crosshair",
-  "author": "JSON Derulo",
+  "author": "Havok",
   "flags": [],
   "api_version": 1,
   "publish": {
-    "tags": ["crosshair", "aim", "overlay", "HUD"],
+    "tags": [
+      "crosshair",
+      "aim",
+      "overlay",
+      "HUD"
+    ],
     "description": "Repurpose the performance overlay into a customizable crosshair.",
     "image": "https://steamuserimages-a.akamaihd.net/ugc/25432209482234967/83EC67A8B25603F81A57F5C72715001021AC8484/"
   }
