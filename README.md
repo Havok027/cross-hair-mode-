@@ -12,6 +12,10 @@
 </p>
 
 <p align="center">
+  🇧🇷 <a href="README.md">Português</a> · 🇺🇸 <a href="README.en.md">English</a> · 🇪🇸 <a href="README.es.md">Español</a>
+</p>
+
+<p align="center">
   <img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin" width="100%" />
 </p>
 
