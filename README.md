@@ -1,102 +1,226 @@
-# 🎯 Crosshair Plugin para Decky Loader
+<div align="center">
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Preview do Plugin" width="100%" />
-</p>
+# 🎯 Crosshair Plugin
 
-[![Baixar Release](https://img.shields.io/badge/Baixar-Release-2ea44f)](https://github.com/Havok027/cross-hair-mode-/releases)
+**Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.**
 
-Plugin para **Decky Loader** (Steam Deck, Legion Go e outros portáteis) que desenha uma mira (crosshair) personalizada na tela utilizando a infraestrutura do **MangoHud**.
- 
-> 📦 **Download:** acesse a [Página de Releases](https://github.com/Havok027/crosshair-plugin/releases) ou baixe direto a versão mais recente: [Crosshair.zip](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip).
+[
+
+![Versão](https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=vers%C3%A3o&color=2ea44f&style=for-the-badge)
+
+](https://github.com/Havok027/crosshair-plugin/releases/latest)
+[
+
+![Downloads](https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge)
+
+](https://github.com/Havok027/crosshair-plugin/releases)
+[
+
+![Decky Loader](https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge)
+
+](https://decky.xyz)
+[
+
+![Licença](https://img.shields.io/badge/licen%C3%A7a-BSD--3-ff007b?style=for-the-badge)
+
+](LICENSE)
+
+<img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin" width="100%" />
+
+[📦 Baixar](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) · [🚀 Como usar](#-como-usar) · [🎮 Atalho](#-atalho-de-botões) · [🩺 Problemas](#-solução-de-problemas) · [📍 Roadmap](#-roadmap)
+
+</div>
 
 ---
 
-## 📸 Recursos Principais
+## 📑 Índice
 
-- **Visualização em Tempo Real:** prévia instantânea da mira na interface de configuração.
-- **Interface para Gamepad:** projetada para ser usada com o controle, no modo Gaming.
-- **Perfis por Jogo:** salve configurações (modelo, cor, tamanho e posição) exclusivas para cada jogo. O perfil é carregado automaticamente ao iniciar a partida (opção configurável).
-- **Ajuste Fino de Posição:** sliders de offset X e Y (de -200 a +200) com botão de reset rápido. O ajuste fica salvo por modelo.
-- **Cores e Tamanhos:** 8 cores pré-definidas, seletor de RGB personalizado e escala de 50% a 300%.
-- **Múltiplos Modelos:** Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços.
-- **Suporte a Resoluções:** Steam Deck, Legion Go S (1920x1200), Legion Go (2560x1600), 1080p e 4K.
+[✨ Destaques](#-destaques) · [📦 Instalação](#-instalação) · [🚀 Como usar](#-como-usar) · [🎮 Atalho de botões](#-atalho-de-botões) · [🎨 Modelos e cores](#-modelos-e-cores) · [📺 Resoluções](#-resoluções) · [🔧 Como funciona](#-como-funciona) · [🩺 Solução de problemas](#-solução-de-problemas) · [📍 Roadmap](#-roadmap) · [📜 Histórico](#-histórico-de-versões) · [🤝 Contribuindo](#-contribuindo) · [💡 Créditos](#-créditos)
 
 ---
 
-## 📥 Instalação
+## ✨ Destaques
 
-1. Baixe o `Crosshair.zip` na [Página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
+| | Recurso | O que faz |
+|---|---|---|
+| 🎯 | **7 modelos de mira** | Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços, escolhidos em uma lista |
+| 🎨 | **Cores e tamanho** | 8 cores prontas, RGB personalizado e escala de 50% a 300% |
+| 📐 | **Escala pelo centro** | A mira cresce a partir do centro, sem sair do lugar (com calibração opcional) |
+| 🕹️ | **Atalho de botões** | Grave 2 botões do controle e ligue ou desligue a mira sem abrir o menu |
+| 🕶️ | **Perfil por jogo** | Modelo, cor, tamanho e posição salvos para cada jogo, aplicados ao abrir |
+| ♻️ | **MangoHud preservado** | Ao desligar a mira, o overlay de desempenho de antes volta |
+| 🧭 | **Ajuste fino** | Sliders de posição X e Y (de -200 a +200), salvos por modelo |
+| 📺 | **Várias telas** | Steam Deck, Legion Go S, Legion Go, 1080p e 4K |
+| 🔄 | **Atualização fácil** | Releases automáticas e compatível com o Direct Updater |
+
+---
+
+## 📦 Instalação
+
+1. Baixe o [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) na [página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
 2. No **Decky Loader**, abra as **Configurações** e ative o **Modo desenvolvedor**.
 3. Em **Desenvolvedor**, escolha **Instalar plugin de ZIP** e selecione o `Crosshair.zip`.
 4. Se o plugin não aparecer, reinicie o Decky ou o aparelho.
 
----
-
-## 🚀 Como Usar
-
-1. Abra o menu do **Decky Loader** no seu portátil.
-2. Acesse o **Crosshair Plugin**.
-3. Selecione a **Resolução** nativa da sua tela.
-4. Escolha o **Modelo**, a **Cor** e o **Tamanho** desejados.
-5. Ative a opção **Mostrar crosshair**.
-6. *(Opcional)* Caso a mira precise de centralização, utilize os sliders **Horizontal (X)** e **Vertical (Y)**.
-7. *(Opcional)* Com um jogo aberto, toque em **Salvar perfil deste jogo**. Dali em diante, essas configurações são aplicadas sempre que o jogo for executado.
+> [!TIP]
+> **Atualizações:** depois da primeira instalação, o plugin é reconhecido pelo **Direct Updater**. Se ele não achar a origem, toque no **?** ao lado do Crosshair, escolha **Find source** e digite `Havok027/crosshair-plugin`.
 
 ---
 
-## 🛠️ Como Funciona & Limitações
+## 🚀 Como usar
 
-- **Infraestrutura:** o plugin gera dinamicamente uma configuração para o MangoHud, renderizando a mira via texto personalizado (`custom_text`), aplicando a cor (`text_color`), o tamanho da fonte (`font_size`) e o deslocamento (`offset_x`, `offset_y`).
-- **Cálculo de Posição:** o ponto central é calculado com base na resolução selecionada, compensando as dimensões do caractere. Os modelos adicionais têm centralização estimada e podem exigir um pequeno ajuste manual.
-- **Perfil Automático:** a aplicação ao abrir o jogo depende de o Steam avisar o plugin que o jogo iniciou. Se em algum jogo o perfil não for aplicado sozinho, abra o plugin e verifique as configurações.
-- ⚠️ **Incompatibilidades Conhecidas:**
-  - Pode conflitar com outras modificações manuais do MangoHud ou com plugins semelhantes (como o *MangoPeel*).
-  - **Não é possível** utilizar o overlay de desempenho padrão do SteamOS/MangoHud simultaneamente com o crosshair. Para voltar o overlay, mude o nível de desempenho no menu rápido e ligue o crosshair de novo no plugin.
-- **Reinício do Decky:** o crosshair sempre começa desligado quando o Decky reinicia. Basta ativar **Mostrar crosshair** de novo.
+1. Abra o menu do **Decky Loader** e acesse o **Crosshair Plugin**.
+2. Escolha a **resolução** da sua tela.
+3. Escolha o **modelo**, a **cor** e o **tamanho**.
+4. Ative **Mostrar crosshair**.
+5. Se a mira não estiver no centro, use os sliders **Horizontal (X)** e **Vertical (Y)**.
+6. *(Opcional)* Com um jogo aberto, toque em **Salvar perfil deste jogo**.
 
----
+**O painel, seção por seção:**
 
-## 📜 Histórico de Versões
+| Seção | O que tem |
+|---|---|
+| **Crosshair** | Resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair* |
+| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho e slider de tamanho |
+| **Tela e posição** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
+| **Atalho de botões** | Gravar, remover, tempo segurando e diagnóstico |
+| **Perfil do jogo** | Salvar, atualizar e excluir perfis, e aplicar ao abrir o jogo |
 
-### 🟤 Versão 1.6.0
-- Atalho de botões refeito: a combinação é gravada pela interface e lida também em jogo.
-- Cor com carrossel e navegação por esquerda e direita.
-- Removida a prévia da mira.
-
-### 🔴 Versão 1.5.0
-- Atalho de botões: grave 2 botões do controle e segure-os juntos para ligar ou desligar a mira.
-- Visual renovado, com prévia com grade e brilho, cartões com destaque e teclas estilizadas.
-
-### 🟠 Versão 1.4.0
-- A mira cresce a partir do centro, sem mudar de posição ao alterar o tamanho (com calibração opcional por modelo).
-- Interface renovada, com prévia com guias de centro e atalhos de tamanho.
-- Código organizado em módulos e pastas, com arrumação automática do repositório.
-- 
-### 🟣 Versão 1.3.1
-- Removidos os botões de direção (Cima, Esquerda, Direita e Baixo); a posição agora é ajustada apenas pelos sliders.
-- A mensagem da release passa a vir do arquivo `RELEASE_NOTES.md`.
-
-### 🟢 Versão 1.3.0
-- Seleção de **Modelo via lista suspensa** (dropdown).
-- **Posição por sliders** (X e Y de -200 a 200) com botão de zerar.
-- **Sistema de Perfis por Jogo** com detecção e aplicação automática.
-- Interface reformulada com preview em tempo real.
-
-### 🔵 Versão 1.2.0
-- Adicionado suporte à **Legion Go S** (1920x1200), além do Steam Deck, Legion Go, 1080p e 4K.
-- Nova interface navegável por controle e seletor de cores.
-- **Ajuste de Cores:** 8 predefinições + RGB customizado.
-- **Ajuste de Tamanho:** escala de 50% a 300%.
-- **Novos Modelos:** Anel, X, Estrela, Colchetes e Traços.
-- Persistência de configurações entre sessões e por modelo.
+> [!NOTE]
+> Na seção **Cor**, o slider troca a cor na hora com esquerda e direita, e a cor escolhida fica no centro do carrossel. Cima e baixo mudam de seção.
 
 ---
 
-## 💡 Créditos e Agradecimentos
+## 🎮 Atalho de botões
 
-Este projeto foi desenvolvido utilizando como base o trabalho original de **[xXJSONDeruloXx](https://github.com/xXJSONDeruloXx)**.
+Ligue e desligue a mira com uma combinação de **2 botões do controle**, sem abrir o menu.
 
-- **Projeto de Origem:** [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) por [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx).
+**Como gravar:**
 
-Agradecimentos à comunidade do Decky Loader pelo suporte e desenvolvimento de ferramentas para portáteis!
+1. Em **Atalho de botões**, toque em **Gravar combinação**.
+2. Aperte os 2 botões **juntos** e solte (em até 12 segundos). Pode fazer com o menu aberto.
+3. A mira pisca duas vezes quando a combinação é gravada.
+4. Pronto: apertar os 2 botões liga ou desliga a mira.
+
+O **tempo segurando** vai de 0 a 1000 ms. O padrão é 0 (instantâneo). Aumente para evitar disparos acidentais.
+
+**Onde cada botão é lido:**
+
+| Botões | Menu aberto | Em jogo |
+|---|:---:|:---:|
+| A, B, X, Y e direcional | ✅ | ✅ |
+| L4, L5, R4, R5 (Steam Deck e Steam Controller) | ✅ | ✅ |
+| LB, RB, LT, RT, Menu e View | ✅ | 🧪 em validação |
+| L3, R3 e botões extras de outros controles | ✅ | ⚠️ depende do Steam |
+
+> [!NOTE]
+> **Como funciona:** a combinação é gravada pela interface do Steam. Fora do menu, o plugin lê o controle direto do sistema. Se a mesma apertada chegar pelos dois caminhos, ela conta uma vez só.
+
+> [!TIP]
+> **Diagnóstico:** o cartão do atalho mostra o **último grupo de botões lido em jogo**, com os nomes e os números. Aperte a combinação em jogo, abra o menu e confira se ela apareceu.
+
+---
+
+## 🎨 Modelos e cores
+
+**Modelos de mira:**
+
+| Modelo | Visual | Observação |
+|---|:---:|---|
+| Caixa | `\| + \|` | Moldura em volta do centro |
+| Ponto | `+` | O clássico |
+| Anel | `O` | Mira aberta |
+| X | `x` | Discreta |
+| Estrela | `*` | Marca pequena |
+| Colchetes | `[ + ]` | Destaca o centro |
+| Traços | `- + -` | Linhas dos lados |
+
+**Cores prontas:**
+
+| Cor | Código | Cor | Código |
+|---|---|---|---|
+| 🩷 Rosa | `#FF007B` | 🩵 Ciano | `#00E5FF` |
+| 💚 Verde | `#00FF66` | 💜 Roxo | `#9B5CFF` |
+| ❤️ Vermelho | `#FF2D2D` | 🧡 Laranja | `#FF8A00` |
+| 💛 Amarelo | `#FFE600` | 🤍 Branco | `#FFFFFF` |
+
+Além delas, dá para montar qualquer cor em **Cor personalizada (RGB)**.
+
+---
+
+## 📺 Resoluções
+
+| Tela | Resolução |
+|---|---|
+| Steam Deck | 1280 x 800 |
+| Legion Go S | 1920 x 1200 |
+| Monitor externo 1080p | 1920 x 1080 |
+| Legion Go | 2560 x 1600 |
+| Monitor externo 4K | 3840 x 2160 |
+
+> [!NOTE]
+> Os modelos novos (Anel, X, Estrela, Colchetes e Traços) têm a centralização **estimada**. Se algum ficar um pouco fora do centro, ajuste com os sliders X e Y. O ajuste é salvo por modelo.
+
+---
+
+## 🔧 Como funciona
+
+O plugin escreve uma configuração do **MangoHud** que desenha a mira como texto (`custom_text`), com a cor (`text_color`), o tamanho (`font_size`) e a posição (`offset_x` e `offset_y`).
+
+| Etapa | O que acontece |
+|---|---|
+| **Ligar a mira** | O plugin guarda o MangoHud que existia e escreve a mira |
+| **Desligar a mira** | O MangoHud de antes é devolvido, idêntico |
+| **O Steam troca o arquivo** | Se você mudar o nível de desempenho, o plugin não sobrescreve |
+| **Reiniciar o Decky** | A mira começa desligada e o overlay volta |
+| **Mudar o tamanho** | A posição é recalculada para a mira crescer a partir do centro |
+
+**Limitações:**
+
+| Limitação | Detalhe |
+|---|---|
+| Overlay de desempenho | Não dá para usar junto com a mira, os dois usam o mesmo MangoHud |
+| Outros plugins | Pode conflitar com plugins que também mexem no MangoHud (como o *MangoPeel*) |
+| Perfil automático | Depende de o Steam avisar o plugin que o jogo abriu |
+| Atalho em jogo | Depende do que o Steam entrega ao controle virtual do aparelho |
+
+---
+
+## 🩺 Solução de problemas
+
+| Problema | Causa provável | O que fazer |
+|---|---|---|
+| A mira está fora do centro | Centralização estimada do modelo | Ajuste X e Y. Para os dois, use *Calibrar escala* |
+| A mira se move ao mudar o tamanho | Margens internas do MangoHud | Em *Calibrar escala*, siga os 3 passos do cartão |
+| O atalho não funciona fora do menu | O Steam não entregou os botões ao jogo | Veja o *último botão lido em jogo* no cartão e grave outra combinação (A, B, X, Y ou direcional) |
+| O atalho não funciona nem com o menu | Combinação antiga ou tempo muito alto | Grave de novo e deixe o *tempo segurando* em 0 |
+| O overlay de desempenho sumiu | A mira está ligada | Desligue a mira: o MangoHud volta |
+| O perfil não aplica ao abrir o jogo | O Steam não avisou o plugin | Abra o plugin e confira *Aplicar perfil ao abrir o jogo* |
+| Erro *Failed to fetch dynamically imported module* | Instalou o código-fonte, sem a pasta `dist` | Instale o `Crosshair.zip` da página de Releases |
+| O Direct Updater diz *Origem não encontrada* | Instalação antiga | **?** > **Find source** > `Havok027/crosshair-plugin` |
+
+Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
+
+---
+
+## 📍 Roadmap
+
+| Situação | Item | Detalhes |
+|:---:|---|---|
+| ✅ | Suporte à Legion Go S | Resolução 1920 x 1200 |
+| ✅ | Cores, tamanho e novos modelos | RGB, escala de 50% a 300% e 7 modelos |
+| ✅ | Perfil por jogo | Aplicado ao abrir o jogo |
+| ✅ | Escala a partir do centro | Com calibração opcional por modelo |
+| ✅ | Atalho de botões | Gravação pela interface e leitura em jogo |
+| ✅ | MangoHud preservado | O overlay de antes volta ao desligar a mira |
+| ✅ | Releases e Direct Updater | Compilação e publicação automáticas |
+| 🔄 | Validar a leitura em jogo | LB, RB, LT, RT, Menu e View |
+| 🧭 | L3, R3 e botões traseiros | Leitura em jogo dos controles que não são da Valve |
+| 🧭 | Calibração automática | Centralizar cada modelo sem ajuste manual |
+| 🧭 | Exportar e importar | Levar configurações e perfis entre aparelhos |
+| 💡 | Segundo atalho | Trocar de modelo ou de perfil com os botões |
+| 💡 | Opacidade e contorno | Mais legibilidade em cenas claras |
+| 💡 | Resolução automática | Detectar a tela sem escolher na lista |
+| 💡 | Mais modelos | Mira com braços e formatos novos |
+| 💡 | Tradução em inglês | README e interface |
+| 💡 | Loja do Decky | Publicar
