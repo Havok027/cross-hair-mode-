@@ -40,11 +40,14 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --no-frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:backend
       - run: pnpm build
       - name: Montar a pasta do plugin
         run: |
           mkdir -p out/Crosshair
-          cp -r dist main.py plugin.json package.json README.md LICENSE out/Crosshair/
+          cp -r dist main.py plugin.json package.json README.md README.en.md README.es.md LICENSE out/Crosshair/
           cd out && zip -r ../Crosshair.zip Crosshair
       - uses: actions/upload-artifact@v4
         with:

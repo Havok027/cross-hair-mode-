@@ -1,10 +1,19 @@
-## Crosshair v1.7.1
-
-### Correções
-- O atalho de botões voltou a funcionar com o menu rápido (QAM) aberto. Na 1.7.0 a interface se calava quando o plugin lia a combinação em jogo, e com o menu aberto ninguém alternava a mira. Agora os dois caminhos ficam sempre ativos e, se a mesma apertada chegar pelos dois, ela conta uma vez só.
+## Crosshair v1.8.0
 
 ### Novidades
-- Diagnóstico no cartão do atalho: mostra o último grupo de botões que o plugin leu em jogo, com os nomes e os números dos botões e há quantos segundos. Serve para conferir se a leitura em jogo está recebendo a sua combinação.
+- Interface em português, inglês e espanhol. Selecione o idioma no dropdown do topo; a preferência fica salva e independe dos perfis de jogo.
+- Documentação em três idiomas, com links para alternar entre as versões do README.
+- Interface inspirada no Mako, organizada em guias: Aparência, Tela, Atalho e Perfis.
+- Navegação entre guias com L1/R1 ou toque, com a última guia salva. Durante a gravação do atalho, L1/R1 podem fazer parte da combinação e não mudam a guia.
+
+### Correções
+- Corrigida a perda de toques rápidos de A/B/X/Y quando os eventos de apertar e soltar chegam juntos, tanto pela interface do Steam quanto pela leitura em jogo. Isso inclui combinações como Select + X.
+- Mantida a prevenção de acionamento duplicado quando a mesma combinação chega pela interface e pelo backend.
+- Alterações pendentes são enviadas ao fechar o painel, evitando perder a última escolha de idioma ou ajuste.
+
+### Validação
+- Testes automatizados com eventos simulados de Select + A/B/X/Y, Select + RT, gravação, tempo segurando, acionamento único, idiomas e navegação L1/R1.
+- O comportamento no aparelho ainda precisa ser validado dentro e fora do QAM, inclusive com o layout de Steam Input usado no jogo.
 
 ### Mantido
 - O MangoHud de antes volta quando a mira é desligada.

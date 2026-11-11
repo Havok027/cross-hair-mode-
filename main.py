@@ -61,6 +61,7 @@ HALF_H = 20  # metade da altura do bloco de 3 linhas, em px (valor original)
 DEFAULT_COMP = (2, -16)
 
 DEFAULTS = {
+    "language": "pt",
     "enabled": False,
     "model": "box",
     "resolution": "800p",
@@ -480,11 +481,20 @@ class HotkeyMonitor:
             if not data:
                 break
             if device["kind"] == "evdev":
-                held = apply_evdev_events(held, data, device.get("xinput", False))
+                # Evaluate every input edge. A quick ABXY tap and its release
+                # can arrive in one read; evaluating only the final state loses it.
+                for offset in range(0, len(data) - _EVENT.size + 1, _EVENT.size):
+                    held = apply_evdev_events(held, data[offset:offset + _EVENT.size], device.get("xinput", False))
+                    with self.lock:
+                        device["held"] = held
+                    self._tick(time.monotonic())
             else:
                 parsed = parse_hid_report(data)
                 if parsed is not None:
                     held = parsed
+                    with self.lock:
+                        device["held"] = held
+                    self._tick(time.monotonic())
         with self.lock:
             device["held"] = held
 
@@ -641,6 +651,7 @@ class Plugin:
 
     def sanitize(self, s):
         out = json.loads(json.dumps(DEFAULTS))
+        out["language"] = s.get("language") if s.get("language") in ("pt", "en", "es") else "pt"
         out["enabled"] = bool(s.get("enabled", False))
         out["model"] = s.get("model") if s.get("model") in MODELS else DEFAULTS["model"]
         out["resolution"] = s.get("resolution") if s.get("resolution") in RESOLUTIONS else DEFAULTS["resolution"]
@@ -711,6 +722,7 @@ class Plugin:
         cx, cy = self.effective_comp()
         return {
             "settings": {
+                "language": s["language"],
                 "enabled": s["enabled"],
                 "model": s["model"],
                 "resolution": s["resolution"],
@@ -834,7 +846,7 @@ class Plugin:
 
     async def update_settings(self, patch: dict) -> dict:
         merged = dict(self.settings)
-        for key in ("enabled", "model", "resolution", "color", "size", "auto_apply"):
+        for key in ("enabled", "model", "resolution", "color", "size", "auto_apply", "language"):
             if key in patch:
                 merged[key] = patch[key]
         merged["nudge"] = dict(self.settings["nudge"])

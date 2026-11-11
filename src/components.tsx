@@ -1,16 +1,29 @@
-import { Focusable } from "@decky/ui";
+import { Focusable, PanelSection, PanelSectionRow } from "@decky/ui";
+import type { ReactNode } from "react";
 import { FaCheck } from "react-icons/fa";
 import type { HotkeyState, Settings } from "./api";
 import { buttonName } from "./hotkey";
+import { useTranslation } from "./i18n";
+import type { MessageKey, Translate } from "./i18n";
 import { COLORS, SIZE_PRESETS } from "./utils";
+
+export function SettingsSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <PanelSection>
+      <PanelSectionRow><div className="xh-section-title">{title}</div></PanelSectionRow>
+      {children}
+    </PanelSection>
+  );
+}
 
 // Resumo do estado da mira (sem prévia): ativa ou não, modelo, tamanho e cor
 export function StatusChips(props: { settings: Settings; modelLabel: string }) {
+  const t = useTranslation();
   const { settings, modelLabel } = props;
   return (
     <div className="xh-chips">
       <span className={"xh-pill" + (settings.enabled ? " xh-on" : "")}>
-        {settings.enabled ? "Ativo" : "Desligado"}
+        {settings.enabled ? t("Ativo") : t("Desligado")}
       </span>
       <span className="xh-chip">{modelLabel}</span>
       <span className="xh-chip">{settings.size}%</span>
@@ -24,11 +37,12 @@ export function StatusChips(props: { settings: Settings; modelLabel: string }) {
 // Carrossel de cores: a cor escolhida fica sempre no centro. Quem muda a cor é o
 // slider logo abaixo (esquerda/direita), então aqui é só visual e também aceita toque.
 export function ColorStrip(props: { value: string; onSelect: (hex: string) => void }) {
+  const t = useTranslation();
   const total = COLORS.length;
   const index = COLORS.findIndex((c) => c.hex === props.value);
   const center = index >= 0 ? index : 0;
   const slots = [-2, -1, 0, 1, 2].map((offset) => COLORS[(center + offset + total) % total]);
-  const name = index >= 0 ? COLORS[index].name : "Personalizada";
+  const name = index >= 0 ? t(COLORS[index].name as MessageKey) : t("Personalizada");
   return (
     <div className="xh-strip-wrap">
       <div className="xh-strip">
@@ -76,15 +90,11 @@ export function SizeChips(props: { value: number; onSelect: (size: number) => vo
 }
 
 // Explica de onde o atalho está sendo lido e, se for o caso, por que só funciona com o menu aberto
-function readingNote(hotkey: HotkeyState): string {
-  if (hotkey.covered) return "Lendo pela interface do Steam e em jogo (" + hotkey.devices + " controle(s)).";
-  if (!hotkey.supported) {
-    return "Esta combinação só funciona com o menu do Steam em foco. Para usar em jogo, grave outra com A, B, X, Y, direcional, LB, RB, LT, RT, Menu ou View.";
-  }
-  if (hotkey.devices === 0) {
-    return "Procurando controles para ler em jogo. O Steam cria o controle virtual quando um jogo abre.";
-  }
-  return "Estes botões não chegam pelo controle virtual do Steam. Para usar em jogo, grave A, B, X, Y, direcional, LB, RB, LT, RT, Menu ou View.";
+function readingNote(hotkey: HotkeyState, t: Translate): string {
+  if (hotkey.covered) return t("reading_both", { count: hotkey.devices });
+  if (!hotkey.supported) return t("reading_unsupported");
+  if (hotkey.devices === 0) return t("reading_search");
+  return t("reading_missing");
 }
 
 // Cartão do atalho de botões: combinação gravada, gravação em andamento e situação da leitura
@@ -94,6 +104,7 @@ export function HotkeyCard(props: {
   secondsLeft: number;
   message: string;
 }) {
+  const t = useTranslation();
   const { hotkey, capturing, secondsLeft, message } = props;
   const hasCombo = hotkey.buttons.length === 2;
   return (
@@ -102,37 +113,37 @@ export function HotkeyCard(props: {
         <>
           <div className="xh-rec">
             <span className="xh-rec-dot" />
-            Gravando... {secondsLeft}s
+            {t("Gravando...")} {secondsLeft}s
           </div>
           <div className="xh-hint">
-            Aperte os 2 botões juntos e depois solte. Pode fazer com este menu aberto.
+            {t("Aperte os 2 botões juntos e depois solte. Pode fazer com este menu aberto.")}
           </div>
         </>
       ) : hasCombo ? (
         <>
-          <div className="xh-card-title">Combinação</div>
+          <div className="xh-card-title">{t("Combinação")}</div>
           <div className="xh-keys">
-            <span className="xh-key">{buttonName(hotkey.buttons[0])}</span>
+            <span className="xh-key">{buttonName(hotkey.buttons[0], t)}</span>
             <span className="xh-plus">+</span>
-            <span className="xh-key">{buttonName(hotkey.buttons[1])}</span>
+            <span className="xh-key">{buttonName(hotkey.buttons[1], t)}</span>
           </div>
         </>
       ) : (
-        <div className="xh-hint">Nenhuma combinação gravada. Toque em "Gravar combinação".</div>
+        <div className="xh-hint">{t("empty_shortcut")}</div>
       )}
       {message && !capturing && <div className="xh-warn">{message}</div>}
-      {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey)}</div>}
+      {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey, t)}</div>}
       {hasCombo && hotkey.enabled && !capturing && hotkey.running && (
         <div className="xh-hint xh-diag">
           {hotkey.last_seen.length > 0
-            ? "Último botão lido em jogo: " +
-              hotkey.last_seen.map((id) => buttonName(id) + "(" + id + ")").join(" + ") +
-              (hotkey.last_seen_age !== null ? ", há " + hotkey.last_seen_age + " s" : "")
-            : "Nenhum botão lido em jogo ainda."}
+            ? t("Último botão lido em jogo: ") +
+              hotkey.last_seen.map((id) => buttonName(id, t) + "(" + id + ")").join(" + ") +
+              (hotkey.last_seen_age !== null ? t("age_seconds", { count: hotkey.last_seen_age }) : "")
+            : t("Nenhum botão lido em jogo ainda.")}
         </div>
       )}
       {hasCombo && hotkey.enabled && !capturing && hotkey.denied > 0 && (
-        <div className="xh-warn">Sem permissão para ler {hotkey.denied} controle(s).</div>
+        <div className="xh-warn">{t("permission_denied", { count: hotkey.denied })}</div>
       )}
     </div>
   );
