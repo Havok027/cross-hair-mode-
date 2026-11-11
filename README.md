@@ -1,35 +1,27 @@
-<div align="center">
+<h1 align="center">🎯 Crosshair Plugin</h1>
 
-# 🎯 Crosshair Plugin
+<p align="center">
+  <b>Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.</b>
+</p>
 
-**Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.**
+<p align="center">
+  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=vers%C3%A3o&color=2ea44f&style=for-the-badge" alt="Versão" /></a>
+  <a href="https://github.com/Havok027/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge" alt="Downloads" /></a>
+  <a href="https://decky.xyz"><img src="https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge" alt="Decky Loader" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licen%C3%A7a-BSD--3-ff007b?style=for-the-badge" alt="Licença" /></a>
+</p>
 
-[
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin" width="100%" />
+</p>
 
-![Versão](https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=vers%C3%A3o&color=2ea44f&style=for-the-badge)
-
-](https://github.com/Havok027/crosshair-plugin/releases/latest)
-[
-
-![Downloads](https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge)
-
-](https://github.com/Havok027/crosshair-plugin/releases)
-[
-
-![Decky Loader](https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge)
-
-](https://decky.xyz)
-[
-
-![Licença](https://img.shields.io/badge/licen%C3%A7a-BSD--3-ff007b?style=for-the-badge)
-
-](LICENSE)
-
-<img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin" width="100%" />
-
-[📦 Baixar](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) · [🚀 Como usar](#-como-usar) · [🎮 Atalho](#-atalho-de-botões) · [🩺 Problemas](#-solução-de-problemas) · [📍 Roadmap](#-roadmap)
-
-</div>
+<p align="center">
+  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip">📦 Baixar</a> ·
+  <a href="#-como-usar">🚀 Como usar</a> ·
+  <a href="#-atalho-de-botões">🎮 Atalho</a> ·
+  <a href="#-solução-de-problemas">🩺 Problemas</a> ·
+  <a href="#-roadmap">📍 Roadmap</a>
+</p>
 
 ---
 
@@ -41,17 +33,17 @@
 
 ## ✨ Destaques
 
-| | Recurso | O que faz |
-|---|---|---|
-| 🎯 | **7 modelos de mira** | Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços, escolhidos em uma lista |
-| 🎨 | **Cores e tamanho** | 8 cores prontas, RGB personalizado e escala de 50% a 300% |
-| 📐 | **Escala pelo centro** | A mira cresce a partir do centro, sem sair do lugar (com calibração opcional) |
-| 🕹️ | **Atalho de botões** | Grave 2 botões do controle e ligue ou desligue a mira sem abrir o menu |
-| 🕶️ | **Perfil por jogo** | Modelo, cor, tamanho e posição salvos para cada jogo, aplicados ao abrir |
-| ♻️ | **MangoHud preservado** | Ao desligar a mira, o overlay de desempenho de antes volta |
-| 🧭 | **Ajuste fino** | Sliders de posição X e Y (de -200 a +200), salvos por modelo |
-| 📺 | **Várias telas** | Steam Deck, Legion Go S, Legion Go, 1080p e 4K |
-| 🔄 | **Atualização fácil** | Releases automáticas e compatível com o Direct Updater |
+| Recurso | O que faz |
+|---|---|
+| 🎯 **7 modelos de mira** | Caixa, Ponto, Anel, X, Estrela, Colchetes e Traços, escolhidos em uma lista |
+| 🎨 **Cores e tamanho** | 8 cores prontas, RGB personalizado e escala de 50% a 300% |
+| 📐 **Escala pelo centro** | A mira cresce a partir do centro, sem sair do lugar (com calibração opcional) |
+| 🕹️ **Atalho de botões** | Grave 2 botões do controle e ligue ou desligue a mira sem abrir o menu |
+| 🕶️ **Perfil por jogo** | Modelo, cor, tamanho e posição salvos para cada jogo, aplicados ao abrir |
+| ♻️ **MangoHud preservado** | Ao desligar a mira, o overlay de desempenho de antes volta |
+| 🧭 **Ajuste fino** | Sliders de posição X e Y (de -200 a +200), salvos por modelo |
+| 📺 **Várias telas** | Steam Deck, Legion Go S, Legion Go, 1080p e 4K |
+| 🔄 **Atualização fácil** | Releases automáticas e compatível com o Direct Updater |
 
 ---
 
@@ -127,13 +119,13 @@ O **tempo segurando** vai de 0 a 1000 ms. O padrão é 0 (instantâneo). Aumente
 
 | Modelo | Visual | Observação |
 |---|:---:|---|
-| Caixa | `\| + \|` | Moldura em volta do centro |
-| Ponto | `+` | O clássico |
-| Anel | `O` | Mira aberta |
-| X | `x` | Discreta |
-| Estrela | `*` | Marca pequena |
-| Colchetes | `[ + ]` | Destaca o centro |
-| Traços | `- + -` | Linhas dos lados |
+| Caixa | <code>&#124; + &#124;</code> | Moldura em volta do centro |
+| Ponto | <code>+</code> | O clássico |
+| Anel | <code>O</code> | Mira aberta |
+| X | <code>x</code> | Discreta |
+| Estrela | <code>*</code> | Marca pequena |
+| Colchetes | <code>[ + ]</code> | Destaca o centro |
+| Traços | <code>- + -</code> | Linhas dos lados |
 
 **Cores prontas:**
 
@@ -217,10 +209,77 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 | 🔄 | Validar a leitura em jogo | LB, RB, LT, RT, Menu e View |
 | 🧭 | L3, R3 e botões traseiros | Leitura em jogo dos controles que não são da Valve |
 | 🧭 | Calibração automática | Centralizar cada modelo sem ajuste manual |
-| 🧭 | Exportar e importar | Levar configurações e perfis entre aparelhos |
-| 💡 | Segundo atalho | Trocar de modelo ou de perfil com os botões |
 | 💡 | Opacidade e contorno | Mais legibilidade em cenas claras |
 | 💡 | Resolução automática | Detectar a tela sem escolher na lista |
 | 💡 | Mais modelos | Mira com braços e formatos novos |
 | 💡 | Tradução em inglês | README e interface |
-| 💡 | Loja do Decky | Publicar
+| 💡 | Loja do Decky | Publicar o plugin na loja oficial |
+
+> [!NOTE]
+> Legenda: ✅ concluído · 🔄 em andamento · 🧭 planejado · 💡 ideia. O roadmap é uma lista de intenções, sem datas.
+
+---
+
+## 📜 Histórico de versões
+
+| Versão | Destaques |
+|:---:|---|
+| **1.7** | MangoHud de antes volta ao desligar a mira · leitura em jogo ampliada (LB, RB, LT, RT, Menu e View) · atalho funciona com o menu aberto · diagnóstico do último botão lido |
+| **1.6** | Atalho refeito (gravação pela interface) · carrossel de cores com esquerda e direita · prévia removida |
+| **1.5** | Primeira versão do atalho de botões · visual renovado |
+| **1.4** | Escala a partir do centro · código em módulos e pastas · compatível com o Direct Updater |
+| **1.3** | Modelo em lista suspensa · posição por sliders · perfil por jogo |
+| **1.2** | Suporte à Legion Go S · cores, tamanho e novos modelos |
+
+As notas completas de cada versão estão na página de [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+
+---
+
+## 🤝 Contribuindo
+
+Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havok027/crosshair-plugin/issues). Ajuda muito incluir:
+
+- o aparelho e a resolução da tela;
+- a versão do plugin;
+- uma foto do painel, ou do cartão do atalho no caso de problemas com os botões;
+- as últimas linhas do log em `~/homebrew/logs/Crosshair/`.
+
+<details>
+<summary><b>📂 Estrutura do projeto</b></summary>
+
+<br>
+
+| Arquivo | Função |
+|---|---|
+| `main.py` | Backend em Python: configurações, posição, MangoHud e leitura do controle |
+| `src/index.tsx` | Ponto de entrada do plugin |
+| `src/Content.tsx` | O painel |
+| `src/components.tsx` | Peças visuais do painel |
+| `src/hotkey.ts` | Atalho de botões (lado da interface) |
+| `src/api.ts` | Tipos e chamadas ao backend |
+| `src/utils.ts` | Cores, tamanhos e funções auxiliares |
+| `src/styles.ts` | CSS do painel |
+| `plugin.json` e `package.json` | Identidade, versão e repositório |
+| `.github/workflows/build.yml` | Compila e publica a release |
+| `RELEASE_NOTES.md` | Texto da release |
+
+Para compilar localmente: `pnpm install` e depois `pnpm build`.
+
+</details>
+
+---
+
+## 💡 Créditos
+
+| Projeto | Autor | Contribuição |
+|---|---|---|
+| [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) | [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx) | Projeto de origem, base deste plugin |
+| [Steamcord](https://github.com/Necrosiak/Steamcord) | [Necrosiak](https://github.com/Necrosiak) | Leitura dos botões do controle (BSD-3-Clause) |
+
+Agradecimentos à comunidade do **Decky Loader** pelo suporte e pelas ferramentas para portáteis.
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença **BSD 3-Clause**. Veja o arquivo [LICENSE](LICENSE).
