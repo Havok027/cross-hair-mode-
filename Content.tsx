@@ -60,7 +60,7 @@ export function Content() {
       .then(setState)
       .catch((error) => {
         console.error(error);
-        setStatus("Falha ao carregar: " + String(error));
+        setStatus(t("Falha ao carregar: ") + String(error));
       });
     return () => {
       if (timer.current !== undefined) window.clearTimeout(timer.current);
@@ -73,7 +73,7 @@ export function Content() {
       setStatus(okMessage);
     } catch (error) {
       console.error(error);
-      setStatus("Falhou: " + String(error));
+      setStatus(t("Falhou: ") + String(error));
     }
   };
 
@@ -109,12 +109,12 @@ export function Content() {
     const result = await handle.promise;
     captureRef.current = null;
     setCapturing(false);
-    if (result.ok) {
-      await run(() => setHotkey(result.buttons), "Combinação gravada");
+    if (result.ok === true) {
+      await run(() => setHotkey(result.buttons), t("Combinação gravada"));
     } else if (result.reason === "count") {
-      setCaptureMessage("Aperte exatamente 2 botões juntos. Tente de novo.");
+      setCaptureMessage(t("Aperte exatamente 2 botões juntos. Tente de novo."));
     } else if (result.reason === "timeout") {
-      setCaptureMessage("Tempo esgotado. Nenhuma combinação foi gravada.");
+      setCaptureMessage(t("Tempo esgotado. Nenhuma combinação foi gravada."));
     }
   };
 
@@ -129,7 +129,7 @@ export function Content() {
         setStatus("");
       } catch (error) {
         console.error(error);
-        setStatus("Falha ao aplicar: " + String(error));
+        setStatus(t("Falha ao aplicar: ") + String(error));
       }
     }, 150);
   };
@@ -157,7 +157,7 @@ export function Content() {
 
   if (!state) {
     return (
-      <PanelSection title="Crosshair">
+      <PanelSection title={t("Crosshair")}>
         <PanelSectionRow>
           <div className="xh-hint">{status || "Carregando..."}</div>
         </PanelSectionRow>
@@ -178,7 +178,7 @@ export function Content() {
     <>
       <style>{STYLES}</style>
 
-      <PanelSection title="Settings">
+      <PanelSection title={t("Settings")}>
         <PanelSectionRow>
           <DropdownItem
             label={t("Language")}
@@ -222,14 +222,14 @@ export function Content() {
       </PanelSection>
 
       {activeTab === 0 && <>
-      <PanelSection title="Crosshair">
+      <PanelSection title={t("Crosshair")}>
         <PanelSectionRow>
-          <StatusChips settings={settings} modelLabel={currentModel.label} />
+          <StatusChips settings={settings} modelLabel={currentModel.label} language={language} />
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Mostrar crosshair"
-            description="Substitui o overlay de desempenho (MangoHud)."
+            label={t("Show crosshair")}
+            description={t("Substitui o overlay de desempenho (MangoHud).")}
             checked={settings.enabled}
             onChange={(value: boolean) => patchSettings({ enabled: value })}
           />
@@ -241,18 +241,18 @@ export function Content() {
       <PanelSection title={t("Appearance")}>
         <PanelSectionRow>
           <DropdownItem
-            label="Modelo"
+            label={t("Modelo")}
             rgOptions={models.map((m) => ({ data: m.id, label: m.label }))}
             selectedOption={settings.model}
             onChange={(option: { data: string }) => patchSettings({ model: option.data })}
           />
         </PanelSectionRow>
         <PanelSectionRow>
-          <ColorStrip value={settings.color} onSelect={(hex) => patchSettings({ color: hex })} />
+          <ColorStrip value={settings.color} onSelect={(hex) => patchSettings({ color: hex })} language={language} />
         </PanelSectionRow>
         <PanelSectionRow>
           <SliderField
-            label="Cor"
+            label={t("Cor")}
             value={colorIndex}
             min={0}
             max={COLORS.length - 1}
@@ -262,7 +262,7 @@ export function Content() {
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Cor personalizada (RGB)"
+            label={t("Cor personalizada (RGB)")}
             checked={customColor}
             onChange={(value: boolean) => setCustomColor(value)}
           />
@@ -271,7 +271,7 @@ export function Content() {
           <>
             <PanelSectionRow>
               <SliderField
-                label="Vermelho"
+                label={t("Vermelho")}
                 value={r}
                 min={0}
                 max={255}
@@ -282,7 +282,7 @@ export function Content() {
             </PanelSectionRow>
             <PanelSectionRow>
               <SliderField
-                label="Verde"
+                label={t("Verde")}
                 value={g}
                 min={0}
                 max={255}
@@ -293,7 +293,7 @@ export function Content() {
             </PanelSectionRow>
             <PanelSectionRow>
               <SliderField
-                label="Azul"
+                label={t("Azul")}
                 value={b}
                 min={0}
                 max={255}
@@ -309,7 +309,7 @@ export function Content() {
         </PanelSectionRow>
         <PanelSectionRow>
           <SliderField
-            label="Tamanho"
+            label={t("Tamanho")}
             value={settings.size}
             min={50}
             max={300}
@@ -326,7 +326,7 @@ export function Content() {
       <PanelSection title={t("Display & position")}>
         <PanelSectionRow>
           <DropdownItem
-            label="Resolução da tela"
+            label={t("Resolução da tela")}
             rgOptions={resolutions.map((res) => ({ data: res.id, label: res.label }))}
             selectedOption={settings.resolution}
             onChange={(option: { data: string }) => patchSettings({ resolution: option.data })}
@@ -334,7 +334,7 @@ export function Content() {
         </PanelSectionRow>
         <PanelSectionRow>
           <SliderField
-            label="Horizontal (X)"
+            label={t("Horizontal (X)")}
             value={settings.nudge_x}
             min={-200}
             max={200}
@@ -345,7 +345,7 @@ export function Content() {
         </PanelSectionRow>
         <PanelSectionRow>
           <SliderField
-            label="Vertical (Y)"
+            label={t("Vertical (Y)")}
             value={settings.nudge_y}
             min={-200}
             max={200}
@@ -355,14 +355,14 @@ export function Content() {
           />
         </PanelSectionRow>
         <PanelSectionRow>
-          <ButtonItem layout="below" onClick={() => run(() => resetNudge(), "Ajuste zerado")}>
-            Zerar ajuste de posição
+          <ButtonItem layout="below" onClick={() => run(() => resetNudge(), t("Ajuste zerado"))}>
+            {t("Zerar ajuste de posição")}
           </ButtonItem>
         </PanelSectionRow>
         <PanelSectionRow>
           <ToggleField
-            label="Calibrar escala (avançado)"
-            description="A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho."
+            label={t("Calibrar escala (avançado)")}
+            description={t("A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho.")}
             checked={calibrate}
             onChange={(value: boolean) => setCalibrate(value)}
           />
@@ -371,18 +371,13 @@ export function Content() {
           <>
             <PanelSectionRow>
               <div className="xh-card">
-                <div className="xh-card-title">Como calibrar</div>
-                <div className="xh-hint">
-                  1) Deixe o tamanho em 100% e centralize a mira com Horizontal e Vertical. 2) Suba o tamanho
-                  para 300%. 3) Se a mira saiu do centro, ajuste a compensação até ela voltar. Se ao crescer
-                  ela sobe ou vai para a esquerda, aumente. Se desce ou vai para a direita, diminua. A
-                  calibração vale para o modelo atual.
-                </div>
+                <div className="xh-card-title">{t("Como calibrar")}</div>
+                <div className="xh-hint">{t("1) Deixe o tamanho em 100% e centralize a mira com Horizontal e Vertical. 2) Suba o tamanho para 300%. 3) Se a mira saiu do centro, ajuste a compensação até ela voltar. Se ao crescer ela sobe ou vai para a esquerda, aumente. Se desce ou vai para a direita, diminua. A calibração vale para o modelo atual.")}</div>
               </div>
             </PanelSectionRow>
             <PanelSectionRow>
               <SliderField
-                label="Compensação horizontal"
+                label={t("Compensação horizontal")}
                 value={settings.comp_x}
                 min={-60}
                 max={60}
@@ -393,7 +388,7 @@ export function Content() {
             </PanelSectionRow>
             <PanelSectionRow>
               <SliderField
-                label="Compensação vertical"
+                label={t("Compensação vertical")}
                 value={settings.comp_y}
                 min={-60}
                 max={60}
@@ -403,15 +398,15 @@ export function Content() {
               />
             </PanelSectionRow>
             <PanelSectionRow>
-              <ButtonItem layout="below" onClick={() => run(() => resetComp(), "Compensação restaurada")}>
-                Restaurar compensação padrão
+              <ButtonItem layout="below" onClick={() => run(() => resetComp(), t("Compensação restaurada"))}>
+                {t("Restaurar compensação padrão")}
               </ButtonItem>
             </PanelSectionRow>
           </>
         )}
         <PanelSectionRow>
           <div className="xh-offsets">
-            Posição final: {state.offset_x}, {state.offset_y}
+            {t("Posição final:")} {state.offset_x}, {state.offset_y}
           </div>
         </PanelSectionRow>
       </PanelSection>
@@ -421,8 +416,8 @@ export function Content() {
       <PanelSection title={t("Button shortcut")}>
         <PanelSectionRow>
           <ToggleField
-            label="Ligar/desligar com 2 botões"
-            description="Segure os 2 botões gravados para mostrar ou esconder a mira."
+            label={t("Ligar/desligar com 2 botões")}
+            description={t("Segure os 2 botões gravados para mostrar ou esconder a mira.")}
             checked={hotkey.enabled}
             onChange={(value: boolean) => patchHotkey({ hotkey_enabled: value })}
           />
@@ -433,27 +428,28 @@ export function Content() {
             capturing={capturing}
             secondsLeft={secondsLeft}
             message={captureMessage}
+            language={language}
           />
         </PanelSectionRow>
         <PanelSectionRow>
           <ButtonItem layout="below" onClick={() => toggleCapture()}>
             {capturing
-              ? "Cancelar gravação"
+              ? t("Cancelar gravação")
               : hotkey.buttons.length === 2
-                ? "Gravar outra combinação"
-                : "Gravar combinação"}
+                ? t("Gravar outra combinação")
+                : t("Gravar combinação")}
           </ButtonItem>
         </PanelSectionRow>
         {hotkey.buttons.length === 2 && (
           <PanelSectionRow>
-            <ButtonItem layout="below" onClick={() => run(() => clearHotkey(), "Combinação removida")}>
-              Remover combinação
+            <ButtonItem layout="below" onClick={() => run(() => clearHotkey(), t("Combinação removida"))}>
+              {t("Remover combinação")}
             </ButtonItem>
           </PanelSectionRow>
         )}
         <PanelSectionRow>
           <SliderField
-            label="Tempo segurando"
+            label={t("Tempo segurando")}
             value={hotkey.hold_ms}
             min={0}
             max={1000}
@@ -476,13 +472,12 @@ export function Content() {
                   <FaGamepad /> {game.name}
                 </div>
                 <span className={"xh-pill" + (hasProfile ? " xh-blue" : "")}>
-                  {hasProfile ? "Perfil salvo" : "Sem perfil"}
+                  {hasProfile ? t("Perfil salvo") : t("Sem perfil")}
                 </span>
               </>
             ) : (
               <div className="xh-hint">
-                Abra este menu com um jogo rodando para salvar um perfil só para ele (modelo, cor, tamanho e
-                posição).
+                {t("Abra este menu com um jogo rodando para salvar um perfil só para ele (modelo, cor, tamanho e posição).")}
               </div>
             )}
           </div>
@@ -491,9 +486,9 @@ export function Content() {
           <PanelSectionRow>
             <ButtonItem
               layout="below"
-              onClick={() => run(() => saveProfile(game.appid, game.name), "Perfil salvo para " + game.name)}
+              onClick={() => run(() => saveProfile(game.appid, game.name), t("Perfil salvo para ") + game.name)}
             >
-              {hasProfile ? "Atualizar perfil deste jogo" : "Salvar perfil deste jogo"}
+              {hasProfile ? t("Atualizar perfil deste jogo") : t("Salvar perfil deste jogo")}
             </ButtonItem>
           </PanelSectionRow>
         )}
@@ -501,15 +496,15 @@ export function Content() {
           <PanelSectionRow>
             <ButtonItem
               layout="below"
-              onClick={() => run(() => deleteProfile(game.appid), "Perfil removido de " + game.name)}
+              onClick={() => run(() => deleteProfile(game.appid), t("Perfil removido de ") + game.name)}
             >
-              Excluir perfil deste jogo
+              {t("Excluir perfil deste jogo")}
             </ButtonItem>
           </PanelSectionRow>
         )}
         <PanelSectionRow>
           <ToggleField
-            label="Aplicar perfil ao abrir o jogo"
+            label={t("Aplicar perfil ao abrir o jogo")}
             checked={settings.auto_apply}
             onChange={(value: boolean) => patchSettings({ auto_apply: value })}
           />
@@ -520,9 +515,9 @@ export function Content() {
             <PanelSectionRow key={p.appid}>
               <ButtonItem
                 layout="below"
-                onClick={() => run(() => deleteProfile(p.appid), "Perfil removido de " + p.name)}
+                onClick={() => run(() => deleteProfile(p.appid), t("Perfil removido de ") + p.name)}
               >
-                Excluir perfil: {p.name}
+                {t("Excluir perfil:")} {p.name}
               </ButtonItem>
             </PanelSectionRow>
           ))}
@@ -537,9 +532,7 @@ export function Content() {
         )}
         <PanelSectionRow>
           <div className="xh-hint">
-            {t("Created by Havok")} · O plugin usa o texto do MangoHud como mira, então não dá para ter o overlay de desempenho ao mesmo
-            tempo. Para voltar o overlay, mude o nível de desempenho no menu rápido. Depois, ligue o crosshair
-            de novo aqui.
+            {t("Created by Havok")} · {t("O plugin usa o texto do MangoHud como mira, então não dá para ter o overlay de desempenho ao mesmo tempo. Para voltar o overlay, mude o nível de desempenho no menu rápido. Depois, ligue o crosshair de novo aqui.")}
           </div>
         </PanelSectionRow>
       </PanelSection>

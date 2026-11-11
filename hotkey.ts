@@ -98,6 +98,13 @@ export function applyHotkeyState(state: HotkeyState) {
   evaluate();
 }
 
+function normalizePressed(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (value === 1 || value === "1" || value === "pressed" || value === "down") return true;
+  if (value === 0 || value === "0" || value === "released" || value === "up") return false;
+  return null;
+}
+
 function onButton(button: number, down: boolean) {
   if (down) held.add(button);
   else held.delete(button);
@@ -178,17 +185,18 @@ function registerControllerListener() {
           if (Array.isArray(first)) {
             for (const event of first) {
               const button = event?.nA ?? event?.button ?? event?.unButton ?? event?.buttonId;
-              const pressed = event?.bS ?? event?.pressed ?? event?.isPressed ?? event?.down;
-              if (typeof button === "number" && typeof pressed === "boolean") {
+              const pressed = normalizePressed(event?.bS ?? event?.pressed ?? event?.isPressed ?? event?.down);
+              if (typeof button === "number" && pressed !== null) {
                 onButton(button, pressed);
               }
             }
           } else if (typeof args[1] === "number") {
-            onButton(args[1], !!args[2]);
+            const pressed = normalizePressed(args[2]);
+            if (pressed !== null) onButton(args[1], pressed);
           } else if (first && typeof first === "object") {
             const button = first.nA ?? first.button ?? first.unButton ?? first.buttonId;
-            const pressed = first.bS ?? first.pressed ?? first.isPressed ?? first.down;
-            if (typeof button === "number" && typeof pressed === "boolean") {
+            const pressed = normalizePressed(first.bS ?? first.pressed ?? first.isPressed ?? first.down);
+            if (typeof button === "number" && pressed !== null) {
               onButton(button, pressed);
             }
           }

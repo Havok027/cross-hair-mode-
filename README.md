@@ -1,10 +1,6 @@
 <h1 align="center">🎯 Crosshair Plugin</h1>
 
 <p align="center">
-  <b>Idioma:</b> <a href="README.md">Português</a> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a>
-</p>
-
-<p align="center">
   <b>Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.</b>
 </p>
 
@@ -13,6 +9,10 @@
   <a href="https://github.com/Havok027/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge" alt="Downloads" /></a>
   <a href="https://decky.xyz"><img src="https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge" alt="Decky Loader" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licen%C3%A7a-BSD--3-ff007b?style=for-the-badge" alt="Licença" /></a>
+</p>
+
+<p align="center">
+  🇧🇷 <a href="README.md">Português</a> · 🇺🇸 <a href="README.en.md">English</a> · 🇪🇸 <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">

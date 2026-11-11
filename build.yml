@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Permite enviar os arquivos soltos (ex.: pelo celular): o que for
+      # TypeScript vai para src/, e o repositório fica organizado em pastas.
+      - name: Organizar arquivos em pastas
+        run: |
+          mkdir -p src
+          for f in *.ts *.tsx; do
+            if [ -f "$f" ]; then mv -f "$f" src/; fi
+          done
+          if [ -f gitignore.txt ]; then mv -f gitignore.txt .gitignore; fi
+          rm -f build.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Organizar arquivos em pastas"
+            git push
+          fi
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm build
+      - name: Montar a pasta do plugin
+        run: |
+          mkdir -p out/Crosshair
+          cp -r dist main.py plugin.json package.json README.md README.en.md README.es.md RELEASE_NOTES.md LICENSE out/Crosshair/
+          cd out && zip -r ../Crosshair.zip Crosshair
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Crosshair
+          path: out
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          [ -f RELEASE_NOTES.md ] || echo "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)." > RELEASE_NOTES.md
+          # Remove a release antiga chamada "latest" (não é uma versão) e recria a da versão atual
+          gh release delete latest --cleanup-tag -y || true
+          gh release delete "$TAG" --cleanup-tag -y || true
+          gh release create "$TAG" Crosshair.zip \
+            --target "${{ github.sha }}" \
+            --title "Crosshair $TAG" \
+            --notes-file RELEASE_NOTES.md
