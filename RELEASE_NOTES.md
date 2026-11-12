@@ -1,3 +1,3 @@
 Crosshair v1.7.2
 
-Atualização de compatibilidade dos metadados e do pacote para o Decky Direct Updater.
+Versão de manutenção para alinhar os metadados do plugin, o README e a publicação do pacote no GitHub Releases. Mantém a compatibilidade de identidade com o Decky Direct Updater.
