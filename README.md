@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip">📦 Baixar</a> ·
+  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest">📦 Baixar</a> ·
   <a href="#-como-usar">🚀 Como usar</a> ·
   <a href="#-atalho-de-botões">🎮 Atalho</a> ·
   <a href="#-solução-de-problemas">🩺 Problemas</a> ·
@@ -51,7 +51,7 @@
 
 ## 📦 Instalação
 
-1. Baixe o [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) na [página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
+1. Baixe o [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest) na [página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
 2. No **Decky Loader**, abra as **Configurações** e ative o **Modo desenvolvedor**.
 3. Em **Desenvolvedor**, escolha **Instalar plugin de ZIP** e selecione o `Crosshair.zip`.
 4. Se o plugin não aparecer, reinicie o Decky ou o aparelho.

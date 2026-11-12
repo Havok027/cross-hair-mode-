@@ -13,7 +13,7 @@
 
 <p align="center"><img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Crosshair Plugin interface (previous version)" width="100%" /></p>
 
-[📦 Download](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) · [Getting started](#getting-started) · [Controller shortcut](#controller-shortcut) · [Troubleshooting](#troubleshooting) · [Roadmap](#roadmap)
+[📦 Download](https://github.com/Havok027/crosshair-plugin/releases/latest) · [Getting started](#getting-started) · [Controller shortcut](#controller-shortcut) · [Troubleshooting](#troubleshooting) · [Roadmap](#roadmap)
 
 ## Contents
 
@@ -37,7 +37,7 @@
 
 ## Installation
 
-1. Download [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) from [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+1. Download [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest) from [Releases](https://github.com/Havok027/crosshair-plugin/releases).
 2. Open **Decky Loader Settings** and enable **Developer Mode**.
 3. Under **Developer**, choose **Install Plugin from ZIP** and select `Crosshair.zip`.
 4. Restart Decky or the device if the plugin does not appear.
