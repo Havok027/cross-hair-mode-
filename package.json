@@ -1,16 +1,18 @@
 {
   "name": "crosshair",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "A Decky plugin that overlays a customizable crosshair for improved aiming precision in games. Perfect for FPS and other accuracy-focused games on the Steam Deck.",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test tests/frontend.test.cjs",
+    "test:backend": "python -m unittest discover -s tests -v",
+    "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Havok027/crosshair-plugin.git"
+    "url": "git+https://github.com/Pedrocarletti/crosshair-plugin.git"
   },
   "keywords": [
     "decky",
@@ -22,12 +24,12 @@
     "HUD",
     "gaming"
   ],
-  "author": "JSON Derulo <jsonderulo@nothanks.com>",
+  "author": "Havok",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/Havok027/crosshair-plugin/issues"
+    "url": "https://github.com/Pedrocarletti/crosshair-plugin/issues"
   },
-  "homepage": "https://github.com/Havok027/crosshair-plugin#readme",
+  "homepage": "https://github.com/Pedrocarletti/crosshair-plugin#readme",
   "devDependencies": {
     "@decky/rollup": "^1.0.1",
     "@decky/ui": "^4.10.1",

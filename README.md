@@ -1,26 +1,24 @@
 <h1 align="center">🎯 Crosshair Plugin</h1>
 
+<p align="center"><b>Idioma:</b> Português · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a></p>
+
 <p align="center">
   <b>Uma mira personalizável para o Decky Loader, feita para Steam Deck, Legion Go e outros portáteis.</b>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=vers%C3%A3o&color=2ea44f&style=for-the-badge" alt="Versão" /></a>
-  <a href="https://github.com/Havok027/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge" alt="Downloads" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Pedrocarletti/crosshair-plugin?label=vers%C3%A3o&color=2ea44f&style=for-the-badge" alt="Versão" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Pedrocarletti/crosshair-plugin/total?label=downloads&color=1a9fff&style=for-the-badge" alt="Downloads" /></a>
   <a href="https://decky.xyz"><img src="https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge" alt="Decky Loader" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licen%C3%A7a-BSD--3-ff007b?style=for-the-badge" alt="Licença" /></a>
 </p>
 
 <p align="center">
-  🇧🇷 <a href="README.md">Português</a> · 🇺🇸 <a href="README.en.md">English</a> · 🇪🇸 <a href="README.es.md">Español</a>
+  <img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin (versão anterior)" width="100%" />
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interface do Crosshair Plugin" width="100%" />
-</p>
-
-<p align="center">
-  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip">📦 Baixar</a> ·
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip">📦 Baixar</a> ·
   <a href="#-como-usar">🚀 Como usar</a> ·
   <a href="#-atalho-de-botões">🎮 Atalho</a> ·
   <a href="#-solução-de-problemas">🩺 Problemas</a> ·
@@ -53,34 +51,39 @@
 
 ## 📦 Instalação
 
-1. Baixe o [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) na [página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
+1. Baixe o [`Crosshair.zip`](https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip) na [página de Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
 2. No **Decky Loader**, abra as **Configurações** e ative o **Modo desenvolvedor**.
 3. Em **Desenvolvedor**, escolha **Instalar plugin de ZIP** e selecione o `Crosshair.zip`.
 4. Se o plugin não aparecer, reinicie o Decky ou o aparelho.
 
 > [!TIP]
-> **Atualizações:** depois da primeira instalação, o plugin é reconhecido pelo **Direct Updater**. Se ele não achar a origem, toque no **?** ao lado do Crosshair, escolha **Find source** e digite `Havok027/crosshair-plugin`.
+> **Atualizações:** depois da primeira instalação, o plugin é reconhecido pelo **Direct Updater**. Se ele não achar a origem, toque no **?** ao lado do Crosshair, escolha **Find source** e digite `Pedrocarletti/crosshair-plugin`.
+
+> **Mudou do repositório antigo?** No Direct Updater, use **Find source**, informe `Pedrocarletti/crosshair-plugin` e confirme **Use this source** uma vez para receber as próximas versões daqui.
 
 ---
 
 ## 🚀 Como usar
 
 1. Abra o menu do **Decky Loader** e acesse o **Crosshair Plugin**.
-2. Escolha a **resolução** da sua tela.
-3. Escolha o **modelo**, a **cor** e o **tamanho**.
-4. Ative **Mostrar crosshair**.
-5. Se a mira não estiver no centro, use os sliders **Horizontal (X)** e **Vertical (Y)**.
-6. *(Opcional)* Com um jogo aberto, toque em **Salvar perfil deste jogo**.
+2. Escolha **Português**, **English** ou **Español** no dropdown **Idioma**. A escolha é salva para as próximas aberturas.
+3. Na guia **Tela**, escolha a **resolução** da sua tela.
+4. Na guia **Aparência**, escolha o **modelo**, a **cor** e o **tamanho**.
+5. Ative **Mostrar crosshair**.
+6. Se a mira não estiver no centro, na guia **Tela**, use os sliders **Horizontal (X)** e **Vertical (Y)**.
+7. *(Opcional)* Com um jogo aberto, na guia **Perfis**, toque em **Salvar perfil deste jogo**.
+
+Use **L1/R1** para alternar entre as guias **Aparência**, **Tela**, **Atalho** e **Perfis**. Também é possível selecionar as guias pelo toque. A última guia fica salva. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia.
 
 **O painel, seção por seção:**
 
 | Seção | O que tem |
 |---|---|
-| **Crosshair** | Resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair* |
+| **Crosshair** | Idioma, resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair* |
 | **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho e slider de tamanho |
-| **Tela e posição** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
-| **Atalho de botões** | Gravar, remover, tempo segurando e diagnóstico |
-| **Perfil do jogo** | Salvar, atualizar e excluir perfis, e aplicar ao abrir o jogo |
+| **Tela** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
+| **Atalho** | Gravar, remover, tempo segurando e diagnóstico |
+| **Perfis** | Salvar, atualizar e excluir perfis, e aplicar ao abrir o jogo |
 
 > [!NOTE]
 > Na seção **Cor**, o slider troca a cor na hora com esquerda e direita, e a cor escolhida fica no centro do carrossel. Cima e baixo mudam de seção.
@@ -93,10 +96,12 @@ Ligue e desligue a mira com uma combinação de **2 botões do controle**, sem a
 
 **Como gravar:**
 
-1. Em **Atalho de botões**, toque em **Gravar combinação**.
+1. Na guia **Atalho**, toque em **Gravar combinação**.
 2. Aperte os 2 botões **juntos** e solte (em até 12 segundos). Pode fazer com o menu aberto.
-3. A mira pisca duas vezes quando a combinação é gravada.
+3. A mira pisca duas vezes quando a combinação é gravada. Combinações como **Select + X** são aceitas.
 4. Pronto: apertar os 2 botões liga ou desliga a mira.
+
+A leitura preserva os eventos de apertar e soltar que chegam juntos, inclusive em toques rápidos de A/B/X/Y.
 
 O **tempo segurando** vai de 0 a 1000 ms. O padrão é 0 (instantâneo). Aumente para evitar disparos acidentais.
 
@@ -188,12 +193,12 @@ O plugin escreve uma configuração do **MangoHud** que desenha a mira como text
 |---|---|---|
 | A mira está fora do centro | Centralização estimada do modelo | Ajuste X e Y. Para os dois, use *Calibrar escala* |
 | A mira se move ao mudar o tamanho | Margens internas do MangoHud | Em *Calibrar escala*, siga os 3 passos do cartão |
-| O atalho não funciona fora do menu | O Steam não entregou os botões ao jogo | Veja o *último botão lido em jogo* no cartão e grave outra combinação (A, B, X, Y ou direcional) |
+| O atalho não funciona fora do menu | O Steam não entregou os botões ao jogo | Veja o *último botão lido em jogo* no cartão, confira o layout do Steam Input e, se necessário, grave outra combinação |
 | O atalho não funciona nem com o menu | Combinação antiga ou tempo muito alto | Grave de novo e deixe o *tempo segurando* em 0 |
 | O overlay de desempenho sumiu | A mira está ligada | Desligue a mira: o MangoHud volta |
 | O perfil não aplica ao abrir o jogo | O Steam não avisou o plugin | Abra o plugin e confira *Aplicar perfil ao abrir o jogo* |
 | Erro *Failed to fetch dynamically imported module* | Instalou o código-fonte, sem a pasta `dist` | Instale o `Crosshair.zip` da página de Releases |
-| O Direct Updater diz *Origem não encontrada* | Instalação antiga | **?** > **Find source** > `Havok027/crosshair-plugin` |
+| O Direct Updater diz *Origem não encontrada* | Instalação antiga | **?** > **Find source** > `Pedrocarletti/crosshair-plugin` |
 
 Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
@@ -216,7 +221,8 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 | 💡 | Opacidade e contorno | Mais legibilidade em cenas claras |
 | 💡 | Resolução automática | Detectar a tela sem escolher na lista |
 | 💡 | Mais modelos | Mira com braços e formatos novos |
-| 💡 | Tradução em inglês | README e interface |
+| ✅ | Português, inglês e espanhol | README com links de idioma e interface com dropdown |
+| ✅ | Interface em guias | Visual inspirado no Mako e navegação com L1/R1 |
 | 💡 | Loja do Decky | Publicar o plugin na loja oficial |
 
 > [!NOTE]
@@ -228,6 +234,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
 | Versão | Destaques |
 |:---:|---|
+| **1.8** | Português, inglês e espanhol · guias com L1/R1 · correção de toques rápidos de A/B/X/Y |
 | **1.7** | MangoHud de antes volta ao desligar a mira · leitura em jogo ampliada (LB, RB, LT, RT, Menu e View) · atalho funciona com o menu aberto · diagnóstico do último botão lido |
 | **1.6** | Atalho refeito (gravação pela interface) · carrossel de cores com esquerda e direita · prévia removida |
 | **1.5** | Primeira versão do atalho de botões · visual renovado |
@@ -235,13 +242,13 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 | **1.3** | Modelo em lista suspensa · posição por sliders · perfil por jogo |
 | **1.2** | Suporte à Legion Go S · cores, tamanho e novos modelos |
 
-As notas completas de cada versão estão na página de [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+As notas completas de cada versão estão na página de [Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
 
 ---
 
 ## 🤝 Contribuindo
 
-Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havok027/crosshair-plugin/issues). Ajuda muito incluir:
+Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Pedrocarletti/crosshair-plugin/issues). Ajuda muito incluir:
 
 - o aparelho e a resolução da tela;
 - a versão do plugin;
@@ -263,11 +270,16 @@ Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havo
 | `src/api.ts` | Tipos e chamadas ao backend |
 | `src/utils.ts` | Cores, tamanhos e funções auxiliares |
 | `src/styles.ts` | CSS do painel |
+| `src/i18n.tsx` | Traduções da interface (PT/EN/ES) |
+| `src/SettingsTabs.tsx` | Guias e navegação com L1/R1 |
+| `tests/` | Regressões da interface e da leitura do controle |
 | `plugin.json` e `package.json` | Identidade, versão e repositório |
 | `.github/workflows/build.yml` | Compila e publica a release |
 | `RELEASE_NOTES.md` | Texto da release |
 
 Para compilar localmente: `pnpm install` e depois `pnpm build`.
+
+Verificações: `pnpm typecheck`, `pnpm test` e `pnpm test:backend` (requer Python 3.7+). Os testes simulam eventos; valide também Select + A/B/X/Y e Select + RT no aparelho, dentro e fora do QAM, e a navegação por L1/R1.
 
 </details>
 
@@ -278,6 +290,7 @@ Para compilar localmente: `pnpm install` e depois `pnpm build`.
 | Projeto | Autor | Contribuição |
 |---|---|---|
 | [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) | [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx) | Projeto de origem, base deste plugin |
+| [MAKO](https://github.com/eugeniosegala/MAKO) | [Eugenio Segala](https://github.com/eugeniosegala) | Referência visual para os painéis e as guias |
 | [Steamcord](https://github.com/Necrosiak/Steamcord) | [Necrosiak](https://github.com/Necrosiak) | Leitura dos botões do controle (BSD-3-Clause) |
 
 Agradecimentos à comunidade do **Decky Loader** pelo suporte e pelas ferramentas para portáteis.

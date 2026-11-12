@@ -1,248 +1,234 @@
 <h1 align="center">🎯 Crosshair Plugin</h1>
 
-<p align="center"><b>Una mira personalizable para Decky Loader, diseñada para Steam Deck, Legion Go y otros PC portátiles.</b></p>
+<p align="center"><b>Idioma:</b> <a href="README.md">Português</a> · <a href="README.en.md">English</a> · Español</p>
+
+<p align="center"><b>Una mira personalizable para Decky Loader, diseñada para Steam Deck, Legion Go y otras consolas portátiles.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=versi%C3%B3n&color=2ea44f&style=for-the-badge" alt="Versión" /></a>
-  <a href="https://github.com/Havok027/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=descargas&color=1a9fff&style=for-the-badge" alt="Descargas" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Pedrocarletti/crosshair-plugin?label=versi%C3%B3n&color=2ea44f&style=for-the-badge" alt="Versión" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Pedrocarletti/crosshair-plugin/total?label=descargas&color=1a9fff&style=for-the-badge" alt="Descargas" /></a>
   <a href="https://decky.xyz"><img src="https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge" alt="Decky Loader" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-BSD--3-ff007b?style=for-the-badge" alt="Licencia" /></a>
 </p>
 
-<p align="center">🇧🇷 <a href="README.md">Português</a> · 🇺🇸 <a href="README.en.md">English</a> · 🇪🇸 <a href="README.es.md">Español</a></p>
+<p align="center"><img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interfaz de Crosshair Plugin (versión anterior)" width="100%" /></p>
 
-<p align="center"><img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interfaz del Crosshair Plugin" width="100%" /></p>
+[📦 Descargar](https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip) · [Primeros pasos](#primeros-pasos) · [Atajo del mando](#atajo-del-mando) · [Solución de problemas](#solución-de-problemas) · [Hoja de ruta](#hoja-de-ruta)
 
-<p align="center"><a href="https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip">📦 Descargar</a> · <a href="#-cómo-usar">🚀 Cómo usar</a> · <a href="#-atajo-de-botones-del-control">🎮 Atajo</a> · <a href="#-solución-de-problemas">🩺 Problemas</a> · <a href="#-hoja-de-ruta">📍 Hoja de ruta</a></p>
+## Índice
 
----
+[Funciones](#funciones) · [Instalación](#instalación) · [Primeros pasos](#primeros-pasos) · [Atajo del mando](#atajo-del-mando) · [Modelos y colores](#modelos-y-colores) · [Resoluciones](#resoluciones) · [Cómo funciona](#cómo-funciona) · [Solución de problemas](#solución-de-problemas) · [Hoja de ruta](#hoja-de-ruta) · [Historial de versiones](#historial-de-versiones) · [Contribuir](#contribuir) · [Créditos](#créditos)
 
-## 📑 Índice
+## Funciones
 
-[✨ Características](#-características) · [📦 Instalación](#-instalación) · [🚀 Cómo usar](#-cómo-usar) · [🎮 Atajo de botones del control](#-atajo-de-botones-del-control) · [🎨 Modelos y colores](#-modelos-y-colores) · [📺 Resoluciones](#-resoluciones) · [🔧 Funcionamiento](#-funcionamiento) · [🩺 Solución de problemas](#-solución-de-problemas) · [📍 Hoja de ruta](#-hoja-de-ruta) · [📜 Historial](#-historial-de-versiones) · [🤝 Contribuir](#-contribuir) · [💡 Créditos](#-créditos)
-
-## ✨ Características
-
-| Función | Descripción |
+| Función | Qué hace |
 |---|---|
-| 🎯 **7 modelos de mira** | Caja, Punto, Anillo, X, Estrella, Corchetes y Líneas, seleccionables en una lista |
-| 🎨 **Colores y tamaño** | 8 colores predefinidos, RGB personalizado y escala del 50% al 300% |
-| 📐 **Escala desde el centro** | La mira crece desde el centro sin desplazarse (calibración opcional) |
-| 🕹️ **Atajo de botones** | Graba 2 botones del control para activar o desactivar la mira sin abrir el menú |
-| 🕶️ **Perfil por juego** | Modelo, color, tamaño y posición guardados para cada juego y aplicados al iniciarlo |
-| ♻️ **MangoHud preservado** | Al desactivar la mira, se restaura la superposición de rendimiento anterior |
-| 🧭 **Ajuste preciso** | Controles X e Y (de -200 a +200), guardados por modelo |
-| 📺 **Varias pantallas** | Steam Deck, Legion Go S, Legion Go, 1080p y 4K |
-| 🔄 **Actualización sencilla** | Releases automáticas y compatibilidad con Direct Updater |
+| **7 modelos de mira** | Caja, Punto, Anillo, X, Estrella, Corchetes y Guiones, en una lista desplegable |
+| **Colores y tamaño** | 8 colores predefinidos, RGB personalizado y escala del 50% al 300% |
+| **Escala desde el centro** | La mira crece desde su centro, con calibración opcional |
+| **Atajo del mando** | Graba 2 botones para activar o desactivar la mira sin abrir el menú |
+| **Perfiles por juego** | Guarda modelo, color, tamaño y posición para aplicarlos al iniciar cada juego |
+| **MangoHud conservado** | Al desactivar la mira se restaura la superposición de rendimiento anterior |
+| **Ajuste de posición** | Controles horizontal y vertical de -200 a +200, guardados por modelo |
+| **Varias pantallas** | Steam Deck, Legion Go S, Legion Go, 1080p y 4K |
+| **Idiomas** | Portugués, inglés y español mediante un selector con preferencia guardada |
+| **Interfaz con pestañas** | Paneles inspirados en Mako; navegación con L1/R1 o por toque |
+| **Actualizaciones** | Versiones automáticas y compatibilidad con Direct Updater |
 
-## 📦 Instalación
+## Instalación
 
-1. Descarga [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) desde la [página de Releases](https://github.com/Havok027/crosshair-plugin/releases).
-2. En **Decky Loader**, abre **Configuración** y activa el **Modo desarrollador**.
-3. En **Desarrollador**, selecciona **Instalar plugin desde ZIP** y elige `Crosshair.zip`.
+1. Descarga [`Crosshair.zip`](https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip) desde [Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
+2. Abre **Configuración de Decky Loader** y activa el **Modo desarrollador**.
+3. En **Desarrollador**, elige **Instalar plugin desde ZIP** y selecciona `Crosshair.zip`.
 4. Si el plugin no aparece, reinicia Decky o el dispositivo.
 
 > [!TIP]
-> **Actualizaciones:** después de la primera instalación, el plugin será reconocido por **Direct Updater**. Si no encuentra el origen, pulsa **?** junto a Crosshair, elige **Find source** e introduce `Havok027/crosshair-plugin`.
+> Después de la primera instalación, **Direct Updater** puede reconocer el plugin. Si no encuentra el origen, selecciona **?** junto a Crosshair, elige **Find source** e introduce `Pedrocarletti/crosshair-plugin`.
 
-## 🚀 Cómo usar
+> **¿Vienes del repositorio anterior?** En Direct Updater, elige **Find source**, introduce `Pedrocarletti/crosshair-plugin` y confirma **Use this source** una vez para recibir las próximas versiones de este repositorio.
 
-1. Abre el menú de **Decky Loader** y accede a **Crosshair Plugin**.
-2. Elige la **resolución** de la pantalla.
-3. Elige el **modelo**, el **color** y el **tamaño**.
-4. Activa **Mostrar mira**.
-5. Si la mira no está centrada, usa los controles **Horizontal (X)** y **Vertical (Y)**.
-6. *(Opcional)* Con un juego abierto, selecciona **Guardar perfil de este juego**.
+## Primeros pasos
 
-**Secciones del panel:**
+1. Abre **Crosshair Plugin** en Decky Loader.
+2. En **Idioma**, selecciona **Português**, **English** o **Español**. La preferencia se guarda.
+3. En **Pantalla**, elige la resolución de tu pantalla.
+4. En **Apariencia**, elige el modelo, el color y el tamaño.
+5. Activa **Mostrar mira**.
+6. Si hace falta, céntrala con **Horizontal (X)** y **Vertical (Y)** en **Pantalla**.
+7. Con un juego en ejecución, puedes usar **Guardar perfil de este juego** en **Perfiles**.
 
-| Sección | Contenido |
+Usa **L1/R1** para recorrer **Apariencia**, **Pantalla**, **Atajo** y **Perfiles**. También puedes seleccionar las pestañas por toque. El plugin recuerda la última pestaña. Durante la grabación, L1/R1 pueden formar parte de la combinación y no cambian de pestaña.
+
+| Área | Controles |
 |---|---|
-| **Crosshair** | Resumen del estado (activo, modelo, tamaño, color) e interruptor *Mostrar mira* |
-| **Apariencia** | Modelo, color (carrusel y control deslizante o RGB), accesos rápidos de tamaño y control de tamaño |
-| **Pantalla y posición** | Resolución, controles X e Y, restablecer ajuste y *Calibrar escala* (avanzado) |
-| **Atajo de botones** | Grabar, eliminar, duración de pulsación y diagnóstico |
-| **Perfil del juego** | Guardar, actualizar y eliminar perfiles, y aplicarlos al iniciar el juego |
+| **Crosshair** | Idioma, resumen del estado e interruptor Mostrar mira |
+| **Apariencia** | Modelo, carrusel y control de color, RGB, tamaños predefinidos y control de tamaño |
+| **Pantalla** | Resolución, controles X/Y, restablecer posición y calibración avanzada |
+| **Atajo** | Grabar, eliminar, tiempo de pulsación y diagnóstico de entrada |
+| **Perfiles** | Guardar, actualizar, eliminar y aplicar perfiles automáticamente |
 
 > [!NOTE]
-> En la sección **Color**, el control deslizante cambia el color al instante con izquierda y derecha, y el color elegido permanece en el centro del carrusel. Arriba y abajo cambian de sección.
+> El control de color cambia el color al instante con izquierda/derecha. El color seleccionado permanece en el centro del carrusel. Usa arriba/abajo para cambiar de control.
 
-## 🎮 Atajo de botones del control
+## Atajo del mando
 
-Activa o desactiva la mira con una combinación de **2 botones del control**, sin abrir el menú.
+Activa o desactiva la mira con **2 botones del mando**, sin abrir el menú.
 
-**Cómo grabar:**
+1. En **Atajo**, selecciona **Grabar combinación**.
+2. Pulsa los 2 botones **a la vez** y suéltalos antes de 12 segundos. Puedes mantener el menú abierto.
+3. La mira parpadea dos veces al guardar. Se aceptan combinaciones como **Select + X**.
+4. Pulsa la combinación para mostrar u ocultar la mira.
 
-1. En **Atajo de botones**, pulsa **Grabar combinación**.
-2. Pulsa los 2 botones **a la vez** y suéltalos (en un máximo de 12 segundos). Puedes hacerlo con el menú abierto.
-3. La mira parpadea dos veces cuando se graba la combinación.
-4. Al pulsar ambos botones de nuevo, la mira cambia de estado.
-
-La **duración de pulsación** va de 0 a 1000 ms. El valor predeterminado es 0 (instantáneo). Auméntalo para evitar activaciones accidentales.
-
-**Dónde se detecta cada botón:**
+La lectura conserva los eventos de pulsación y liberación que llegan juntos, incluidas las pulsaciones rápidas de A/B/X/Y. El **Tiempo de pulsación** va de 0 a 1000 ms; el valor predeterminado es 0 para una activación inmediata. Auméntalo para evitar activaciones accidentales.
 
 | Botones | Menú abierto | En el juego |
 |---|:---:|:---:|
 | A, B, X, Y y cruceta | ✅ | ✅ |
-| L4, L5, R4, R5 (Steam Deck y Steam Controller) | ✅ | ✅ |
-| LB, RB, LT, RT, Menu y View | ✅ | 🧪 en validación |
-| L3, R3 y botones adicionales de otros controles | ✅ | ⚠️ depende de Steam |
+| L4, L5, R4, R5 en Steam Deck y Steam Controller | ✅ | ✅ |
+| LB, RB, LT, RT, Menu y View | ✅ | 🧪 En validación |
+| L3, R3 y botones adicionales de otros mandos | ✅ | ⚠️ Depende de Steam |
 
 > [!NOTE]
-> **Cómo funciona:** la combinación se graba mediante la interfaz de Steam. Fuera del menú, el plugin lee el control directamente del sistema. Si la misma pulsación llega por ambas vías, solo se cuenta una vez.
+> La grabación usa la interfaz de Steam. Durante el juego, el plugin también lee el mando directamente desde el sistema. Si ambas vías detectan la misma pulsación, solo se cuenta una vez. La disponibilidad en el juego depende de los botones expuestos por Steam Input y el dispositivo.
 
 > [!TIP]
-> **Diagnóstico:** la tarjeta del atajo muestra el **último grupo de botones detectado en el juego**, con sus nombres y números. Pulsa la combinación durante el juego, abre el menú y comprueba si aparece.
+> La tarjeta del atajo muestra los **últimos botones leídos en el juego**, con sus nombres e identificadores. Pulsa la combinación en el juego y vuelve a abrir el menú para comprobarla.
 
-## 🎨 Modelos y colores
+## Modelos y colores
 
-**Modelos de mira:**
-
-| Modelo | Vista | Descripción |
+| Modelo | Aspecto | Descripción |
 |---|:---:|---|
 | Caja | <code>&#124; + &#124;</code> | Marco alrededor del centro |
-| Punto | <code>+</code> | El clásico |
-| Anillo | <code>O</code> | Mira circular abierta |
-| X | <code>x</code> | Discreta |
-| Estrella | <code>*</code> | Marca pequeña |
-| Corchetes | <code>[ + ]</code> | Resalta el centro |
-| Líneas | <code>- + -</code> | Líneas laterales |
-
-**Colores predefinidos:**
+| Punto | `+` | El modelo clásico |
+| Anillo | `O` | Mira abierta |
+| X | `x` | Discreta |
+| Estrella | `*` | Marca pequeña |
+| Corchetes | `[ + ]` | Destaca el centro |
+| Guiones | `- + -` | Líneas a los lados |
 
 | Color | Código | Color | Código |
 |---|---|---|---|
-| 🩷 Rosa | `#FF007B` | 🩵 Cian | `#00E5FF` |
-| 💚 Verde | `#00FF66` | 💜 Morado | `#9B5CFF` |
-| ❤️ Rojo | `#FF2D2D` | 🧡 Naranja | `#FF8A00` |
-| 💛 Amarillo | `#FFE600` | 🤍 Blanco | `#FFFFFF` |
+| Rosa | `#FF007B` | Cian | `#00E5FF` |
+| Verde | `#00FF66` | Morado | `#9B5CFF` |
+| Rojo | `#FF2D2D` | Naranja | `#FF8A00` |
+| Amarillo | `#FFE600` | Blanco | `#FFFFFF` |
 
-También puedes crear cualquier color en **Color personalizado (RGB)**.
+Usa **Color personalizado (RGB)** para crear cualquier otro color.
 
-## 📺 Resoluciones
+## Resoluciones
 
 | Pantalla | Resolución |
 |---|---|
-| Steam Deck | 1280 x 800 |
-| Legion Go S | 1920 x 1200 |
-| Monitor externo 1080p | 1920 x 1080 |
-| Legion Go | 2560 x 1600 |
-| Monitor externo 4K | 3840 x 2160 |
+| Steam Deck | 1280 × 800 |
+| Legion Go S | 1920 × 1200 |
+| Monitor externo, 1080p | 1920 × 1080 |
+| Legion Go | 2560 × 1600 |
+| Monitor externo, 4K | 3840 × 2160 |
 
 > [!NOTE]
-> Los modelos nuevos (Anillo, X, Estrella, Corchetes y Líneas) tienen un centrado **estimado**. Si alguno queda ligeramente descentrado, ajústalo con los controles X e Y. El ajuste se guarda por modelo.
+> El centrado de Anillo, X, Estrella, Corchetes y Guiones es estimado. Ajusta X/Y si hace falta; la posición se guarda por modelo.
 
-## 🔧 Funcionamiento
+## Cómo funciona
 
-El plugin escribe una configuración de **MangoHud** que dibuja la mira como texto (`custom_text`), con su color (`text_color`), tamaño (`font_size`) y posición (`offset_x` y `offset_y`).
+El plugin escribe una configuración de **MangoHud** que dibuja texto (`custom_text`) con el color (`text_color`), el tamaño (`font_size`) y la posición (`offset_x`, `offset_y`) elegidos.
 
-| Paso | Qué ocurre |
+| Acción | Resultado |
 |---|---|
-| **Activar la mira** | El plugin guarda la configuración MangoHud existente y escribe la mira |
-| **Desactivar la mira** | Se restaura exactamente la configuración MangoHud anterior |
-| **Steam cambia el archivo** | Si cambias el nivel de rendimiento, el plugin no sobrescribe los cambios de Steam |
-| **Reiniciar Decky** | La mira comienza desactivada y se restaura la superposición |
-| **Cambiar el tamaño** | La posición se recalcula para que la mira crezca desde el centro |
-
-**Limitaciones:**
+| Activar la mira | Guarda la configuración de MangoHud existente y escribe la mira |
+| Desactivar la mira | Restaura exactamente la configuración anterior |
+| Steam sustituye el archivo | Conserva la nueva configuración de rendimiento de Steam |
+| Reiniciar Decky | Inicia con la mira desactivada y restaura la superposición |
+| Cambiar tamaño | Recalcula la posición para crecer desde el centro |
 
 | Limitación | Detalle |
 |---|---|
-| Superposición de rendimiento | No se puede usar junto con la mira; ambos utilizan la misma configuración de MangoHud |
-| Otros plugins | Puede haber conflictos con plugins que también modifican MangoHud (como *MangoPeel*) |
-| Perfil automático | Depende de que Steam avise al plugin cuando se inicia el juego |
-| Atajo durante el juego | Depende de las entradas del control que Steam envíe al control virtual del dispositivo |
+| Superposición de rendimiento | No puede mostrarse junto con la mira; ambas usan MangoHud |
+| Otros plugins | Puede entrar en conflicto con plugins que modifican MangoHud, como MangoPeel |
+| Perfiles automáticos | Dependen de que Steam avise al plugin cuando se inicia un juego |
+| Atajos en el juego | Dependen de los botones expuestos por Steam y el dispositivo |
 
-## 🩺 Solución de problemas
+## Solución de problemas
 
 | Problema | Causa probable | Qué hacer |
 |---|---|---|
-| La mira está descentrada | Centrado estimado del modelo | Ajusta X e Y. Para ambos ejes, usa *Calibrar escala* |
-| La mira se mueve al cambiar el tamaño | Márgenes internos de MangoHud | Sigue los 3 pasos de la tarjeta *Calibrar escala* |
-| El atajo no funciona fuera del menú | Steam no envió los botones al juego | Consulta *último botón detectado en el juego* y graba otra combinación (A, B, X, Y o cruceta) |
-| El atajo tampoco funciona en el menú | Combinación antigua o duración demasiado alta | Graba de nuevo y deja la *duración de pulsación* en 0 |
+| La mira está descentrada | Posición estimada del modelo | Ajusta X/Y; usa Calibrar escala si también se mueve al cambiar el tamaño |
+| La mira se mueve al cambiar el tamaño | Márgenes internos de MangoHud | Sigue los 3 pasos de Calibrar escala |
+| El atajo falla fuera del menú | Los botones no llegan al juego | Consulta los últimos botones leídos, revisa Steam Input o graba otra combinación |
+| El atajo falla incluso en el menú | Grabación antigua o tiempo de pulsación alto | Graba de nuevo y ajusta Tiempo de pulsación a 0 |
 | Desapareció la superposición de rendimiento | La mira está activada | Desactiva la mira para restaurar MangoHud |
-| El perfil no se aplica al iniciar el juego | Steam no avisó al plugin | Abre el plugin y comprueba *Aplicar perfil al iniciar el juego* |
-| Error *Failed to fetch dynamically imported module* | Se instaló el código fuente sin la carpeta `dist` | Instala `Crosshair.zip` desde la página de Releases |
-| Direct Updater muestra *Source not found* | Instalación antigua | **?** > **Find source** > `Havok027/crosshair-plugin` |
+| El perfil no se aplica al iniciar | Steam no avisó al plugin | Abre el plugin y comprueba Aplicar perfil al iniciar el juego |
+| Failed to fetch dynamically imported module | Se instaló el código fuente sin `dist` | Instala `Crosshair.zip` desde Releases |
+| Direct Updater no encuentra el origen | Instalación antigua | **?** → **Find source** → `Pedrocarletti/crosshair-plugin` |
 
-Los registros del plugin están en `~/homebrew/logs/Crosshair/`.
+Registros: `~/homebrew/logs/Crosshair/`.
 
-## 📍 Hoja de ruta
+## Hoja de ruta
 
-| Estado | Elemento | Detalles |
-|:---:|---|---|
-| ✅ | Compatibilidad con Legion Go S | Resolución 1920 x 1200 |
-| ✅ | Colores, tamaño y nuevos modelos | RGB, escala del 50% al 300% y 7 modelos |
-| ✅ | Perfil por juego | Se aplica al iniciar el juego |
-| ✅ | Escala desde el centro | Con calibración opcional por modelo |
-| ✅ | Atajo de botones | Grabación desde la interfaz y lectura durante el juego |
-| ✅ | MangoHud preservado | La superposición anterior vuelve al desactivar la mira |
-| ✅ | Releases y Direct Updater | Compilación y publicación automáticas |
-| 🔄 | Validar lectura durante el juego | LB, RB, LT, RT, Menu y View |
-| 🧭 | L3, R3 y botones traseros | Lectura durante el juego en controles que no son de Valve |
-| 🧭 | Calibración automática | Centrar cada modelo sin ajustes manuales |
-| 💡 | Opacidad y contorno | Mejor visibilidad en escenas claras |
-| 💡 | Resolución automática | Detectar la pantalla sin elegirla en una lista |
-| 💡 | Más modelos | Nuevos brazos y diseños de mira |
-| 💡 | Traducción al inglés | README e interfaz |
-| 💡 | Tienda de Decky | Publicar el plugin en la tienda oficial |
+| Estado | Elemento |
+|:---:|---|
+| ✅ | Legion Go S, colores, tamaño y 7 modelos |
+| ✅ | Perfiles por juego y escala desde el centro |
+| ✅ | Grabación del mando, lectura en el juego y restauración de MangoHud |
+| ✅ | Versiones automáticas y Direct Updater |
+| ✅ | Documentación e interfaz en portugués, inglés y español |
+| ✅ | Pestañas inspiradas en Mako y navegación con L1/R1 |
+| 🔄 | Validar LB, RB, LT, RT, Menu y View en el juego |
+| 🧭 | L3/R3 y botones traseros de mandos que no sean de Valve |
+| 🧭 | Calibración automática del centrado |
+| 💡 | Opacidad y contorno |
+| 💡 | Detección automática de resolución |
+| 💡 | Más modelos de mira |
+| 💡 | Publicación en la tienda oficial de Decky |
 
-> [!NOTE]
-> Leyenda: ✅ completado · 🔄 en curso · 🧭 planificado · 💡 idea. La hoja de ruta recoge intenciones, sin fechas.
+✅ Completado · 🔄 En curso · 🧭 Planificado · 💡 Idea. Esta hoja de ruta expresa intenciones sin fechas.
 
-## 📜 Historial de versiones
+## Historial de versiones
 
 | Versión | Novedades |
 |:---:|---|
-| **1.7** | Se restaura MangoHud al desactivar la mira · lectura ampliada durante el juego (LB, RB, LT, RT, Menu y View) · atajo disponible con el menú abierto · diagnóstico del último botón detectado |
-| **1.6** | Atajo rediseñado (grabación desde la interfaz) · carrusel de colores con izquierda y derecha · vista previa eliminada |
-| **1.5** | Primera versión del atajo de botones · interfaz renovada |
-| **1.4** | Escala desde el centro · código modular y carpetas · compatibilidad con Direct Updater |
-| **1.3** | Selector desplegable de modelos · controles de posición · perfil por juego |
-| **1.2** | Compatibilidad con Legion Go S · colores, tamaño y nuevos modelos |
+| **1.8** | Portugués, inglés y español; pestañas con L1/R1; corrección de pulsaciones rápidas de A/B/X/Y |
+| **1.7** | Restauración de MangoHud; más botones en el juego; atajos con QAM abierto; diagnóstico |
+| **1.6** | Grabación renovada desde Steam; carrusel de colores con izquierda/derecha; vista previa eliminada |
+| **1.5** | Primera implementación del atajo e interfaz renovada |
+| **1.4** | Escala desde el centro, código modular y compatibilidad con Direct Updater |
+| **1.3** | Lista de modelos, controles de posición y perfiles por juego |
+| **1.2** | Legion Go S, colores, tamaño y nuevos modelos |
 
-Las notas completas están en la página de [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+Las notas completas están en [Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
 
-## 🤝 Contribuir
+## Contribuir
 
-¿Encontraste un problema o tienes una idea? Abre una [issue](https://github.com/Havok027/crosshair-plugin/issues). Es útil incluir:
-
-- el dispositivo y la resolución de pantalla;
-- la versión del plugin;
-- una foto del panel o de la tarjeta del atajo si hay problemas con los botones;
-- las últimas líneas del registro en `~/homebrew/logs/Crosshair/`.
-
-<details>
-<summary><b>📂 Estructura del proyecto</b></summary>
+Envía errores o ideas en [Issues](https://github.com/Pedrocarletti/crosshair-plugin/issues). Incluye el dispositivo, la resolución, la versión del plugin, una captura del panel (o del diagnóstico del atajo para problemas con botones) y las últimas líneas de `~/homebrew/logs/Crosshair/`.
 
 | Archivo | Función |
 |---|---|
-| `main.py` | Backend Python: ajustes, posición, MangoHud y lectura del control |
+| `main.py` | Configuración, posición, MangoHud y lectura del mando |
 | `src/index.tsx` | Punto de entrada del plugin |
 | `src/Content.tsx` | Panel principal |
-| `src/components.tsx` | Componentes visuales del panel |
-| `src/hotkey.ts` | Atajo de botones (interfaz) |
-| `src/api.ts` | Tipos y llamadas al backend |
-| `src/utils.ts` | Colores, tamaños y funciones auxiliares |
+| `src/components.tsx` | Componentes compartidos del panel |
+| `src/hotkey.ts` | Atajos desde la interfaz |
+| `src/i18n.tsx` | Traducciones PT/EN/ES |
+| `src/SettingsTabs.tsx` | Pestañas y navegación L1/R1 |
+| `src/api.ts` | Llamadas al backend y tipos compartidos |
+| `src/utils.ts` | Colores, tamaños y utilidades |
 | `src/styles.ts` | CSS del panel |
-| `plugin.json` y `package.json` | Identidad, versión y repositorio |
-| `.github/workflows/build.yml` | Compila y publica la release |
-| `RELEASE_NOTES.md` | Descripción de la release |
+| `tests/` | Regresiones de la interfaz y de la lectura del mando |
+| `plugin.json`, `package.json` | Identidad y versión del plugin |
+| `.github/workflows/build.yml` | Compilación y publicación automáticas |
+| `RELEASE_NOTES.md` | Descripción de la versión |
 
-Para compilar localmente: `pnpm install` y después `pnpm build`.
-</details>
+Para compilar: `pnpm install` y después `pnpm build`. Ejecuta `pnpm typecheck`, `pnpm test` y `pnpm test:backend` (Python 3.7+). Las pruebas simulan eventos; comprueba también Select + A/B/X/Y, Select + RT, QAM abierto/cerrado y L1/R1 en el dispositivo.
 
-## 💡 Créditos
+## Créditos
 
 | Proyecto | Autor | Contribución |
 |---|---|---|
-| [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) | [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx) | Proyecto original y base de este plugin |
-| [Steamcord](https://github.com/Necrosiak/Steamcord) | [Necrosiak](https://github.com/Necrosiak) | Lectura de botones del control (BSD-3-Clause) |
+| [crosshair-plugin](https://github.com/xXJSONDeruloXx/crosshair-plugin) | [@xXJSONDeruloXx](https://github.com/xXJSONDeruloXx) | Proyecto original |
+| [Steamcord](https://github.com/Necrosiak/Steamcord) | [Necrosiak](https://github.com/Necrosiak) | Referencia de lectura del mando (BSD-3-Clause) |
+| [MAKO](https://github.com/eugeniosegala/MAKO) | [Eugenio Segala](https://github.com/eugeniosegala) | Referencia visual de los paneles y las pestañas |
 
-Gracias a la comunidad de **Decky Loader** por su apoyo y por las herramientas para dispositivos portátiles.
+Gracias a la comunidad de **Decky Loader** por su apoyo y sus herramientas para dispositivos portátiles.
 
-## 📄 Licencia
+## Licencia
 
-Distribuido bajo la licencia **BSD 3-Clause**. Consulta el archivo [LICENSE](LICENSE).
+Distribuido bajo la licencia **BSD 3-Clause**. Consulta [LICENSE](LICENSE).
