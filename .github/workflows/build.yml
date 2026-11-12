@@ -18,14 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Impedir alteração de uma versão já publicada
+      - name: Verificar se a versão precisa de uma release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if gh release view "v$VERSION" > /dev/null 2>&1; then
-            echo "::error::A versão v$VERSION já foi publicada. Aumente a versão em package.json antes de publicar outro ZIP."
-            exit 1
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::A versão v$VERSION já foi publicada. O ZIP novo ficará nos artefatos desta execução; a release existente será preservada."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
 
       # Permite enviar os arquivos soltos (ex.: pelo celular): o que for
@@ -73,6 +76,7 @@ jobs:
           name: Crosshair
           path: out
       - name: Publicar release
+        if: steps.release.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -85,6 +89,7 @@ jobs:
             --notes-file RELEASE_NOTES.md \
             --latest
       - name: Verificar download e SHA-256 pelo Direct Updater
+        if: steps.release.outputs.publish == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           python tests/check_direct_updater.py --repo "${{ github.repository }}" --version "$VERSION"
