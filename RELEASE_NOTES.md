@@ -13,7 +13,7 @@
 - Alterações pendentes são enviadas ao fechar o painel.
 
 ### Direct Updater
-- Metadados e links de distribuição alinhados a `Havok027/crosshair-plugin`, com versões iguais nos dois manifestos.
+- Metadados e links de distribuição alinhados a `Havok027/crosshair-plugin`, com a versão definida em `package.json`, evitando divergências com `plugin.json`.
 - Cada versão mantém seu ZIP original. Outro pacote exige aumentar a versão; a automação não substitui arquivos já publicados.
 - O pacote passa pelo validador original do Direct Updater antes da publicação.
 - Depois da publicação, a automação confere a seleção da release, a identidade e o SHA-256 do download pela API e pela página de arquivos do GitHub.

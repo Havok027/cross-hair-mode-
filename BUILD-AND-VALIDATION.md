@@ -6,7 +6,7 @@ This package uses the editable `src/` tree, the official Decky Rollup preset, a 
 
 Run `pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm test`, `pnpm test:backend`, and `pnpm build`. GitHub Actions uses Node 24 and Python 3.12, packages `dist/`, the backend, manifests, license and three READMEs, then checks the ZIP with the pinned original Direct Updater validator.
 
-Published release versions are never overwritten. Increase the version in both `package.json` and `plugin.json` before publishing another package. After publication, the workflow checks the public download and its SHA-256 using both GitHub API and asset-page metadata.
+Published release versions are never overwritten. Increase the version in `package.json` before publishing another package. The version is omitted from `plugin.json` to keep a single source of truth. After publication, the workflow checks the public download and its SHA-256 using both GitHub API and asset-page metadata.
 
 ## Important
 
