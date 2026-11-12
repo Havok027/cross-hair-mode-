@@ -188,7 +188,7 @@ Registros: `~/homebrew/logs/Crosshair/`.
 
 | Versión | Novedades |
 |:---:|---|
-| **1.8** | Portugués, inglés y español; pestañas con L1/R1; corrección de pulsaciones rápidas de A/B/X/Y |
+| **1.7.2** | Portugués, inglés y español; pestañas con L1/R1; corrección de pulsaciones rápidas de A/B/X/Y |
 | **1.7** | Restauración de MangoHud; más botones en el juego; atajos con QAM abierto; diagnóstico |
 | **1.6** | Grabación renovada desde Steam; carrusel de colores con izquierda/derecha; vista previa eliminada |
 | **1.5** | Primera implementación del atajo e interfaz renovada |

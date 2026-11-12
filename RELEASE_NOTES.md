@@ -1,4 +1,4 @@
-## Crosshair v1.8.2
+## Crosshair v1.7.2
 
 ### Novidades
 - Interface em português, inglês e espanhol, com idioma salvo e independente dos perfis de jogo.
@@ -31,7 +31,3 @@
 1. No Decky, ative o Modo desenvolvedor nas configurações.
 2. Em Desenvolvedor, escolha "Instalar plugin de ZIP" e selecione o Crosshair.zip.
 3. Reinicie o Decky se o plugin não aparecer.
-
-## Crosshair v1.7.2
-
-Versão de manutenção para alinhar os metadados do plugin, o README e a publicação do pacote no GitHub Releases. Mantém a compatibilidade de identidade com o Decky Direct Updater.

@@ -188,7 +188,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 
 | Version | Highlights |
 |:---:|---|
-| **1.8** | Portuguese, English and Spanish; tabs with L1/R1; quick A/B/X/Y tap fixes |
+| **1.7.2** | Portuguese, English and Spanish; tabs with L1/R1; quick A/B/X/Y tap fixes |
 | **1.7** | Restore previous MangoHud; expanded in-game input; QAM shortcuts; input diagnostics |
 | **1.6** | Reworked recording through Steam UI; left/right color carousel; preview removed |
 | **1.5** | First controller shortcut implementation and refreshed interface |
