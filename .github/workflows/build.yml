@@ -2,38 +2,45 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, mauro-test]
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: crosshair-release
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v7
 
-      # Organiza os arquivos TypeScript na pasta src/
+      - name: Impedir alteração de uma versão já publicada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "::error::A versão v$VERSION já foi publicada. Aumente a versão em package.json antes de publicar outro ZIP."
+            exit 1
+          fi
+
+      # Permite enviar os arquivos soltos (ex.: pelo celular): o que for
+      # TypeScript vai para src/, e o repositório fica organizado em pastas.
       - name: Organizar arquivos em pastas
         run: |
           mkdir -p src
           for f in *.ts *.tsx; do
             if [ -f "$f" ]; then mv -f "$f" src/; fi
           done
-
-          if [ -f gitignore.txt ]; then
-            mv -f gitignore.txt .gitignore
-          fi
-
+          if [ -f gitignore.txt ]; then mv -f gitignore.txt .gitignore; fi
           rm -f build.yml
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           git add -A
-
           if ! git diff --cached --quiet; then
             git commit -m "Organizar arquivos em pastas"
             git push
@@ -42,41 +49,42 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           version: 9
-
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: pnpm install --no-frozen-lockfile
-
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:backend
       - run: pnpm build
-
-      # Monta o pacote de instalação do Decky
       - name: Montar a pasta do plugin
         run: |
           mkdir -p out/Crosshair
-          cp -r dist main.py plugin.json package.json README.md LICENSE out/Crosshair/
+          cp -r dist main.py plugin.json package.json README.md README.en.md README.es.md LICENSE out/Crosshair/
           cd out && zip -r ../Crosshair.zip Crosshair
-
+      - name: Validar ZIP com o Direct Updater
+        run: python tests/check_direct_updater.py Crosshair.zip
       - uses: actions/upload-artifact@v7
         with:
           name: Crosshair
           path: out
-
-      # Publica ou atualiza o release
       - name: Publicar release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="v$VERSION"
-
           [ -f RELEASE_NOTES.md ] || echo "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)." > RELEASE_NOTES.md
-
-          gh release delete latest --cleanup-tag -y || true
-          gh release delete "$TAG" --cleanup-tag -y || true
-
           gh release create "$TAG" Crosshair.zip \
-            --target "${{ github.sha }}" \
+            --target "$(git rev-parse HEAD)" \
             --title "Crosshair $TAG" \
-            --notes-file RELEASE_NOTES.md
+            --notes-file RELEASE_NOTES.md \
+            --latest
+      - name: Verificar download e SHA-256 pelo Direct Updater
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          python tests/check_direct_updater.py --repo "${{ github.repository }}" --version "$VERSION"

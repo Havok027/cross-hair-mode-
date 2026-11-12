@@ -47,6 +47,8 @@
 
 > **Switching from the previous repository?** In Direct Updater, choose **Find source**, enter `Havok027/crosshair-plugin` and confirm **Use this source** once to receive future releases from this repository.
 
+> **“GitHub asset checksum mismatch”:** the download differs from the hash saved by the updater. Check that the source is `Havok027/crosshair-plugin`, leave the details page and refresh the list. This distribution does not replace ZIPs from published versions.
+
 ## Getting started
 
 1. Open **Crosshair Plugin** in Decky Loader.

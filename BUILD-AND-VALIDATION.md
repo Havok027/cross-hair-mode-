@@ -1,11 +1,13 @@
 # Build and validation notes
 
-This package preserves the original Crosshair project layout and adds the reconstructed `src/` tree, Rollup preset configuration, pnpm v9 lockfile seed, translated READMEs, and release notes.
+This package uses the editable `src/` tree, the official Decky Rollup preset, a complete pnpm v9 lockfile, translated READMEs, and release notes.
 
 ## Build
 
-The supplied GitHub Actions workflow runs `pnpm install --no-frozen-lockfile` followed by `pnpm build`. The `rollup.config.js` uses the official `@decky/rollup` preset. The workflow copies the three README files and `RELEASE_NOTES.md` into the plugin ZIP.
+Run `pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm test`, `pnpm test:backend`, and `pnpm build`. GitHub Actions uses Node 24 and Python 3.12, packages `dist/`, the backend, manifests, license and three READMEs, then checks the ZIP with the pinned original Direct Updater validator.
+
+Published release versions are never overwritten. Increase the version in `package.json` before publishing another package. The version is omitted from `plugin.json` to keep a single source of truth. After publication, the workflow checks the public download and its SHA-256 using both GitHub API and asset-page metadata.
 
 ## Important
 
-The source archives supplied for this task did not include the original Rollup configuration, lockfile, or editable source tree. The TypeScript source in this package was reconstructed from the uploaded source map and the earlier patch. The current container has no pnpm executable and cannot complete a dependency install, so a fresh GitHub Actions build and SteamOS runtime test remain required. In particular, test A/B/X/Y, Select+X, Select+RT, capture while QAM is open/closed, and L1/R1 tab navigation on the target controller.
+Automated input tests use simulated events. A SteamOS runtime check remains necessary for A/B/X/Y, Select+X, Select+RT, recording with the QAM open, shortcut use with the QAM open/closed, and L1/R1 navigation on the target controller.

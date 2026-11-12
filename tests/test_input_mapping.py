@@ -3,7 +3,7 @@ import ast
 import pathlib
 import unittest
 
-SOURCE = pathlib.Path(__file__).resolve().parents[1].joinpath("main.py").read_text()
+SOURCE = pathlib.Path(__file__).resolve().parents[1].joinpath("main.py").read_text(encoding="utf-8")
 TREE = ast.parse(SOURCE)
 
 def assignment(name):
