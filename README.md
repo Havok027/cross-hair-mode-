@@ -61,6 +61,8 @@
 
 > **Mudou do repositório antigo?** No Direct Updater, use **Find source**, informe `Pedrocarletti/crosshair-plugin` e confirme **Use this source** uma vez para receber as próximas versões daqui.
 
+> **Erro “GitHub asset checksum mismatch”:** o arquivo baixado difere do hash guardado pelo atualizador. Confira se a origem é `Pedrocarletti/crosshair-plugin`, saia da página e atualize a lista. Esta distribuição não substitui ZIPs de versões já publicadas.
+
 ---
 
 ## 🚀 Como usar

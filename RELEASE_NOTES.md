@@ -1,9 +1,17 @@
+## Crosshair v1.8.2
+
+### Direct Updater
+- Cada versão mantém o ZIP original: a automação não substitui mais arquivos de releases existentes. Para publicar outro pacote, é necessário aumentar a versão.
+- O pacote passa pelo validador original do Direct Updater antes da publicação.
+- Depois da publicação, a automação verifica a seleção da release, a identidade do plugin e o SHA-256 do download, usando os metadados da API e da página de arquivos do GitHub.
+- Se aparecer uma versão antiga de `Havok027/crosshair-plugin`, selecione `Pedrocarletti/crosshair-plugin` em **Find source** e confirme **Use this source**. Depois atualize a lista.
+
 ## Crosshair v1.8.1
 
 ### Atualizações
 - Restaurada a publicação automática ao enviar alterações para a branch `mauro-test`, além da `main`.
 - Metadados, links de download e instruções do Direct Updater apontam para `Pedrocarletti/crosshair-plugin`.
-- A release gerada é marcada como a mais recente. Reexecutar a compilação atualiza o ZIP sem excluir a release ou sua tag.
+- A release gerada é marcada como a mais recente. A substituição de ZIPs da mesma versão foi desativada na 1.8.2 para evitar divergências com metadados em cache.
 - Quem já usa o repositório antigo no Direct Updater deve selecionar **Find source**, informar `Pedrocarletti/crosshair-plugin` e confirmar **Use this source** uma vez.
 
 ## Crosshair v1.8.0
