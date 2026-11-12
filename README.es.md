@@ -5,15 +5,15 @@
 <p align="center"><b>Una mira personalizable para Decky Loader, diseñada para Steam Deck, Legion Go y otras consolas portátiles.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Havok027/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Havok027/crosshair-plugin?label=versi%C3%B3n&color=2ea44f&style=for-the-badge" alt="Versión" /></a>
-  <a href="https://github.com/Havok027/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Havok027/crosshair-plugin/total?label=descargas&color=1a9fff&style=for-the-badge" alt="Descargas" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases/latest"><img src="https://img.shields.io/github/v/release/Pedrocarletti/crosshair-plugin?label=versi%C3%B3n&color=2ea44f&style=for-the-badge" alt="Versión" /></a>
+  <a href="https://github.com/Pedrocarletti/crosshair-plugin/releases"><img src="https://img.shields.io/github/downloads/Pedrocarletti/crosshair-plugin/total?label=descargas&color=1a9fff&style=for-the-badge" alt="Descargas" /></a>
   <a href="https://decky.xyz"><img src="https://img.shields.io/badge/Decky%20Loader-plugin-9b5cff?style=for-the-badge" alt="Decky Loader" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-BSD--3-ff007b?style=for-the-badge" alt="Licencia" /></a>
 </p>
 
 <p align="center"><img src="https://github.com/user-attachments/assets/2a8a1378-ad2d-41a8-b484-789cc49682d4" alt="Interfaz de Crosshair Plugin (versión anterior)" width="100%" /></p>
 
-[📦 Descargar](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) · [Primeros pasos](#primeros-pasos) · [Atajo del mando](#atajo-del-mando) · [Solución de problemas](#solución-de-problemas) · [Hoja de ruta](#hoja-de-ruta)
+[📦 Descargar](https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip) · [Primeros pasos](#primeros-pasos) · [Atajo del mando](#atajo-del-mando) · [Solución de problemas](#solución-de-problemas) · [Hoja de ruta](#hoja-de-ruta)
 
 ## Índice
 
@@ -37,13 +37,15 @@
 
 ## Instalación
 
-1. Descarga [`Crosshair.zip`](https://github.com/Havok027/crosshair-plugin/releases/latest/download/Crosshair.zip) desde [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+1. Descarga [`Crosshair.zip`](https://github.com/Pedrocarletti/crosshair-plugin/releases/latest/download/Crosshair.zip) desde [Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
 2. Abre **Configuración de Decky Loader** y activa el **Modo desarrollador**.
 3. En **Desarrollador**, elige **Instalar plugin desde ZIP** y selecciona `Crosshair.zip`.
 4. Si el plugin no aparece, reinicia Decky o el dispositivo.
 
 > [!TIP]
-> Después de la primera instalación, **Direct Updater** puede reconocer el plugin. Si no encuentra el origen, selecciona **?** junto a Crosshair, elige **Find source** e introduce `Havok027/crosshair-plugin`.
+> Después de la primera instalación, **Direct Updater** puede reconocer el plugin. Si no encuentra el origen, selecciona **?** junto a Crosshair, elige **Find source** e introduce `Pedrocarletti/crosshair-plugin`.
+
+> **¿Vienes del repositorio anterior?** En Direct Updater, elige **Find source**, introduce `Pedrocarletti/crosshair-plugin` y confirma **Use this source** una vez para recibir las próximas versiones de este repositorio.
 
 ## Primeros pasos
 
@@ -156,7 +158,7 @@ El plugin escribe una configuración de **MangoHud** que dibuja texto (`custom_t
 | Desapareció la superposición de rendimiento | La mira está activada | Desactiva la mira para restaurar MangoHud |
 | El perfil no se aplica al iniciar | Steam no avisó al plugin | Abre el plugin y comprueba Aplicar perfil al iniciar el juego |
 | Failed to fetch dynamically imported module | Se instaló el código fuente sin `dist` | Instala `Crosshair.zip` desde Releases |
-| Direct Updater no encuentra el origen | Instalación antigua | **?** → **Find source** → `Havok027/crosshair-plugin` |
+| Direct Updater no encuentra el origen | Instalación antigua | **?** → **Find source** → `Pedrocarletti/crosshair-plugin` |
 
 Registros: `~/homebrew/logs/Crosshair/`.
 
@@ -192,11 +194,11 @@ Registros: `~/homebrew/logs/Crosshair/`.
 | **1.3** | Lista de modelos, controles de posición y perfiles por juego |
 | **1.2** | Legion Go S, colores, tamaño y nuevos modelos |
 
-Las notas completas están en [Releases](https://github.com/Havok027/crosshair-plugin/releases).
+Las notas completas están en [Releases](https://github.com/Pedrocarletti/crosshair-plugin/releases).
 
 ## Contribuir
 
-Envía errores o ideas en [Issues](https://github.com/Havok027/crosshair-plugin/issues). Incluye el dispositivo, la resolución, la versión del plugin, una captura del panel (o del diagnóstico del atajo para problemas con botones) y las últimas líneas de `~/homebrew/logs/Crosshair/`.
+Envía errores o ideas en [Issues](https://github.com/Pedrocarletti/crosshair-plugin/issues). Incluye el dispositivo, la resolución, la versión del plugin, una captura del panel (o del diagnóstico del atajo para problemas con botones) y las últimas líneas de `~/homebrew/logs/Crosshair/`.
 
 | Archivo | Función |
 |---|---|

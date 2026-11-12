@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, mauro-test]
   workflow_dispatch:
 
 permissions:
@@ -60,10 +60,16 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           TAG="v$VERSION"
           [ -f RELEASE_NOTES.md ] || echo "Plugin compilado, pronto para instalar pelo Decky (Instalar plugin de ZIP)." > RELEASE_NOTES.md
-          # Remove a release antiga chamada "latest" (não é uma versão) e recria a da versão atual
-          gh release delete latest --cleanup-tag -y || true
-          gh release delete "$TAG" --cleanup-tag -y || true
-          gh release create "$TAG" Crosshair.zip \
-            --target "${{ github.sha }}" \
-            --title "Crosshair $TAG" \
-            --notes-file RELEASE_NOTES.md
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" Crosshair.zip --clobber
+            gh release edit "$TAG" \
+              --title "Crosshair $TAG" \
+              --notes-file RELEASE_NOTES.md \
+              --latest
+          else
+            gh release create "$TAG" Crosshair.zip \
+              --target "$(git rev-parse HEAD)" \
+              --title "Crosshair $TAG" \
+              --notes-file RELEASE_NOTES.md \
+              --latest
+          fi

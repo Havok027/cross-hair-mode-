@@ -1,3 +1,11 @@
+## Crosshair v1.8.1
+
+### Atualizações
+- Restaurada a publicação automática ao enviar alterações para a branch `mauro-test`, além da `main`.
+- Metadados, links de download e instruções do Direct Updater apontam para `Pedrocarletti/crosshair-plugin`.
+- A release gerada é marcada como a mais recente. Reexecutar a compilação atualiza o ZIP sem excluir a release ou sua tag.
+- Quem já usa o repositório antigo no Direct Updater deve selecionar **Find source**, informar `Pedrocarletti/crosshair-plugin` e confirmar **Use this source** uma vez.
+
 ## Crosshair v1.8.0
 
 ### Novidades
