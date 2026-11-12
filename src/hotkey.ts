@@ -11,6 +11,7 @@
 //     apertada chegar pelos dois, o backend conta como uma só (deduplicação).
 import { getState, hotkeyToggle } from "./api";
 import type { HotkeyState } from "./api";
+import type { MessageKey, Translate } from "./i18n";
 
 // Nomes do enum de botões do Steam (extraídos do bundle do Steam pelo Steamcord).
 // Os não listados aparecem como "BTN<n>".
@@ -44,8 +45,9 @@ const BUTTON_NAMES: Record<number, string> = {
   45: "R4",
 };
 
-export function buttonName(id: number): string {
-  return BUTTON_NAMES[id] ?? "BTN" + id;
+export function buttonName(id: number, t?: Translate): string {
+  const name = BUTTON_NAMES[id] ?? "BTN" + id;
+  return t && (name.startsWith("D-") || name === "Guia") ? t(name as MessageKey) : name;
 }
 
 export type CaptureResult =
@@ -79,6 +81,12 @@ function evaluate() {
   const active = cfg.enabled && cfg.buttons.length === 2 && cfg.buttons.every((b) => held.has(b));
   if (active && !comboActive) {
     comboActive = true;
+    // A tap can contain both edges in the same Steam callback. A zero-delay
+    // timer would be cancelled by the release before it ever gets to run.
+    if (cfg.holdMs === 0) {
+      fire();
+      return;
+    }
     holdTimer = window.setTimeout(() => {
       holdTimer = undefined;
       if (comboActive) fire();
@@ -96,13 +104,6 @@ function evaluate() {
 export function applyHotkeyState(state: HotkeyState) {
   cfg = { enabled: state.enabled, buttons: state.buttons, holdMs: state.hold_ms };
   evaluate();
-}
-
-function normalizePressed(value: unknown): boolean | null {
-  if (typeof value === "boolean") return value;
-  if (value === 1 || value === "1" || value === "pressed" || value === "down") return true;
-  if (value === 0 || value === "0" || value === "released" || value === "up") return false;
-  return null;
 }
 
 function onButton(button: number, down: boolean) {
@@ -184,21 +185,10 @@ function registerControllerListener() {
           const first = args[0];
           if (Array.isArray(first)) {
             for (const event of first) {
-              const button = event?.nA ?? event?.button ?? event?.unButton ?? event?.buttonId;
-              const pressed = normalizePressed(event?.bS ?? event?.pressed ?? event?.isPressed ?? event?.down);
-              if (typeof button === "number" && pressed !== null) {
-                onButton(button, pressed);
-              }
+              if (typeof event?.nA === "number") onButton(event.nA, !!event.bS);
             }
           } else if (typeof args[1] === "number") {
-            const pressed = normalizePressed(args[2]);
-            if (pressed !== null) onButton(args[1], pressed);
-          } else if (first && typeof first === "object") {
-            const button = first.nA ?? first.button ?? first.unButton ?? first.buttonId;
-            const pressed = normalizePressed(first.bS ?? first.pressed ?? first.isPressed ?? first.down);
-            if (typeof button === "number" && pressed !== null) {
-              onButton(button, pressed);
-            }
+            onButton(args[1], !!args[2]);
           }
         } catch (error) {
           console.warn("[Crosshair] falha ao tratar um botão:", error);

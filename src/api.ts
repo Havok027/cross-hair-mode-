@@ -4,6 +4,7 @@ import { callable } from "@decky/api";
 // Tipos compartilhados com o backend (main.py)
 // ---------------------------------------------------------------------------
 export interface Settings {
+  language: "pt" | "en" | "es";
   enabled: boolean;
   model: string;
   resolution: string;

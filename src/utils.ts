@@ -32,7 +32,7 @@ export function getRunningGame(): GameInfo | null {
       MainRunningApp?: { appid: string | number; display_name?: string };
     }).MainRunningApp;
     if (app && app.appid) {
-      return { appid: String(app.appid), name: app.display_name || "Jogo " + app.appid };
+      return { appid: String(app.appid), name: app.display_name || String(app.appid) };
     }
   } catch (error) {
     console.error(error);
