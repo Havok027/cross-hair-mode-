@@ -7,6 +7,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 import importlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import sys
@@ -26,6 +27,12 @@ def fetch(url):
         "User-Agent": "Decky-Direct-Updater/0.1",
         "Accept": "application/vnd.github+json" if "api.github.com/" in url else "*/*",
     })
+    parsed = urllib.parse.urlsplit(url)
+    token = os.environ.get("GH_TOKEN")
+    if token and parsed.scheme == "https" and parsed.netloc == "api.github.com":
+        # Hosted runners share the anonymous API quota. Authenticate metadata
+        # reads only; never forward this token to raw sources or ZIP downloads.
+        request.add_unredirected_header("Authorization", "Bearer " + token)
     for attempt in range(3):
         try:
             with urllib.request.urlopen(request, timeout=20) as response:

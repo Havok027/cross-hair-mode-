@@ -70,6 +70,8 @@ jobs:
           cp -r dist main.py plugin.json package.json README.md README.en.md README.es.md LICENSE out/Crosshair/
           cd out && zip -r ../Crosshair.zip Crosshair
       - name: Validar ZIP com o Direct Updater
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python tests/check_direct_updater.py Crosshair.zip
       - uses: actions/upload-artifact@v7
         with:
@@ -90,6 +92,8 @@ jobs:
             --latest
       - name: Verificar download e SHA-256 pelo Direct Updater
         if: steps.release.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           python tests/check_direct_updater.py --repo "${{ github.repository }}" --version "$VERSION"
