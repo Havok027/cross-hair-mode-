@@ -2,7 +2,7 @@
 // @ts-ignore
 
 // Prevents it from being duplicated in output.
-const manifest = {"name":"Crosshair","author":"JSON Derulo","flags":[],"api_version":1,"publish":{"tags":["crosshair","aim","overlay","HUD"],"description":"Repurpose the performance overlay into a customizable crosshair.","image":"https://steamuserimages-a.akamaihd.net/ugc/25432209482234967/83EC67A8B25603F81A57F5C72715001021AC8484/"}};
+const manifest = {"name":"Crosshair","author":"Havok","flags":[],"api_version":1,"publish":{"tags":["crosshair","aim","overlay","HUD"],"description":"Repurpose the performance overlay into a customizable crosshair.","image":"https://steamuserimages-a.akamaihd.net/ugc/25432209482234967/83EC67A8B25603F81A57F5C72715001021AC8484/"}};
 const API_VERSION = 2;
 const internalAPIConnection = window.__DECKY_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED_deckyLoaderAPIInit;
 // Initialize
@@ -203,6 +203,15 @@ function applyHotkeyState(state) {
     cfg = { enabled: state.enabled, buttons: state.buttons, holdMs: state.hold_ms };
     evaluate();
 }
+function normalizePressed(value) {
+    if (typeof value === "boolean")
+        return value;
+    if (value === 1 || value === "1" || value === "pressed" || value === "down")
+        return true;
+    if (value === 0 || value === "0" || value === "released" || value === "up")
+        return false;
+    return null;
+}
 function onButton(button, down) {
     if (down)
         held.add(button);
@@ -290,12 +299,24 @@ function registerControllerListener() {
                     const first = args[0];
                     if (Array.isArray(first)) {
                         for (const event of first) {
-                            if (typeof event?.nA === "number")
-                                onButton(event.nA, !!event.bS);
+                            const button = event?.nA ?? event?.button ?? event?.unButton ?? event?.buttonId;
+                            const pressed = normalizePressed(event?.bS ?? event?.pressed ?? event?.isPressed ?? event?.down);
+                            if (typeof button === "number" && pressed !== null) {
+                                onButton(button, pressed);
+                            }
                         }
                     }
                     else if (typeof args[1] === "number") {
-                        onButton(args[1], !!args[2]);
+                        const pressed = normalizePressed(args[2]);
+                        if (pressed !== null)
+                            onButton(args[1], pressed);
+                    }
+                    else if (first && typeof first === "object") {
+                        const button = first.nA ?? first.button ?? first.unButton ?? first.buttonId;
+                        const pressed = normalizePressed(first.bS ?? first.pressed ?? first.isPressed ?? first.down);
+                        if (typeof button === "number" && pressed !== null) {
+                            onButton(button, pressed);
+                        }
                     }
                 }
                 catch (error) {
