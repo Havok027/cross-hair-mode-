@@ -41,6 +41,7 @@ async function controller() {
     configure: (buttons, hold_ms = 0) => hotkey.applyHotkeyState({ enabled: true, buttons, hold_ms }),
     batch: (events) => listener(events.map(([nA, bS]) => ({ nA, bS }))),
     positional: (id, down) => listener(0, id, down),
+    raw: (...args) => listener(...args),
     advance: (ms) => {
       now += ms;
       for (const [id, timer] of timers) if (timer.at <= now) { timers.delete(id); timer.fn(); }
@@ -56,6 +57,30 @@ test("QAM: quick Select + A/B/X/Y taps in one callback toggle exactly once", asy
     assert.equal(input.fires(), 1, `face ${face}`);
     input.advance(100);
     assert.equal(input.fires(), 1);
+    input.hotkey.disposeHotkey();
+  }
+});
+
+test("alternate Steam event fields preserve textual and numeric press/release states", async () => {
+  const formats = [
+    ["nA", "bS", true, false],
+    ["unButton", "isPressed", 1, 0],
+    ["buttonId", "pressed", "1", "0"],
+    ["button", "down", "pressed", "released"],
+    ["button", "down", "down", "up"],
+  ];
+  for (const [id, state, down, up] of formats) {
+    const input = await controller();
+    input.configure([35, 2]);
+    input.raw([{ [id]: 35, [state]: down }, { [id]: 2, [state]: up }]);
+    assert.equal(input.fires(), 0);
+    input.raw({ [id]: 2, [state]: down });
+    assert.equal(input.fires(), 1);
+    input.raw({ [id]: 2, [state]: up });
+    input.raw({ [id]: 2, [state]: "unknown" });
+    assert.equal(input.fires(), 1);
+    input.raw({ [id]: 2, [state]: down });
+    assert.equal(input.fires(), 2);
     input.hotkey.disposeHotkey();
   }
 });

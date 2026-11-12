@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Impedir alteração de uma versão já publicada
         env:
@@ -46,12 +46,12 @@ jobs:
             git push
           fi
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
       - uses: actions/setup-python@v5
         with:
@@ -68,7 +68,7 @@ jobs:
           cd out && zip -r ../Crosshair.zip Crosshair
       - name: Validar ZIP com o Direct Updater
         run: python tests/check_direct_updater.py Crosshair.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Crosshair
           path: out

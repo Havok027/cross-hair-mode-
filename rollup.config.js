@@ -1,5 +1,4 @@
 import deckyPlugin from "@decky/rollup";
 
-export default deckyPlugin({
-  // Add your extra Rollup options here
-})
+// Decky Loader's maintained Rollup preset: emits the plugin bundle to dist/index.js.
+export default deckyPlugin({});
