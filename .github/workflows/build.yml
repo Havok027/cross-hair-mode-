@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main, mauro-test]
+    branches: [main, teste]
   workflow_dispatch:
 
 permissions:
