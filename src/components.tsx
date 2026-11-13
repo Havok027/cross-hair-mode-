@@ -1,8 +1,8 @@
-import { ConfirmModal, Focusable, PanelSection, PanelSectionRow, TextField } from "@decky/ui";
+import { ConfirmModal, DialogButton, Focusable, PanelSection, PanelSectionRow, TextField } from "@decky/ui";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { FaCheck } from "react-icons/fa";
-import type { HotkeyState, Settings } from "./api";
+import { FaCheck, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import type { HotkeyState, ProfileInfo, Settings } from "./api";
 import { buttonName } from "./hotkey";
 import { useTranslation } from "./i18n";
 import type { MessageKey, Translate } from "./i18n";
@@ -17,42 +17,126 @@ export function SettingsSection({ title, children }: { title: string; children: 
   );
 }
 
-// Estado atual em tabela (no estilo do Mako): ativa ou não, modelo, tamanho, cor, atalho e perfil
-export function StatusTable(props: { settings: Settings; hotkey: HotkeyState; modelLabel: string; profile: string }) {
-  const t = useTranslation();
-  const { settings, hotkey, modelLabel, profile } = props;
-  const combo = hotkey.buttons.length === 2
-    ? buttonName(hotkey.buttons[0], t) + " + " + buttonName(hotkey.buttons[1], t)
-    : "";
-  const shortcut = !combo ? t("Sem combinação") : hotkey.enabled ? combo : combo + " · " + t("Desligado");
+// Seção que pode ser recolhida pela barra com seta (como no Mako). A escolha fica salva.
+export function FoldSection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  const [folded, setFolded] = useState<boolean>(() => {
+    try { return localStorage.getItem("crosshair-fold-" + id) === "1"; } catch { return false; }
+  });
+  const toggle = () => {
+    const next = !folded;
+    setFolded(next);
+    try { localStorage.setItem("crosshair-fold-" + id, next ? "1" : "0"); } catch { /* Storage is optional. */ }
+  };
+  return (
+    <PanelSection>
+      <PanelSectionRow><div className="xh-section-title">{title}</div></PanelSectionRow>
+      <PanelSectionRow>
+        <DialogButton className="xh-fold" onClick={toggle} aria-expanded={!folded}>
+          {folded ? <FaChevronDown /> : <FaChevronUp />}
+        </DialogButton>
+      </PanelSectionRow>
+      {!folded && children}
+    </PanelSection>
+  );
+}
+
+// Tabela de resumo (no estilo do Mako): cabeçalho com o estado e linhas de rótulo e valor
+function InfoTable(props: { head: string; on: boolean; rows: { label: string; value: ReactNode }[] }) {
   return (
     <div className="xh-table">
-      <div className={"xh-table-head" + (settings.enabled ? " xh-on" : "")}>
+      <div className={"xh-table-head" + (props.on ? " xh-on" : "")}>
         <span className="xh-state-dot" />
-        {settings.enabled ? t("Crosshair ativo") : t("Crosshair desligado")}
+        <span>{props.head}</span>
       </div>
-      <div className="xh-trow"><span>{t("Modelo")}</span><b>{modelLabel}</b></div>
-      <div className="xh-trow"><span>{t("Tamanho")}</span><b>{settings.size}%</b></div>
-      <div className="xh-trow">
-        <span>{t("Cor")}</span>
-        <b><span className="xh-dot xh-tdot" style={{ background: "#" + settings.color }} />#{settings.color}</b>
-      </div>
-      <div className="xh-trow"><span>{t("Atalho")}</span><b>{shortcut}</b></div>
-      <div className="xh-trow"><span>{t("Perfil")}</span><b>{profile}</b></div>
+      {props.rows.map((row) => (
+        <div className="xh-trow" key={row.label}><span>{row.label}</span><b>{row.value}</b></div>
+      ))}
     </div>
   );
 }
 
-// Aviso flutuante do R1, como no Mako: mostra ou oculta as informações de apoio
-export function DetailsBadge({ shown }: { shown: boolean }) {
+function ColorValue({ hex }: { hex: string }) {
+  return <><span className="xh-dot xh-tdot" style={{ background: "#" + hex }} />#{hex}</>;
+}
+
+// Aba Aparência: como a mira está agora (modelo, tamanho, cor, tela e posição final)
+export function StatusTable(props: {
+  settings: Settings;
+  modelLabel: string;
+  resolutionLabel: string;
+  offsetX: number;
+  offsetY: number;
+}) {
   const t = useTranslation();
+  const { settings } = props;
   return (
-    <div className="xh-badge-anchor">
-      <div className="xh-badge">
-        <span className="xh-badge-key">R1</span>
-        <span>{shown ? t("Ocultar informações") : t("Mostrar informações")}</span>
-      </div>
-    </div>
+    <InfoTable
+      head={settings.enabled ? t("Crosshair ativo") : t("Crosshair desligado")}
+      on={settings.enabled}
+      rows={[
+        { label: t("Modelo"), value: props.modelLabel },
+        { label: t("Tamanho"), value: settings.size + "%" },
+        { label: t("Cor"), value: <ColorValue hex={settings.color} /> },
+        { label: t("Resolução"), value: props.resolutionLabel },
+        { label: t("Posição"), value: props.offsetX + ", " + props.offsetY },
+      ]}
+    />
+  );
+}
+
+// Aba Perfis: o que está gravado no perfil escolhido e se ele bate com o ajuste atual
+export function ProfileTable(props: {
+  profile: ProfileInfo;
+  settings: Settings;
+  modelLabel: string;
+  gameOpen: boolean;
+}) {
+  const t = useTranslation();
+  const { profile, settings, gameOpen } = props;
+  const same =
+    profile.enabled === settings.enabled &&
+    profile.model === settings.model &&
+    profile.size === settings.size &&
+    profile.color.toUpperCase() === settings.color.toUpperCase() &&
+    profile.nudge_x === settings.nudge_x &&
+    profile.nudge_y === settings.nudge_y;
+  return (
+    <InfoTable
+      head={profile.name + (gameOpen ? " · " + t("Jogo aberto") : "")}
+      on={gameOpen}
+      rows={[
+        { label: t("Modelo"), value: props.modelLabel },
+        { label: t("Tamanho"), value: profile.size + "%" },
+        { label: t("Cor"), value: <ColorValue hex={profile.color} /> },
+        { label: t("Posição"), value: profile.nudge_x + ", " + profile.nudge_y },
+        { label: t("Mira ao aplicar"), value: profile.enabled ? t("Ativo") : t("Desligado") },
+        { label: t("Aplicação automática"), value: settings.auto_apply ? t("Ativo") : t("Desligado") },
+        { label: t("Situação"), value: same ? t("Igual ao ajuste atual") : t("Diferente do ajuste atual") },
+      ]}
+    />
+  );
+}
+
+const LANGUAGE_NAMES = { pt: "Português", en: "English", es: "Español" };
+
+// Aba Config.: idioma e atalho de botões num relance
+export function ShortcutTable(props: { settings: Settings; hotkey: HotkeyState }) {
+  const t = useTranslation();
+  const { settings, hotkey } = props;
+  const hasCombo = hotkey.buttons.length === 2;
+  const combo = hasCombo ? buttonName(hotkey.buttons[0], t) + " + " + buttonName(hotkey.buttons[1], t) : t("Sem combinação");
+  const on = hasCombo && hotkey.enabled;
+  return (
+    <InfoTable
+      head={on ? t("Atalho ativo") : t("Atalho desligado")}
+      on={on}
+      rows={[
+        { label: t("Idioma"), value: LANGUAGE_NAMES[settings.language] },
+        { label: t("Combinação"), value: combo },
+        { label: t("Tempo segurando"), value: hotkey.hold_ms + " ms" },
+        { label: t("Leitura em jogo"), value: hotkey.running ? t("Ativa") : t("Inativa") },
+      ]}
+    />
   );
 }
 
@@ -151,10 +235,9 @@ export function HotkeyCard(props: {
   capturing: boolean;
   secondsLeft: number;
   message: string;
-  details: boolean;
 }) {
   const t = useTranslation();
-  const { hotkey, capturing, secondsLeft, message, details } = props;
+  const { hotkey, capturing, secondsLeft, message } = props;
   const hasCombo = hotkey.buttons.length === 2;
   return (
     <div className={"xh-card" + (capturing ? " xh-recording" : "")}>
@@ -181,8 +264,8 @@ export function HotkeyCard(props: {
         <div className="xh-hint">{t("empty_shortcut")}</div>
       )}
       {message && !capturing && <div className="xh-warn">{message}</div>}
-      {details && hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey, t)}</div>}
-      {details && hasCombo && hotkey.enabled && !capturing && hotkey.running && (
+      {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey, t)}</div>}
+      {hasCombo && hotkey.enabled && !capturing && hotkey.running && (
         <div className="xh-hint xh-diag">
           {hotkey.last_seen.length > 0
             ? t("Último botão lido em jogo: ") +

@@ -37,11 +37,23 @@ export interface HotkeyState {
   last_seen_age: number | null; // há quantos segundos
 }
 
+// Perfil salvo de um jogo (o que foi gravado e o nome exibido)
+export interface ProfileInfo {
+  appid: string;
+  name: string;
+  enabled: boolean;
+  model: string;
+  color: string; // RRGGBB, sem "#"
+  size: number;
+  nudge_x: number;
+  nudge_y: number;
+}
+
 export interface PluginState {
   settings: Settings;
   models: ModelInfo[];
   resolutions: { id: string; label: string }[];
-  profiles: { appid: string; name: string }[];
+  profiles: ProfileInfo[];
   hotkey: HotkeyState;
   offset_x: number;
   offset_y: number;
