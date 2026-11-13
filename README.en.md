@@ -32,7 +32,7 @@
 | **Fine positioning** | Horizontal and vertical sliders from -200 to +200, saved per style |
 | **Multiple displays** | Steam Deck, Legion Go S, Legion Go, 1080p and 4K |
 | **Languages** | Portuguese, English and Spanish, with a saved language dropdown |
-| **Tabbed interface** | Mako-inspired panels; switch tabs using L1/R1 or touch |
+| **Tabbed interface** | Mako-inspired panels; L1 switches tabs, R1 shows or hides details, or use touch |
 | **Updates** | Automated releases and Direct Updater compatibility |
 
 ## Installation
@@ -57,17 +57,17 @@
 4. In **Appearance**, choose the style, color and size.
 5. Enable **Show crosshair**.
 6. If necessary, center it using **Horizontal (X)** and **Vertical (Y)** in **Display**.
-7. With a game running, optionally use **Save this game's profile** at the bottom of **Appearance**.
+7. With a game running, optionally open **Profiles** and use **Create profile**.
 
-Use **L1/R1** to cycle through **Appearance**, **Display**, **Shortcut** and **Settings**. You can also select tabs by touch. The plugin remembers the last tab. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs.
+Use **L1** to move to the next tab: **Appearance**, **Display**, **Profiles** and **Settings**. You can also select tabs by touch. Use **R1** to show or hide the supporting details, as in Mako. The plugin remembers the last tab and the R1 choice. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs or details.
 
 | Area | Controls |
 |---|---|
-| **Crosshair** | Status summary and Show crosshair toggle, right below the tabs (hidden in **Settings**) |
-| **Appearance** | Style, color carousel and slider, RGB controls, size presets and slider, plus the game profile (save, update, delete and apply on launch) at the bottom |
+| **Current status** | Table with state, style, size, color, shortcut and profile, plus the Show crosshair toggle, right below the tabs (hidden in **Settings**) |
+| **Appearance** | Style, color carousel and slider, RGB controls, size presets and slider |
 | **Display** | Resolution, X/Y sliders, position reset and advanced scaling calibration |
-| **Shortcut** | Record, remove, hold duration and input diagnostics |
-| **Settings** | Language (Português, English or Español) and upcoming settings |
+| **Profiles** | Create (or update) the running game's profile, choose, rename and delete saved profiles, and apply them on launch |
+| **Settings** | Language (Português, English or Español), button shortcut (record, remove, hold duration and input diagnostics) and upcoming settings |
 
 > [!NOTE]
 > The color slider changes colors immediately with left/right. The selected color stays in the center of the carousel. Use up/down to move between controls.
@@ -76,7 +76,7 @@ Use **L1/R1** to cycle through **Appearance**, **Display**, **Shortcut** and **S
 
 Toggle the crosshair with **2 controller buttons**, without opening the menu.
 
-1. In **Shortcut**, select **Record shortcut**.
+1. In **Settings**, select **Record shortcut**.
 2. Press the 2 buttons **together**, then release them within 12 seconds. You can keep the menu open.
 3. The crosshair flashes twice when saved. Combinations such as **Select + X** are accepted.
 4. Press the combination to show or hide the crosshair.
@@ -173,7 +173,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 | ✅ | Controller recording, in-game input and MangoHud restoration |
 | ✅ | Automated releases and Direct Updater |
 | ✅ | Portuguese, English and Spanish documentation and interface |
-| ✅ | Mako-inspired tabs with L1/R1 navigation |
+| ✅ | Mako-inspired tabs, with L1 to switch tabs and R1 to show or hide details |
 | 🔄 | Validate in-game LB, RB, LT, RT, Menu and View |
 | 🧭 | L3/R3 and rear buttons on non-Valve controllers |
 | 🧭 | Automatic centering calibration |
@@ -188,6 +188,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 
 | Version | Highlights |
 |:---:|---|
+| **1.7.4** | Current status table; **Profiles** tab with create, rename and delete; shortcut inside **Settings**; R1 shows or hides details |
 | **1.7.3** | Tabs at the top with icon and label below; new **Settings** tab with the language; game profile at the bottom of **Appearance** |
 | **1.7.2** | Portuguese, English and Spanish; tabs with L1/R1; quick A/B/X/Y tap fixes |
 | **1.7** | Restore previous MangoHud; expanded in-game input; QAM shortcuts; input diagnostics |
@@ -211,7 +212,7 @@ Report bugs or ideas in [Issues](https://github.com/Havok027/crosshair-plugin/is
 | `src/components.tsx` | Shared panel components |
 | `src/hotkey.ts` | Frontend shortcut handling |
 | `src/i18n.tsx` | PT/EN/ES interface translations |
-| `src/SettingsTabs.tsx` | Tabs and L1/R1 navigation |
+| `src/SettingsTabs.tsx` | Tabs, L1 to switch tabs and R1 to show or hide details |
 | `src/api.ts` | Backend calls and shared types |
 | `src/utils.ts` | Colors, sizes and helpers |
 | `src/styles.ts` | Panel CSS |
@@ -220,7 +221,7 @@ Report bugs or ideas in [Issues](https://github.com/Havok027/crosshair-plugin/is
 | `.github/workflows/build.yml` | Build and release automation |
 | `RELEASE_NOTES.md` | Release description |
 
-Build with `pnpm install` followed by `pnpm build`. Run `pnpm typecheck`, `pnpm test` and `pnpm test:backend` (Python 3.7+). Tests simulate input; also verify Select + A/B/X/Y, Select + RT, QAM open/closed and L1/R1 navigation on the device.
+Build with `pnpm install` followed by `pnpm build`. Run `pnpm typecheck`, `pnpm test` and `pnpm test:backend` (Python 3.7+). Tests simulate input; also verify Select + A/B/X/Y, Select + RT, QAM open/closed and L1/R1 on the device.
 
 ## Credits
 

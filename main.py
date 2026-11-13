@@ -915,6 +915,15 @@ class Plugin:
         self.save_settings()
         return self.state()
 
+    async def rename_profile(self, appid: str, name: str) -> dict:
+        """Troca só o nome exibido do perfil; o jogo (appid) continua o mesmo."""
+        profile = self.settings["profiles"].get(str(appid))
+        clean = " ".join(str(name).split())[:80]
+        if profile is not None and clean:
+            profile["name"] = clean
+            self.save_settings()
+        return self.state()
+
     async def game_started(self, appid: str) -> dict:
         """Chamado quando um jogo abre: aplica o perfil dele, se existir."""
         prof = self.settings["profiles"].get(str(appid))

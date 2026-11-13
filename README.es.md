@@ -32,7 +32,7 @@
 | **Ajuste de posición** | Controles horizontal y vertical de -200 a +200, guardados por modelo |
 | **Varias pantallas** | Steam Deck, Legion Go S, Legion Go, 1080p y 4K |
 | **Idiomas** | Portugués, inglés y español mediante un selector con preferencia guardada |
-| **Interfaz con pestañas** | Paneles inspirados en Mako; navegación con L1/R1 o por toque |
+| **Interfaz con pestañas** | Paneles inspirados en Mako; L1 cambia de pestaña, R1 muestra u oculta información, o por toque |
 | **Actualizaciones** | Versiones automáticas y compatibilidad con Direct Updater |
 
 ## Instalación
@@ -57,17 +57,17 @@
 4. En **Apariencia**, elige el modelo, el color y el tamaño.
 5. Activa **Mostrar mira**.
 6. Si hace falta, céntrala con **Horizontal (X)** y **Vertical (Y)** en **Pantalla**.
-7. Con un juego en ejecución, puedes usar **Guardar perfil de este juego** al final de **Apariencia**.
+7. Con un juego en ejecución, puedes abrir **Perfiles** y usar **Crear perfil**.
 
-Usa **L1/R1** para recorrer **Apariencia**, **Pantalla**, **Atajo** y **Ajustes**. También puedes seleccionar las pestañas por toque. El plugin recuerda la última pestaña. Durante la grabación, L1/R1 pueden formar parte de la combinación y no cambian de pestaña.
+Usa **L1** para pasar a la siguiente pestaña: **Apariencia**, **Pantalla**, **Perfiles** y **Ajustes**. También puedes seleccionar las pestañas por toque. Usa **R1** para mostrar u ocultar la información de apoyo, como en Mako. El plugin recuerda la última pestaña y la elección de R1. Durante la grabación, L1/R1 pueden formar parte de la combinación y no cambian de pestaña ni de información.
 
 | Área | Controles |
 |---|---|
-| **Crosshair** | Resumen del estado e interruptor Mostrar mira, justo debajo de las pestañas (oculto en **Ajustes**) |
-| **Apariencia** | Modelo, carrusel y control de color, RGB, tamaños predefinidos control de tamaño y, al final, el perfil del juego (guardar, actualizar, eliminar y aplicar al abrir el juego) |
+| **Estado actual** | Tabla con estado, modelo, tamaño, color, atajo y perfil, e interruptor Mostrar mira, justo debajo de las pestañas (oculto en **Ajustes**) |
+| **Apariencia** | Modelo, carrusel y control de color, RGB, tamaños predefinidos y control de tamaño |
 | **Pantalla** | Resolución, controles X/Y, restablecer posición y calibración avanzada |
-| **Atajo** | Grabar, eliminar, tiempo de pulsación y diagnóstico de entrada |
-| **Ajustes** | Idioma (Português, English o Español) y los próximos ajustes |
+| **Perfiles** | Crear (o actualizar) el perfil del juego en ejecución, elegir, renombrar y eliminar perfiles guardados, y aplicarlos al iniciar |
+| **Ajustes** | Idioma (Português, English o Español), atajo del mando (grabar, eliminar, tiempo de pulsación y diagnóstico de entrada) y los próximos ajustes |
 
 > [!NOTE]
 > El control de color cambia el color al instante con izquierda/derecha. El color seleccionado permanece en el centro del carrusel. Usa arriba/abajo para cambiar de control.
@@ -76,7 +76,7 @@ Usa **L1/R1** para recorrer **Apariencia**, **Pantalla**, **Atajo** y **Ajustes*
 
 Activa o desactiva la mira con **2 botones del mando**, sin abrir el menú.
 
-1. En **Atajo**, selecciona **Grabar combinación**.
+1. En **Ajustes**, selecciona **Grabar combinación**.
 2. Pulsa los 2 botones **a la vez** y suéltalos antes de 12 segundos. Puedes mantener el menú abierto.
 3. La mira parpadea dos veces al guardar. Se aceptan combinaciones como **Select + X**.
 4. Pulsa la combinación para mostrar u ocultar la mira.
@@ -173,7 +173,7 @@ Registros: `~/homebrew/logs/Crosshair/`.
 | ✅ | Grabación del mando, lectura en el juego y restauración de MangoHud |
 | ✅ | Versiones automáticas y Direct Updater |
 | ✅ | Documentación e interfaz en portugués, inglés y español |
-| ✅ | Pestañas inspiradas en Mako y navegación con L1/R1 |
+| ✅ | Pestañas inspiradas en Mako, con L1 para cambiar de pestaña y R1 para mostrar u ocultar información |
 | 🔄 | Validar LB, RB, LT, RT, Menu y View en el juego |
 | 🧭 | L3/R3 y botones traseros de mandos que no sean de Valve |
 | 🧭 | Calibración automática del centrado |
@@ -188,6 +188,7 @@ Registros: `~/homebrew/logs/Crosshair/`.
 
 | Versión | Novedades |
 |:---:|---|
+| **1.7.4** | Estado actual en tabla; pestaña **Perfiles** con crear, renombrar y eliminar; atajo dentro de **Ajustes**; R1 muestra u oculta información |
 | **1.7.3** | Pestañas arriba con icono y nombre debajo; nueva pestaña **Ajustes** con el idioma; perfil del juego al final de **Apariencia** |
 | **1.7.2** | Portugués, inglés y español; pestañas con L1/R1; corrección de pulsaciones rápidas de A/B/X/Y |
 | **1.7** | Restauración de MangoHud; más botones en el juego; atajos con QAM abierto; diagnóstico |
@@ -211,7 +212,7 @@ Envía errores o ideas en [Issues](https://github.com/Havok027/crosshair-plugin/
 | `src/components.tsx` | Componentes compartidos del panel |
 | `src/hotkey.ts` | Atajos desde la interfaz |
 | `src/i18n.tsx` | Traducciones PT/EN/ES |
-| `src/SettingsTabs.tsx` | Pestañas y navegación L1/R1 |
+| `src/SettingsTabs.tsx` | Pestañas, L1 para cambiar de pestaña y R1 para mostrar u ocultar información |
 | `src/api.ts` | Llamadas al backend y tipos compartidos |
 | `src/utils.ts` | Colores, tamaños y utilidades |
 | `src/styles.ts` | CSS del panel |
