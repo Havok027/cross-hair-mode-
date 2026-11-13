@@ -186,6 +186,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 
 | Version | Highlights |
 |:---:|---|
+| **1.7.6** | Clear selection on every tab: active tab with its own mark and highlight, chosen size with a ✓, open or closed section bars, and a visible focus on every button |
 | **1.7.5** | Appearance and Display in one tab; sections that fold with an arrow; a different summary table on each tab, with profile details; **Profiles** tab with create, rename and delete; shortcut inside **Settings** |
 | **1.7.3** | Tabs at the top with icon and label below; new **Settings** tab with the language; game profile at the bottom of **Appearance** |
 | **1.7.2** | Portuguese, English and Spanish; tabs with L1/R1; quick A/B/X/Y tap fixes |

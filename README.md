@@ -234,6 +234,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
 | Versão | Destaques |
 |:---:|---|
+| **1.7.6** | Seleção clara em todas as guias: guia ativa com marca e destaque próprio, tamanho escolhido com ✓, barras de seção abertas ou fechadas, e foco visível em todos os botões |
 | **1.7.5** | Aparência e Tela na mesma guia · seções que recolhem com seta · tabela de resumo diferente em cada guia, com os detalhes do perfil · guia **Perfis** com criar, renomear e excluir · atalho dentro de **Config.** |
 | **1.7.3** | Guias no topo, com ícone e nome embaixo · nova guia **Config.** com o idioma · perfil do jogo no fim de **Aparência** |
 | **1.7.2** | Português, inglês e espanhol · guias com L1/R1 · correção de toques rápidos de A/B/X/Y |

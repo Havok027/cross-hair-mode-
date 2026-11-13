@@ -186,6 +186,7 @@ Registros: `~/homebrew/logs/Crosshair/`.
 
 | Versión | Novedades |
 |:---:|---|
+| **1.7.6** | Selección clara en todas las pestañas: pestaña activa con marca y resalte propio, tamaño elegido con ✓, barras de sección abiertas o cerradas y foco visible en todos los botones |
 | **1.7.5** | Apariencia y Pantalla en una pestaña; secciones que se contraen con flecha; una tabla resumen distinta en cada pestaña, con los detalles del perfil; pestaña **Perfiles** con crear, renombrar y eliminar; atajo dentro de **Ajustes** |
 | **1.7.3** | Pestañas arriba con icono y nombre debajo; nueva pestaña **Ajustes** con el idioma; perfil del juego al final de **Apariencia** |
 | **1.7.2** | Portugués, inglés y español; pestañas con L1/R1; corrección de pulsaciones rápidas de A/B/X/Y |
