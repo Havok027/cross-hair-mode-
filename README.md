@@ -236,6 +236,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
 | Versão | Destaques |
 |:---:|---|
+| **1.7.3** | Guias no topo, com ícone e nome embaixo · nova guia **Config.** com o idioma · perfil do jogo no fim de **Aparência** |
 | **1.7.2** | Português, inglês e espanhol · guias com L1/R1 · correção de toques rápidos de A/B/X/Y |
 | **1.7** | MangoHud de antes volta ao desligar a mira · leitura em jogo ampliada (LB, RB, LT, RT, Menu e View) · atalho funciona com o menu aberto · diagnóstico do último botão lido |
 | **1.6** | Atalho refeito (gravação pela interface) · carrossel de cores com esquerda e direita · prévia removida |
