@@ -10,6 +10,8 @@ export const messages = {
   "Tela": ["Display", "Pantalla"],
   "Atalho": ["Shortcut", "Atajo"],
   "Perfis": ["Profiles", "Perfiles"],
+  "Config.": ["Settings", "Ajustes"],
+  "Configurações": ["Settings", "Configuración"],
   "L1 / R1 · trocar guia": ["L1 / R1 · switch tabs", "L1 / R1 · cambiar pestaña"],
   "Criado por Havok": ["Created by Havok", "Creado por Havok"],
   "Carregando...": ["Loading...", "Cargando..."],

@@ -1,15 +1,15 @@
 import { Focusable, GamepadButton, PanelSection, PanelSectionRow } from "@decky/ui";
 import { useRef, useState } from "react";
 import type { ComponentProps, ComponentType, ReactNode, Ref } from "react";
-import { FaBullseye, FaDesktop, FaGamepad, FaLayerGroup } from "react-icons/fa";
+import { FaBullseye, FaCog, FaDesktop, FaGamepad } from "react-icons/fa";
 import { useTranslation } from "./i18n";
 
-const tabs = ["appearance", "display", "shortcut", "profiles"] as const;
-type TabId = typeof tabs[number];
+const tabs = ["appearance", "display", "shortcut", "settings"] as const;
+export type TabId = typeof tabs[number];
 type NavigationHandle = { TakeFocus: () => boolean };
 const TabFocus = Focusable as ComponentType<ComponentProps<typeof Focusable> & { navRef?: Ref<NavigationHandle> }>;
 
-export function TabbedSettings({ children, capturing, header }: { children: (tab: TabId) => ReactNode; capturing: boolean; header?: ReactNode }) {
+export function TabbedSettings({ children, capturing, header }: { children: (tab: TabId) => ReactNode; capturing: boolean; header?: (tab: TabId) => ReactNode }) {
   const t = useTranslation();
   const [active, setActive] = useState<TabId>(() => {
     try {
@@ -24,8 +24,8 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
     try { localStorage.setItem("crosshair-active-tab", tab); } catch { /* Storage is optional. */ }
     if (focus) navigation.current[tab]?.TakeFocus();
   };
-  const labels = [t("Aparência"), t("Tela"), t("Atalho"), t("Perfis")];
-  const icons = [FaBullseye, FaDesktop, FaGamepad, FaLayerGroup];
+  const labels = [t("Aparência"), t("Tela"), t("Atalho"), t("Config.")];
+  const icons = [FaBullseye, FaDesktop, FaGamepad, FaCog];
   return (
     <Focusable
       className="xh-settings"
@@ -41,7 +41,6 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
         select(tabs[(tabs.indexOf(active) + direction + tabs.length) % tabs.length], true);
       }}
     >
-      {header}
       <PanelSection>
         <PanelSectionRow>
           <Focusable className="xh-tabs" flow-children="row" role="tablist" aria-label="Crosshair">
@@ -68,6 +67,7 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
         </PanelSectionRow>
         <PanelSectionRow><div className="xh-tab-hint">{t("L1 / R1 · trocar guia")}</div></PanelSectionRow>
       </PanelSection>
+      {header?.(active)}
       <div key={active} id={`xh-panel-${active}`} role="tabpanel" aria-labelledby={`xh-tab-${active}`} className="xh-tab-panel">
         {children(active)}
       </div>
