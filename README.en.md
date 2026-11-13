@@ -32,7 +32,7 @@
 | **Fine positioning** | Horizontal and vertical sliders from -200 to +200, saved per style |
 | **Multiple displays** | Steam Deck, Legion Go S, Legion Go, 1080p and 4K |
 | **Languages** | Portuguese, English and Spanish, with a saved language dropdown |
-| **Tabbed interface** | Mako-inspired panels; L1 switches tabs, R1 shows or hides details, or use touch |
+| **Tabbed interface** | Mako-inspired panels; L1/R1 switch tabs, sections fold with an arrow, or use touch |
 | **Updates** | Automated releases and Direct Updater compatibility |
 
 ## Installation
@@ -59,15 +59,13 @@
 6. If necessary, center it using **Horizontal (X)** and **Vertical (Y)** in **Display**.
 7. With a game running, optionally open **Profiles** and use **Create profile**.
 
-Use **L1** to move to the next tab: **Appearance**, **Display**, **Profiles** and **Settings**. You can also select tabs by touch. Use **R1** to show or hide the supporting details, as in Mako. The plugin remembers the last tab and the R1 choice. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs or details.
+Use **L1/R1** to cycle through **Appearance**, **Profiles** and **Settings**. You can also select tabs by touch. The plugin remembers the last tab. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs. Each section has an arrow bar that folds or unfolds its content, and the choice is remembered.
 
 | Area | Controls |
 |---|---|
-| **Current status** | Table with state, style, size, color, shortcut and profile, plus the Show crosshair toggle, right below the tabs (hidden in **Settings**) |
-| **Appearance** | Style, color carousel and slider, RGB controls, size presets and slider |
-| **Display** | Resolution, X/Y sliders, position reset and advanced scaling calibration |
-| **Profiles** | Create (or update) the running game's profile, choose, rename and delete saved profiles, and apply them on launch |
-| **Settings** | Language (Português, English or Español), button shortcut (record, remove, hold duration and input diagnostics) and upcoming settings |
+| **Appearance** | Current status table (state, style, size, color, resolution and position), Show crosshair toggle, style, color carousel and slider, RGB controls, size presets and slider and, in the same tab, resolution, X/Y sliders, position reset and advanced scaling calibration |
+| **Profiles** | Table with the chosen profile's details (style, size, color, position, crosshair on apply and whether it matches the current settings), create or update the running game's profile, rename, delete and apply on launch |
+| **Settings** | Summary table (language, shortcut, hold duration and in-game input), language (Português, English or Español), button shortcut (record, remove, hold duration and input diagnostics) and upcoming settings |
 
 > [!NOTE]
 > The color slider changes colors immediately with left/right. The selected color stays in the center of the carousel. Use up/down to move between controls.
@@ -173,7 +171,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 | ✅ | Controller recording, in-game input and MangoHud restoration |
 | ✅ | Automated releases and Direct Updater |
 | ✅ | Portuguese, English and Spanish documentation and interface |
-| ✅ | Mako-inspired tabs, with L1 to switch tabs and R1 to show or hide details |
+| ✅ | Mako-inspired tabs, with L1/R1 to switch tabs and foldable sections |
 | 🔄 | Validate in-game LB, RB, LT, RT, Menu and View |
 | 🧭 | L3/R3 and rear buttons on non-Valve controllers |
 | 🧭 | Automatic centering calibration |
@@ -188,7 +186,7 @@ Logs: `~/homebrew/logs/Crosshair/`.
 
 | Version | Highlights |
 |:---:|---|
-| **1.7.4** | Current status table; **Profiles** tab with create, rename and delete; shortcut inside **Settings**; R1 shows or hides details |
+| **1.7.5** | Appearance and Display in one tab; sections that fold with an arrow; a different summary table on each tab, with profile details; **Profiles** tab with create, rename and delete; shortcut inside **Settings** |
 | **1.7.3** | Tabs at the top with icon and label below; new **Settings** tab with the language; game profile at the bottom of **Appearance** |
 | **1.7.2** | Portuguese, English and Spanish; tabs with L1/R1; quick A/B/X/Y tap fixes |
 | **1.7** | Restore previous MangoHud; expanded in-game input; QAM shortcuts; input diagnostics |
@@ -212,7 +210,7 @@ Report bugs or ideas in [Issues](https://github.com/Havok027/crosshair-plugin/is
 | `src/components.tsx` | Shared panel components |
 | `src/hotkey.ts` | Frontend shortcut handling |
 | `src/i18n.tsx` | PT/EN/ES interface translations |
-| `src/SettingsTabs.tsx` | Tabs, L1 to switch tabs and R1 to show or hide details |
+| `src/SettingsTabs.tsx` | Tabs and L1/R1 navigation |
 | `src/api.ts` | Backend calls and shared types |
 | `src/utils.ts` | Colors, sizes and helpers |
 | `src/styles.ts` | Panel CSS |
