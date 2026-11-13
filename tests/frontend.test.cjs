@@ -9,7 +9,8 @@ function load(name, mocks, globals = {}) {
   const filename = path.join(__dirname, "..", "src", name);
   const code = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020,
-      jsx: ts.JsxEmit.React, jsxFactory: "window.SP_REACT.createElement" },
+      jsx: ts.JsxEmit.React, jsxFactory: "window.SP_REACT.createElement",
+      jsxFragmentFactory: "window.SP_REACT.Fragment" },
   }).outputText;
   const module = { exports: {} };
   vm.runInNewContext(code, { module, exports: module.exports, console, ...globals,
@@ -145,7 +146,7 @@ test("L1/R1 cycle tabs, retain focus, persist selection, and stay idle during ca
     } },
     "@decky/ui": { Focusable: "Focusable", PanelSection: "Section", PanelSectionRow: "Row",
       GamepadButton: { BUMPER_LEFT: 5, BUMPER_RIGHT: 6 } },
-    "react-icons/fa": { FaBullseye: "Icon", FaDesktop: "Icon", FaGamepad: "Icon", FaLayerGroup: "Icon" },
+    "react-icons/fa": { FaBullseye: "Icon", FaDesktop: "Icon", FaGamepad: "Icon", FaCog: "Icon" },
     "./i18n": { useTranslation: () => i18n.translator("en") },
   }, { window: { SP_REACT: { createElement } }, localStorage: {
     getItem: () => saved, setItem: (_, value) => { saved = value; },
@@ -164,7 +165,7 @@ test("L1/R1 cycle tabs, retain focus, persist selection, and stay idle during ca
   function press(button) {
     render().props.onButtonDown({ detail: { button }, stopPropagation() {}, preventDefault() {} });
   }
-  press(5); assert.equal(saved, "profiles"); assert.equal(focused, "xh-tab-profiles");
+  press(5); assert.equal(saved, "settings"); assert.equal(focused, "xh-tab-settings");
   press(6); assert.equal(saved, "appearance");
   press(6); assert.equal(saved, "display");
   capturing = true;
@@ -191,17 +192,22 @@ test("language dropdown is localized and its pending choice is saved when QAM cl
     "./components": { ColorStrip: "ColorStrip", HotkeyCard: "HotkeyCard", SettingsSection: "Section", SizeChips: "SizeChips", StatusChips: "StatusChips" },
     "./hotkey": { applyHotkeyState() {} }, "./i18n": i18n, "./SettingsTabs": { TabbedSettings: "Tabs" },
     "./styles": { STYLES: "" }, "./utils": { COLORS: [{ hex: "FF007B" }], getRunningGame: () => null, hexToRgb: () => [255, 0, 123] },
-  }, { window: { SP_REACT: { createElement }, setTimeout: () => 1, clearTimeout() {} } });
+  }, { window: { SP_REACT: { createElement, Fragment: "Fragment" }, setTimeout: () => 1, clearTimeout() {} } });
   const tree = content.Content();
   await Promise.resolve();
-  let dropdown;
+  let dropdown, currentTab;
   function visit(node) {
+    if (typeof node === "function") return visit(node(currentTab));
     if (Array.isArray(node)) return node.forEach(visit);
     if (!node?.props) return;
     if (node.props.label === "Language") dropdown = node;
     visit(node.props.header); visit(node.props.children);
   }
-  visit(tree);
+  for (const tab of ["appearance", "display", "shortcut"]) {
+    currentTab = tab; visit(tree);
+    assert.equal(dropdown, undefined, `language must not appear in ${tab}`);
+  }
+  currentTab = "settings"; visit(tree);
   assert.ok(dropdown);
   assert.equal(dropdown.props.selectedOption, "en");
   dropdown.props.onChange({ data: "es" });
