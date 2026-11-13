@@ -1,17 +1,20 @@
 import {
   ButtonItem,
+  DialogButton,
   DropdownItem,
   PanelSection,
   PanelSectionRow,
   SliderField,
   ToggleField,
+  showModal,
 } from "@decky/ui";
 import { useEffect, useRef, useState } from "react";
-import { FaGamepad } from "react-icons/fa";
+import { FaGamepad, FaPen, FaPlus, FaTrash } from "react-icons/fa";
 import {
   clearHotkey,
   deleteProfile,
   getState,
+  renameProfile,
   resetComp,
   resetNudge,
   saveProfile,
@@ -19,7 +22,7 @@ import {
   updateSettings,
 } from "./api";
 import type { GameInfo, PluginState, Settings } from "./api";
-import { ColorStrip, HotkeyCard, SettingsSection, SizeChips, StatusChips } from "./components";
+import { ColorStrip, DetailsBadge, HotkeyCard, RenameProfileModal, SettingsSection, SizeChips, StatusTable } from "./components";
 import { applyHotkeyState, captureButtons } from "./hotkey";
 import { LanguageContext, modelLabel, translator } from "./i18n";
 import { TabbedSettings } from "./SettingsTabs";
@@ -38,6 +41,11 @@ export function Content() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [captureMessage, setCaptureMessage] = useState("");
   const captureRef = useRef<{ cancel: () => void } | null>(null);
+  // R1 mostra ou oculta as informações de apoio; a escolha fica salva
+  const [details, setDetails] = useState<boolean>(() => {
+    try { return localStorage.getItem("crosshair-show-details") !== "0"; } catch { return true; }
+  });
+  const [pickedProfile, setPickedProfile] = useState("");
 
   const t = translator(state?.settings.language ?? "pt");
 
@@ -151,6 +159,24 @@ export function Content() {
     queue(patch);
   };
 
+  const toggleDetails = () => {
+    const next = !details;
+    setDetails(next);
+    try { localStorage.setItem("crosshair-show-details", next ? "1" : "0"); } catch { /* Storage is optional. */ }
+  };
+
+  const openRename = (profile: { appid: string; name: string }) => {
+    showModal(
+      <RenameProfileModal
+        initial={profile.name}
+        title={t("Renomear perfil")}
+        okText={t("Salvar")}
+        cancelText={t("Cancelar")}
+        onSave={(name) => { void run(() => renameProfile(profile.appid, name), t("Perfil renomeado")); }}
+      />,
+    );
+  };
+
   if (!state) {
     return (
       <PanelSection title="Crosshair">
@@ -164,7 +190,9 @@ export function Content() {
   const { settings, models, resolutions, profiles, hotkey } = state;
   const currentModel = models.find((m) => m.id === settings.model) ?? models[0];
   const [r, g, b] = hexToRgb(settings.color);
-  const hasProfile = game !== null && profiles.some((p) => p.appid === game.appid);
+  const gameProfile = game ? profiles.find((p) => p.appid === game.appid) : undefined;
+  const hasProfile = gameProfile !== undefined;
+  const selectedProfile = profiles.find((p) => p.appid === pickedProfile) ?? gameProfile ?? profiles[0];
   const colorIndex = Math.max(
     0,
     COLORS.findIndex((c) => c.hex === settings.color),
@@ -175,20 +203,25 @@ export function Content() {
       <div className="xh-plugin">
         <style>{STYLES}</style>
 
-        <TabbedSettings capturing={capturing} header={(tab) => tab === "settings" ? null : (
-          <PanelSection title="Crosshair">
+        <TabbedSettings capturing={capturing} onToggleDetails={toggleDetails} header={(tab) => tab === "settings" ? null : (
+          <SettingsSection title={t("Estado atual")}>
             <PanelSectionRow>
-              <StatusChips settings={settings} modelLabel={modelLabel(currentModel.id, t)} />
+              <StatusTable
+                settings={settings}
+                hotkey={hotkey}
+                modelLabel={modelLabel(currentModel.id, t)}
+                profile={game ? (hasProfile ? t("Perfil salvo") : t("Sem perfil")) : "—"}
+              />
             </PanelSectionRow>
             <PanelSectionRow>
               <ToggleField
                 label={t("Mostrar crosshair")}
-                description={t("Substitui o overlay de desempenho (MangoHud).")}
+                description={details ? t("Substitui o overlay de desempenho (MangoHud).") : undefined}
                 checked={settings.enabled}
                 onChange={(value: boolean) => patchSettings({ enabled: value })}
               />
             </PanelSectionRow>
-          </PanelSection>
+          </SettingsSection>
         )}>{(tab) => (<>
           {tab === "appearance" && (<>
             <SettingsSection title={t("Aparência")}>
@@ -273,66 +306,6 @@ export function Content() {
                 />
               </PanelSectionRow>
             </SettingsSection>
-
-            <SettingsSection title={t("Perfil do jogo")}>
-              <PanelSectionRow>
-                <div className="xh-card">
-                  {game ? (
-                    <>
-                      <div className="xh-card-title">
-                        <FaGamepad /> {game.name}
-                      </div>
-                      <span className={"xh-pill" + (hasProfile ? " xh-blue" : "")}>
-                        {hasProfile ? t("Perfil salvo") : t("Sem perfil")}
-                      </span>
-                    </>
-                  ) : (
-                    <div className="xh-hint">
-                      {t("profile_hint")}
-                    </div>
-                  )}
-                </div>
-              </PanelSectionRow>
-              {game && (
-                <PanelSectionRow>
-                  <ButtonItem
-                    layout="below"
-                    onClick={() => run(() => saveProfile(game.appid, game.name), t("Perfil salvo para ") + game.name)}
-                  >
-                    {hasProfile ? t("Atualizar perfil deste jogo") : t("Salvar perfil deste jogo")}
-                  </ButtonItem>
-                </PanelSectionRow>
-              )}
-              {game && hasProfile && (
-                <PanelSectionRow>
-                  <ButtonItem
-                    layout="below"
-                    onClick={() => run(() => deleteProfile(game.appid), t("Perfil removido de ") + game.name)}
-                  >
-                    {t("Excluir perfil deste jogo")}
-                  </ButtonItem>
-                </PanelSectionRow>
-              )}
-              <PanelSectionRow>
-                <ToggleField
-                  label={t("Aplicar perfil ao abrir o jogo")}
-                  checked={settings.auto_apply}
-                  onChange={(value: boolean) => patchSettings({ auto_apply: value })}
-                />
-              </PanelSectionRow>
-              {profiles
-                .filter((p) => !game || p.appid !== game.appid)
-                .map((p) => (
-                  <PanelSectionRow key={p.appid}>
-                    <ButtonItem
-                      layout="below"
-                      onClick={() => run(() => deleteProfile(p.appid), t("Perfil removido de ") + p.name)}
-                    >
-                      {t("Excluir perfil:")} {p.name}
-                    </ButtonItem>
-                  </PanelSectionRow>
-                ))}
-            </SettingsSection>
           </>)}
 
           {tab === "display" && (
@@ -375,21 +348,21 @@ export function Content() {
               <PanelSectionRow>
                 <ToggleField
                   label={t("Calibrar escala (avançado)")}
-                  description={t("A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho.")}
+                  description={details ? t("A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho.") : undefined}
                   checked={calibrate}
                   onChange={(value: boolean) => setCalibrate(value)}
                 />
               </PanelSectionRow>
               {calibrate && (
                 <>
-                  <PanelSectionRow>
+                  {details && <PanelSectionRow>
                     <div className="xh-card">
                       <div className="xh-card-title">{t("Como calibrar")}</div>
                       <div className="xh-hint">
                         {t("calibration_steps")}
                       </div>
                     </div>
-                  </PanelSectionRow>
+                  </PanelSectionRow>}
                   <PanelSectionRow>
                     <SliderField
                       label={t("Compensação horizontal")}
@@ -427,12 +400,102 @@ export function Content() {
             </SettingsSection>
           )}
 
-          {tab === "shortcut" && (
+          {tab === "profiles" && (
+            <SettingsSection title={t("Perfis de jogo")}>
+              {details && (
+                <PanelSectionRow>
+                  <div className="xh-hint">{t("profiles_info")}</div>
+                </PanelSectionRow>
+              )}
+              <PanelSectionRow>
+                <div className="xh-card">
+                  {game ? (
+                    <>
+                      <div className="xh-card-title">
+                        <FaGamepad /> {game.name}
+                      </div>
+                      <span className={"xh-pill" + (hasProfile ? " xh-blue" : "")}>
+                        {hasProfile ? t("Perfil salvo") : t("Sem perfil")}
+                      </span>
+                    </>
+                  ) : (
+                    <div className="xh-hint">{t("Abra um jogo para salvar seu perfil")}</div>
+                  )}
+                </div>
+              </PanelSectionRow>
+              <PanelSectionRow>
+                {profiles.length > 0 ? (
+                  <DropdownItem
+                    label={t("Perfis salvos")}
+                    rgOptions={profiles.map((p) => ({ data: p.appid, label: p.name }))}
+                    selectedOption={selectedProfile?.appid}
+                    onChange={(option: { data: string }) => setPickedProfile(option.data)}
+                  />
+                ) : (
+                  <div className="xh-hint">{t("Nenhum perfil salvo")}</div>
+                )}
+              </PanelSectionRow>
+              <PanelSectionRow>
+                <DialogButton
+                  className="xh-act xh-act-create"
+                  disabled={game === null}
+                  onClick={() => {
+                    if (game) void run(() => saveProfile(game.appid, gameProfile?.name ?? game.name), t("Perfil salvo para ") + game.name);
+                  }}
+                >
+                  <FaPlus />
+                  <span>{hasProfile ? t("Atualizar perfil") : t("Criar perfil")}</span>
+                </DialogButton>
+              </PanelSectionRow>
+              <PanelSectionRow>
+                <DialogButton
+                  className="xh-act xh-act-rename"
+                  disabled={!selectedProfile}
+                  onClick={() => { if (selectedProfile) openRename(selectedProfile); }}
+                >
+                  <FaPen />
+                  <span>{t("Renomear")}</span>
+                </DialogButton>
+              </PanelSectionRow>
+              <PanelSectionRow>
+                <DialogButton
+                  className="xh-act xh-act-delete"
+                  disabled={!selectedProfile}
+                  onClick={() => {
+                    if (selectedProfile) void run(() => deleteProfile(selectedProfile.appid), t("Perfil removido de ") + selectedProfile.name);
+                  }}
+                >
+                  <FaTrash />
+                  <span>{t("Excluir")}</span>
+                </DialogButton>
+              </PanelSectionRow>
+              <PanelSectionRow>
+                <ToggleField
+                  label={t("Aplicar perfil ao abrir o jogo")}
+                  checked={settings.auto_apply}
+                  onChange={(value: boolean) => patchSettings({ auto_apply: value })}
+                />
+              </PanelSectionRow>
+            </SettingsSection>
+          )}
+
+          {tab === "settings" && (<>
+            <SettingsSection title={t("Configurações")}>
+              <PanelSectionRow>
+                <DropdownItem
+                  label={t("Idioma")}
+                  rgOptions={[{ data: "pt", label: "Português" }, { data: "en", label: "English" }, { data: "es", label: "Español" }]}
+                  selectedOption={settings.language}
+                  onChange={(option: { data: Settings["language"] }) => patchSettings({ language: option.data })}
+                />
+              </PanelSectionRow>
+            </SettingsSection>
+
             <SettingsSection title={t("Atalho de botões")}>
               <PanelSectionRow>
                 <ToggleField
                   label={t("Ligar/desligar com 2 botões")}
-                  description={t("Segure os 2 botões gravados para mostrar ou esconder a mira.")}
+                  description={details ? t("Segure os 2 botões gravados para mostrar ou esconder a mira.") : undefined}
                   checked={hotkey.enabled}
                   onChange={(value: boolean) => patchHotkey({ hotkey_enabled: value })}
                 />
@@ -443,6 +506,7 @@ export function Content() {
                   capturing={capturing}
                   secondsLeft={secondsLeft}
                   message={captureMessage}
+                  details={details}
                 />
               </PanelSectionRow>
               <PanelSectionRow>
@@ -474,20 +538,7 @@ export function Content() {
                 />
               </PanelSectionRow>
             </SettingsSection>
-          )}
-
-          {tab === "settings" && (
-            <SettingsSection title={t("Configurações")}>
-              <PanelSectionRow>
-                <DropdownItem
-                  label={t("Idioma")}
-                  rgOptions={[{ data: "pt", label: "Português" }, { data: "en", label: "English" }, { data: "es", label: "Español" }]}
-                  selectedOption={settings.language}
-                  onChange={(option: { data: Settings["language"] }) => patchSettings({ language: option.data })}
-                />
-              </PanelSectionRow>
-            </SettingsSection>
-          )}
+          </>)}
 
         </>)}</TabbedSettings>
 
@@ -497,13 +548,16 @@ export function Content() {
               <div className="xh-hint">{status}</div>
             </PanelSectionRow>
           )}
-          <PanelSectionRow>
-            <div className="xh-hint">
-              {t("overlay_hint")}
-            </div>
-          </PanelSectionRow>
+          {details && (
+            <PanelSectionRow>
+              <div className="xh-hint">
+                {t("overlay_hint")}
+              </div>
+            </PanelSectionRow>
+          )}
         </PanelSection>
         <footer className="xh-footer">{t("Criado por Havok")}</footer>
+        <DetailsBadge shown={details} />
       </div>
     </LanguageContext.Provider>
   );

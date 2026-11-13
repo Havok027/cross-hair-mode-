@@ -1,4 +1,5 @@
-import { Focusable, PanelSection, PanelSectionRow } from "@decky/ui";
+import { ConfirmModal, Focusable, PanelSection, PanelSectionRow, TextField } from "@decky/ui";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { FaCheck } from "react-icons/fa";
 import type { HotkeyState, Settings } from "./api";
@@ -16,21 +17,68 @@ export function SettingsSection({ title, children }: { title: string; children: 
   );
 }
 
-// Resumo do estado da mira (sem prévia): ativa ou não, modelo, tamanho e cor
-export function StatusChips(props: { settings: Settings; modelLabel: string }) {
+// Estado atual em tabela (no estilo do Mako): ativa ou não, modelo, tamanho, cor, atalho e perfil
+export function StatusTable(props: { settings: Settings; hotkey: HotkeyState; modelLabel: string; profile: string }) {
   const t = useTranslation();
-  const { settings, modelLabel } = props;
+  const { settings, hotkey, modelLabel, profile } = props;
+  const combo = hotkey.buttons.length === 2
+    ? buttonName(hotkey.buttons[0], t) + " + " + buttonName(hotkey.buttons[1], t)
+    : "";
+  const shortcut = !combo ? t("Sem combinação") : hotkey.enabled ? combo : combo + " · " + t("Desligado");
   return (
-    <div className="xh-chips">
-      <span className={"xh-pill" + (settings.enabled ? " xh-on" : "")}>
-        {settings.enabled ? t("Ativo") : t("Desligado")}
-      </span>
-      <span className="xh-chip">{modelLabel}</span>
-      <span className="xh-chip">{settings.size}%</span>
-      <span className="xh-chip">
-        <span className="xh-dot" style={{ background: "#" + settings.color }} />#{settings.color}
-      </span>
+    <div className="xh-table">
+      <div className={"xh-table-head" + (settings.enabled ? " xh-on" : "")}>
+        <span className="xh-state-dot" />
+        {settings.enabled ? t("Crosshair ativo") : t("Crosshair desligado")}
+      </div>
+      <div className="xh-trow"><span>{t("Modelo")}</span><b>{modelLabel}</b></div>
+      <div className="xh-trow"><span>{t("Tamanho")}</span><b>{settings.size}%</b></div>
+      <div className="xh-trow">
+        <span>{t("Cor")}</span>
+        <b><span className="xh-dot xh-tdot" style={{ background: "#" + settings.color }} />#{settings.color}</b>
+      </div>
+      <div className="xh-trow"><span>{t("Atalho")}</span><b>{shortcut}</b></div>
+      <div className="xh-trow"><span>{t("Perfil")}</span><b>{profile}</b></div>
     </div>
+  );
+}
+
+// Aviso flutuante do R1, como no Mako: mostra ou oculta as informações de apoio
+export function DetailsBadge({ shown }: { shown: boolean }) {
+  const t = useTranslation();
+  return (
+    <div className="xh-badge-anchor">
+      <div className="xh-badge">
+        <span className="xh-badge-key">R1</span>
+        <span>{shown ? t("Ocultar informações") : t("Mostrar informações")}</span>
+      </div>
+    </div>
+  );
+}
+
+// Janela para renomear um perfil. Fica fora da árvore do plugin, então recebe os textos já traduzidos.
+export function RenameProfileModal(props: {
+  initial: string;
+  title: string;
+  okText: string;
+  cancelText: string;
+  onSave: (name: string) => void;
+  closeModal?: () => void;
+}) {
+  const [value, setValue] = useState(props.initial);
+  return (
+    <ConfirmModal
+      strTitle={props.title}
+      strOKButtonText={props.okText}
+      strCancelButtonText={props.cancelText}
+      onOK={() => {
+        const name = value.trim();
+        if (name) props.onSave(name);
+      }}
+      closeModal={props.closeModal}
+    >
+      <TextField value={value} onChange={(event) => setValue(event.target.value)} />
+    </ConfirmModal>
   );
 }
 
@@ -103,9 +151,10 @@ export function HotkeyCard(props: {
   capturing: boolean;
   secondsLeft: number;
   message: string;
+  details: boolean;
 }) {
   const t = useTranslation();
-  const { hotkey, capturing, secondsLeft, message } = props;
+  const { hotkey, capturing, secondsLeft, message, details } = props;
   const hasCombo = hotkey.buttons.length === 2;
   return (
     <div className={"xh-card" + (capturing ? " xh-recording" : "")}>
@@ -132,8 +181,8 @@ export function HotkeyCard(props: {
         <div className="xh-hint">{t("empty_shortcut")}</div>
       )}
       {message && !capturing && <div className="xh-warn">{message}</div>}
-      {hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey, t)}</div>}
-      {hasCombo && hotkey.enabled && !capturing && hotkey.running && (
+      {details && hasCombo && hotkey.enabled && !capturing && <div className="xh-hint xh-diag">{readingNote(hotkey, t)}</div>}
+      {details && hasCombo && hotkey.enabled && !capturing && hotkey.running && (
         <div className="xh-hint xh-diag">
           {hotkey.last_seen.length > 0
             ? t("Último botão lido em jogo: ") +

@@ -15,6 +15,25 @@ export const STYLES = `
 .xh-tab.xh-selected { color: #edf8fb; background: #124457; border-bottom-color: #83bff0; }
 .xh-tab.gpfocus, .xh-tab:focus-visible { outline: 2px solid #52d5e8; outline-offset: 1px; background: #145669; }
 .xh-tab[aria-disabled="true"] { opacity: 0.5; }
+.xh-table { width: 100%; box-sizing: border-box; border: 1px solid rgba(77,170,190,0.6); border-radius: 8px; background: rgba(7,31,49,0.68); overflow: hidden; }
+.xh-table-head { display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding: 7px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #8fb6c4; border-bottom: 1px solid rgba(77,170,190,0.4); }
+.xh-table-head.xh-on { color: #5ee6a0; }
+.xh-state-dot { width: 9px; height: 9px; border-radius: 50%; background: #6b7f88; flex: none; }
+.xh-table-head.xh-on .xh-state-dot { background: #3ddc84; box-shadow: 0 0 6px #3ddc84; }
+.xh-trow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 12px; font-size: 13px; border-bottom: 1px solid rgba(77,170,190,0.18); }
+.xh-trow:last-child { border-bottom: 0; }
+.xh-trow > span { color: #8fa5ad; flex: none; }
+.xh-trow > b { color: #edf8fb; font-weight: 600; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+.xh-tdot { margin-right: 6px; vertical-align: -1px; }
+.xh-plugin .xh-act { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-width: 0; padding: 10px 12px; color: #fff; border: 1px solid rgba(255,255,255,0.18); }
+.xh-plugin .xh-act svg { flex: none; }
+.xh-plugin .xh-act-create { background: linear-gradient(90deg, #1b76c6, #22a6c9) !important; }
+.xh-plugin .xh-act-rename { background: linear-gradient(90deg, #17506f, #1d8fb0) !important; }
+.xh-plugin .xh-act-delete { background: linear-gradient(90deg, #7d2540, #cf4068) !important; }
+.xh-plugin .xh-act[disabled], .xh-plugin .xh-act:disabled { opacity: 0.4; }
+.xh-badge-anchor { position: sticky; bottom: 10px; height: 0; z-index: 20; pointer-events: none; }
+.xh-badge { position: absolute; right: 8px; bottom: 0; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(82,213,232,0.7); background: rgba(14,90,115,0.95); color: #edf8fb; font-size: 12px; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.45); }
+.xh-badge-key { display: inline-block; padding: 1px 6px; border-radius: 4px; border: 1.5px solid #edf8fb; font-size: 11px; font-weight: 700; }
 .xh-tab-hint { width: 100%; text-align: center; font-size: 10px; color: #a8bdc2; }
 .xh-tab-panel { animation: xh-enter 150ms ease-out; }
 @keyframes xh-enter { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }

@@ -61,6 +61,7 @@ export const resetNudge = callable<[], PluginState>("reset_nudge");
 export const resetComp = callable<[], PluginState>("reset_comp");
 export const saveProfile = callable<[string, string], PluginState>("save_profile");
 export const deleteProfile = callable<[string], PluginState>("delete_profile");
+export const renameProfile = callable<[string, string], PluginState>("rename_profile");
 export const gameStarted = callable<[string], PluginState>("game_started");
 export const hotkeyToggle = callable<[string], PluginState>("hotkey_toggle");
 export const setHotkey = callable<[number[]], PluginState>("set_hotkey");

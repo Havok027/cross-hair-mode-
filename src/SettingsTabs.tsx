@@ -1,15 +1,20 @@
 import { Focusable, GamepadButton, PanelSection, PanelSectionRow } from "@decky/ui";
 import { useRef, useState } from "react";
 import type { ComponentProps, ComponentType, ReactNode, Ref } from "react";
-import { FaBullseye, FaCog, FaDesktop, FaGamepad } from "react-icons/fa";
+import { FaBullseye, FaCog, FaDesktop, FaLayerGroup } from "react-icons/fa";
 import { useTranslation } from "./i18n";
 
-const tabs = ["appearance", "display", "shortcut", "settings"] as const;
+const tabs = ["appearance", "display", "profiles", "settings"] as const;
 export type TabId = typeof tabs[number];
 type NavigationHandle = { TakeFocus: () => boolean };
 const TabFocus = Focusable as ComponentType<ComponentProps<typeof Focusable> & { navRef?: Ref<NavigationHandle> }>;
 
-export function TabbedSettings({ children, capturing, header }: { children: (tab: TabId) => ReactNode; capturing: boolean; header?: (tab: TabId) => ReactNode }) {
+export function TabbedSettings({ children, capturing, header, onToggleDetails }: {
+  children: (tab: TabId) => ReactNode;
+  capturing: boolean;
+  header?: (tab: TabId) => ReactNode;
+  onToggleDetails: () => void;
+}) {
   const t = useTranslation();
   const [active, setActive] = useState<TabId>(() => {
     try {
@@ -24,8 +29,8 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
     try { localStorage.setItem("crosshair-active-tab", tab); } catch { /* Storage is optional. */ }
     if (focus) navigation.current[tab]?.TakeFocus();
   };
-  const labels = [t("Aparência"), t("Tela"), t("Atalho"), t("Config.")];
-  const icons = [FaBullseye, FaDesktop, FaGamepad, FaCog];
+  const labels = [t("Aparência"), t("Tela"), t("Perfis"), t("Config.")];
+  const icons = [FaBullseye, FaDesktop, FaLayerGroup, FaCog];
   return (
     <Focusable
       className="xh-settings"
@@ -37,8 +42,9 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
         event.stopPropagation();
         event.preventDefault();
         if (event.detail.is_repeat) return;
-        const direction = button === GamepadButton.BUMPER_LEFT ? -1 : 1;
-        select(tabs[(tabs.indexOf(active) + direction + tabs.length) % tabs.length], true);
+        // R1 mostra ou oculta as informações (como no Mako); L1 passa para a próxima guia.
+        if (button === GamepadButton.BUMPER_RIGHT) onToggleDetails();
+        else select(tabs[(tabs.indexOf(active) + 1) % tabs.length], true);
       }}
     >
       <PanelSection>
@@ -65,7 +71,7 @@ export function TabbedSettings({ children, capturing, header }: { children: (tab
             })}
           </Focusable>
         </PanelSectionRow>
-        <PanelSectionRow><div className="xh-tab-hint">{t("L1 / R1 · trocar guia")}</div></PanelSectionRow>
+        <PanelSectionRow><div className="xh-tab-hint">{t("L1 · trocar guia")}</div></PanelSectionRow>
       </PanelSection>
       {header?.(active)}
       <div key={active} id={`xh-panel-${active}`} role="tabpanel" aria-labelledby={`xh-tab-${active}`} className="xh-tab-panel">
