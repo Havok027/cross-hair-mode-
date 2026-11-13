@@ -52,22 +52,22 @@
 ## Primeros pasos
 
 1. Abre **Crosshair Plugin** en Decky Loader.
-2. En **Idioma**, selecciona **Português**, **English** o **Español**. La preferencia se guarda.
+2. En la pestaña **Ajustes** (la última de la fila), usa **Idioma** para seleccionar **Português**, **English** o **Español**. La preferencia se guarda.
 3. En **Pantalla**, elige la resolución de tu pantalla.
 4. En **Apariencia**, elige el modelo, el color y el tamaño.
 5. Activa **Mostrar mira**.
 6. Si hace falta, céntrala con **Horizontal (X)** y **Vertical (Y)** en **Pantalla**.
-7. Con un juego en ejecución, puedes usar **Guardar perfil de este juego** en **Perfiles**.
+7. Con un juego en ejecución, puedes usar **Guardar perfil de este juego** al final de **Apariencia**.
 
-Usa **L1/R1** para recorrer **Apariencia**, **Pantalla**, **Atajo** y **Perfiles**. También puedes seleccionar las pestañas por toque. El plugin recuerda la última pestaña. Durante la grabación, L1/R1 pueden formar parte de la combinación y no cambian de pestaña.
+Usa **L1/R1** para recorrer **Apariencia**, **Pantalla**, **Atajo** y **Ajustes**. También puedes seleccionar las pestañas por toque. El plugin recuerda la última pestaña. Durante la grabación, L1/R1 pueden formar parte de la combinación y no cambian de pestaña.
 
 | Área | Controles |
 |---|---|
-| **Crosshair** | Idioma, resumen del estado e interruptor Mostrar mira |
-| **Apariencia** | Modelo, carrusel y control de color, RGB, tamaños predefinidos y control de tamaño |
+| **Crosshair** | Resumen del estado e interruptor Mostrar mira, justo debajo de las pestañas (oculto en **Ajustes**) |
+| **Apariencia** | Modelo, carrusel y control de color, RGB, tamaños predefinidos control de tamaño y, al final, el perfil del juego (guardar, actualizar, eliminar y aplicar al abrir el juego) |
 | **Pantalla** | Resolución, controles X/Y, restablecer posición y calibración avanzada |
 | **Atajo** | Grabar, eliminar, tiempo de pulsación y diagnóstico de entrada |
-| **Perfiles** | Guardar, actualizar, eliminar y aplicar perfiles automáticamente |
+| **Ajustes** | Idioma (Português, English o Español) y los próximos ajustes |
 
 > [!NOTE]
 > El control de color cambia el color al instante con izquierda/derecha. El color seleccionado permanece en el centro del carrusel. Usa arriba/abajo para cambiar de control.

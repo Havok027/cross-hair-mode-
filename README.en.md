@@ -52,22 +52,22 @@
 ## Getting started
 
 1. Open **Crosshair Plugin** in Decky Loader.
-2. In the **Language** dropdown, select **Português**, **English** or **Español**. Your choice is saved.
+2. In the **Settings** tab (the last one in the row), use the **Language** dropdown to select **Português**, **English** or **Español**. Your choice is saved.
 3. In **Display**, select your screen resolution.
 4. In **Appearance**, choose the style, color and size.
 5. Enable **Show crosshair**.
 6. If necessary, center it using **Horizontal (X)** and **Vertical (Y)** in **Display**.
-7. With a game running, optionally use **Save this game's profile** in **Profiles**.
+7. With a game running, optionally use **Save this game's profile** at the bottom of **Appearance**.
 
-Use **L1/R1** to cycle through **Appearance**, **Display**, **Shortcut** and **Profiles**. You can also select tabs by touch. The plugin remembers the last tab. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs.
+Use **L1/R1** to cycle through **Appearance**, **Display**, **Shortcut** and **Settings**. You can also select tabs by touch. The plugin remembers the last tab. While recording a shortcut, L1/R1 can be included in the combination and do not switch tabs.
 
 | Area | Controls |
 |---|---|
-| **Crosshair** | Language, status summary and Show crosshair toggle |
-| **Appearance** | Style, color carousel and slider, RGB controls, size presets and slider |
+| **Crosshair** | Status summary and Show crosshair toggle, right below the tabs (hidden in **Settings**) |
+| **Appearance** | Style, color carousel and slider, RGB controls, size presets and slider, plus the game profile (save, update, delete and apply on launch) at the bottom |
 | **Display** | Resolution, X/Y sliders, position reset and advanced scaling calibration |
 | **Shortcut** | Record, remove, hold duration and input diagnostics |
-| **Profiles** | Save, update, delete and automatically apply game profiles |
+| **Settings** | Language (Português, English or Español) and upcoming settings |
 
 > [!NOTE]
 > The color slider changes colors immediately with left/right. The selected color stays in the center of the carousel. Use up/down to move between controls.
