@@ -136,8 +136,8 @@ test("all three languages have complete messages with matching placeholders", ()
   assert.equal(i18n.modelLabel("box", i18n.translator("en")), "Box");
 });
 
-test("L1 changes tabs, R1 toggles details, and both stay idle during capture", () => {
-  let active, saved, focused, toggled = 0, capturing = false;
+test("L1/R1 cycle the three tabs, retain focus, persist selection, and stay idle during capture", () => {
+  let active, saved, focused, capturing = false;
   const nav = { current: {} };
   const createElement = (type, props, ...children) => ({ type, props: { ...props, children } });
   const tabs = load("SettingsTabs.tsx", {
@@ -146,38 +146,43 @@ test("L1 changes tabs, R1 toggles details, and both stay idle during capture", (
     } },
     "@decky/ui": { Focusable: "Focusable", PanelSection: "Section", PanelSectionRow: "Row",
       GamepadButton: { BUMPER_LEFT: 5, BUMPER_RIGHT: 6 } },
-    "react-icons/fa": { FaBullseye: "Icon", FaDesktop: "Icon", FaLayerGroup: "Icon", FaCog: "Icon" },
+    "react-icons/fa": { FaBullseye: "Icon", FaLayerGroup: "Icon", FaCog: "Icon" },
     "./i18n": { useTranslation: () => i18n.translator("en") },
   }, { window: { SP_REACT: { createElement } }, localStorage: {
     getItem: () => saved, setItem: (_, value) => { saved = value; },
   } });
   function render() {
-    const tree = tabs.TabbedSettings({ capturing, onToggleDetails: () => { toggled += 1; }, children: () => null });
+    const tree = tabs.TabbedSettings({ capturing, children: () => null });
+    const ids = [];
     function visit(node) {
       if (Array.isArray(node)) return node.forEach(visit);
       if (!node?.props) return;
-      if (node.props.role === "tab") node.props.navRef({ TakeFocus: () => { focused = node.props.id; return true; } });
+      if (node.props.role === "tab") {
+        ids.push(node.props.id);
+        node.props.navRef({ TakeFocus: () => { focused = node.props.id; return true; } });
+      }
       visit(node.props.children);
     }
     visit(tree);
+    render.ids = ids;
     return tree;
   }
   function press(button) {
     render().props.onButtonDown({ detail: { button }, stopPropagation() {}, preventDefault() {} });
   }
-  press(5); assert.equal(saved, "display"); assert.equal(focused, "xh-tab-display");
-  press(5); assert.equal(saved, "profiles");
+  press(6); assert.equal(saved, "profiles"); assert.equal(focused, "xh-tab-profiles");
+  assert.deepEqual(render.ids, ["xh-tab-appearance", "xh-tab-profiles", "xh-tab-settings"]);
+  press(6); assert.equal(saved, "settings");
+  press(6); assert.equal(saved, "appearance");
   press(5); assert.equal(saved, "settings"); assert.equal(focused, "xh-tab-settings");
-  press(5); assert.equal(saved, "appearance");
-  press(6); assert.equal(toggled, 1); assert.equal(saved, "appearance");
   capturing = true;
-  press(5); assert.equal(saved, "appearance");
-  press(6); assert.equal(toggled, 1);
+  press(5); assert.equal(saved, "settings");
+  press(6); assert.equal(saved, "settings");
 });
 
 function mountContent({ game = null, profiles = [], language = "en" } = {}) {
-  let state = { settings: { language, model: "box", color: "FF007B", size: 100 },
-    models: [{ id: "box" }], resolutions: [], profiles, hotkey: { buttons: [] } };
+  let state = { settings: { language, model: "box", color: "FF007B", size: 100, resolution: "deck" },
+    models: [{ id: "box" }], resolutions: [{ id: "deck", label: "Deck" }], profiles, hotkey: { buttons: [] }, offset_x: 1, offset_y: 2 };
   const cleanups = [], updates = [], calls = [], modals = [];
   let hook = 0;
   const createElement = (type, props, ...children) => ({ type, props: { ...props, children } });
@@ -196,8 +201,9 @@ function mountContent({ game = null, profiles = [], language = "en" } = {}) {
     "./api": { getState: async () => state, updateSettings: async (patch) => { updates.push(patch); return state; },
       renameProfile: api("rename"), saveProfile: api("save"), deleteProfile: api("delete"), resetNudge: api("x"), resetComp: api("x"),
       setHotkey: api("x"), clearHotkey: api("x") },
-    "./components": { ColorStrip: "ColorStrip", DetailsBadge: "DetailsBadge", HotkeyCard: "HotkeyCard", RenameProfileModal: "RenameProfileModal",
-      SettingsSection: "Section", SizeChips: "SizeChips", StatusTable: "StatusTable" },
+    "./components": { ColorStrip: "ColorStrip", FoldSection: "FoldSection", HotkeyCard: "HotkeyCard", ProfileTable: "ProfileTable",
+      RenameProfileModal: "RenameProfileModal", SettingsSection: "Section", ShortcutTable: "ShortcutTable", SizeChips: "SizeChips",
+      StatusTable: "StatusTable" },
     "./hotkey": { applyHotkeyState() {} }, "./i18n": i18n, "./SettingsTabs": { TabbedSettings: "Tabs" },
     "./styles": { STYLES: "" }, "./utils": { COLORS: [{ hex: "FF007B" }], getRunningGame: () => game, hexToRgb: () => [255, 0, 123] },
   }, { window: { SP_REACT: { createElement, Fragment: "Fragment" }, setTimeout: () => 1, clearTimeout() {} },
@@ -222,7 +228,7 @@ test("language dropdown is localized and its pending choice is saved when QAM cl
   const tree = app.content.Content();
   await Promise.resolve();
   const isLanguage = (node) => node.props.label === "Language";
-  for (const tab of ["appearance", "display", "profiles"]) {
+  for (const tab of ["appearance", "profiles"]) {
     assert.equal(collect(tree, tab, isLanguage).length, 0, `language must not appear in ${tab}`);
   }
   const [dropdown] = collect(tree, "settings", isLanguage);
@@ -241,13 +247,16 @@ test("shortcut settings live in the Settings tab only", async () => {
   const tree = app.content.Content();
   await Promise.resolve();
   const isCard = (node) => node.type === "HotkeyCard";
-  for (const tab of ["appearance", "display", "profiles"]) assert.equal(collect(tree, tab, isCard).length, 0, tab);
+  for (const tab of ["appearance", "profiles"]) assert.equal(collect(tree, tab, isCard).length, 0, tab);
   assert.equal(collect(tree, "settings", isCard).length, 1);
 });
 
+const PROFILE_A = { appid: "10", name: "Mine", enabled: true, model: "box", color: "FF007B", size: 100, nudge_x: 0, nudge_y: 0 };
+const PROFILE_B = { appid: "20", name: "Other", enabled: false, model: "box", color: "00FF00", size: 150, nudge_x: 3, nudge_y: -2 };
+
 test("profile buttons create, rename and delete the selected game profile", async () => {
   const game = { appid: "10", name: "Game" };
-  const app = mountContent({ game, profiles: [{ appid: "10", name: "Mine" }, { appid: "20", name: "Other" }] });
+  const app = mountContent({ game, profiles: [PROFILE_A, PROFILE_B] });
   const tree = app.content.Content();
   await Promise.resolve();
   const buttons = collect(tree, "profiles", (node) => node.type === "DialogButton");
@@ -271,10 +280,80 @@ test("without a running game profiles can be renamed or deleted but not created"
   let tree = none.content.Content(); await Promise.resolve();
   let buttons = collect(tree, "profiles", (node) => node.type === "DialogButton");
   assert.deepEqual(buttons.map((b) => b.props.disabled), [true, true, true]);
-  const saved = mountContent({ profiles: [{ appid: "20", name: "Other" }] });
+  const saved = mountContent({ profiles: [PROFILE_B] });
   tree = saved.content.Content(); await Promise.resolve();
   buttons = collect(tree, "profiles", (node) => node.type === "DialogButton");
   assert.deepEqual(buttons.map((b) => b.props.disabled), [true, false, false]);
   buttons[2].props.onClick();
   assert.deepEqual(saved.calls.pop(), ["delete", "20"]);
+});
+
+test("each tab shows its own preview table", async () => {
+  const game = { appid: "10", name: "Game" };
+  const app = mountContent({ game, profiles: [PROFILE_A, PROFILE_B] });
+  const tree = app.content.Content();
+  await Promise.resolve();
+  const tables = (tab) => collect(tree, tab, (node) => ["StatusTable", "ProfileTable", "ShortcutTable"].includes(node.type)).map((n) => n.type);
+  assert.deepEqual(tables("appearance"), ["StatusTable"]);
+  assert.deepEqual(tables("profiles"), ["ProfileTable"]);
+  assert.deepEqual(tables("settings"), ["ShortcutTable"]);
+  const [status] = collect(tree, "appearance", (node) => node.type === "StatusTable");
+  assert.equal(status.props.resolutionLabel, "Deck");
+  assert.equal(status.props.offsetX, 1); assert.equal(status.props.offsetY, 2);
+  // The table follows the profile of the running game, which is selected by default.
+  const [profile] = collect(tree, "profiles", (node) => node.type === "ProfileTable");
+  assert.equal(profile.props.profile.appid, "10");
+  assert.equal(profile.props.gameOpen, true);
+  const other = mountContent({ profiles: [PROFILE_B] });
+  const otherTree = other.content.Content(); await Promise.resolve();
+  const [shown] = collect(otherTree, "profiles", (node) => node.type === "ProfileTable");
+  assert.equal(shown.props.profile.appid, "20"); assert.equal(shown.props.gameOpen, false);
+});
+
+test("sections can be folded and keep their saved state", () => {
+  let folded = "no-state";
+  const store = { "crosshair-fold-demo": "1" };
+  const createElement = (type, props, ...children) => ({ type, props: { ...props, children } });
+  const components = load("components.tsx", {
+    react: { useState: (initial) => { const value = typeof initial === "function" ? initial() : initial;
+      folded = value; return [value, (next) => { folded = next; }]; } },
+    "@decky/ui": { ConfirmModal: "ConfirmModal", DialogButton: "DialogButton", Focusable: "Focusable", PanelSection: "Section",
+      PanelSectionRow: "Row", TextField: "TextField" },
+    "react-icons/fa": { FaCheck: "Check", FaChevronDown: "Down", FaChevronUp: "Up" },
+    "./hotkey": { buttonName: () => "?" }, "./i18n": { useTranslation: () => (key) => key }, "./utils": { COLORS: [], SIZE_PRESETS: [] },
+  }, { window: { SP_REACT: { createElement, Fragment: "Fragment" } },
+    localStorage: { getItem: (key) => store[key] ?? null, setItem: (key, value) => { store[key] = value; } } });
+  let tree = components.FoldSection({ id: "demo", title: "Demo", children: "BODY" });
+  assert.equal(folded, true);
+  assert.ok(!JSON.stringify(tree).includes("BODY"));
+  tree = components.FoldSection({ id: "other", title: "Other", children: "BODY" });
+  assert.equal(folded, false);
+  assert.ok(JSON.stringify(tree).includes("BODY"));
+  const button = collect(tree, null, (node) => node.type === "DialogButton")[0];
+  button.props.onClick();
+  assert.equal(store["crosshair-fold-other"], "1");
+});
+
+test("profile table compares the saved profile with the current settings", () => {
+  const createElement = (type, props, ...children) => ({ type, props: { ...props, children } });
+  const components = load("components.tsx", {
+    react: { useState: (initial) => [initial, () => {}] },
+    "@decky/ui": { ConfirmModal: "ConfirmModal", DialogButton: "DialogButton", Focusable: "Focusable", PanelSection: "Section",
+      PanelSectionRow: "Row", TextField: "TextField" },
+    "react-icons/fa": { FaCheck: "Check", FaChevronDown: "Down", FaChevronUp: "Up" },
+    "./hotkey": { buttonName: (id) => "B" + id }, "./i18n": { useTranslation: () => i18n.translator("en") },
+    "./utils": { COLORS: [], SIZE_PRESETS: [] },
+  }, { window: { SP_REACT: { createElement, Fragment: "Fragment" } } });
+  const text = (node) => JSON.stringify(node);
+  const settings = { enabled: true, model: "box", color: "ff007b", size: 100, nudge_x: 0, nudge_y: 0, auto_apply: true, language: "en" };
+  const same = components.ProfileTable({ profile: PROFILE_A, settings, modelLabel: "Box", gameOpen: true });
+  assert.match(text(same), /Same as current settings/);
+  assert.match(text(same), /Game open/);
+  const different = components.ProfileTable({ profile: PROFILE_B, settings, modelLabel: "Box", gameOpen: false });
+  assert.match(text(different), /Differs from current settings/);
+  assert.match(text(different), /3, -2/);
+  const shortcut = components.ShortcutTable({ settings, hotkey: { buttons: [35, 2], enabled: true, hold_ms: 150, running: true } });
+  assert.match(text(shortcut), /B35 \+ B2/);
+  assert.match(text(shortcut), /150 ms/);
+  assert.match(text(shortcut), /Shortcut on/);
 });

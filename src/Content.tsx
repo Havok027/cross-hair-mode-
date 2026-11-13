@@ -22,7 +22,7 @@ import {
   updateSettings,
 } from "./api";
 import type { GameInfo, PluginState, Settings } from "./api";
-import { ColorStrip, DetailsBadge, HotkeyCard, RenameProfileModal, SettingsSection, SizeChips, StatusTable } from "./components";
+import { ColorStrip, FoldSection, HotkeyCard, ProfileTable, RenameProfileModal, SettingsSection, ShortcutTable, SizeChips, StatusTable } from "./components";
 import { applyHotkeyState, captureButtons } from "./hotkey";
 import { LanguageContext, modelLabel, translator } from "./i18n";
 import { TabbedSettings } from "./SettingsTabs";
@@ -41,10 +41,6 @@ export function Content() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [captureMessage, setCaptureMessage] = useState("");
   const captureRef = useRef<{ cancel: () => void } | null>(null);
-  // R1 mostra ou oculta as informações de apoio; a escolha fica salva
-  const [details, setDetails] = useState<boolean>(() => {
-    try { return localStorage.getItem("crosshair-show-details") !== "0"; } catch { return true; }
-  });
   const [pickedProfile, setPickedProfile] = useState("");
 
   const t = translator(state?.settings.language ?? "pt");
@@ -159,12 +155,6 @@ export function Content() {
     queue(patch);
   };
 
-  const toggleDetails = () => {
-    const next = !details;
-    setDetails(next);
-    try { localStorage.setItem("crosshair-show-details", next ? "1" : "0"); } catch { /* Storage is optional. */ }
-  };
-
   const openRename = (profile: { appid: string; name: string }) => {
     showModal(
       <RenameProfileModal
@@ -190,6 +180,8 @@ export function Content() {
   const { settings, models, resolutions, profiles, hotkey } = state;
   const currentModel = models.find((m) => m.id === settings.model) ?? models[0];
   const [r, g, b] = hexToRgb(settings.color);
+  const currentResolution = resolutions.find((res) => res.id === settings.resolution);
+  const resolutionLabel = currentResolution ? currentResolution.label.replace("Monitor externo", t("Monitor externo")) : settings.resolution;
   const gameProfile = game ? profiles.find((p) => p.appid === game.appid) : undefined;
   const hasProfile = gameProfile !== undefined;
   const selectedProfile = profiles.find((p) => p.appid === pickedProfile) ?? gameProfile ?? profiles[0];
@@ -203,28 +195,52 @@ export function Content() {
       <div className="xh-plugin">
         <style>{STYLES}</style>
 
-        <TabbedSettings capturing={capturing} onToggleDetails={toggleDetails} header={(tab) => tab === "settings" ? null : (
+        <TabbedSettings capturing={capturing} header={(tab) => tab === "appearance" ? (
           <SettingsSection title={t("Estado atual")}>
             <PanelSectionRow>
               <StatusTable
                 settings={settings}
-                hotkey={hotkey}
                 modelLabel={modelLabel(currentModel.id, t)}
-                profile={game ? (hasProfile ? t("Perfil salvo") : t("Sem perfil")) : "—"}
+                resolutionLabel={resolutionLabel}
+                offsetX={state.offset_x}
+                offsetY={state.offset_y}
               />
             </PanelSectionRow>
             <PanelSectionRow>
               <ToggleField
                 label={t("Mostrar crosshair")}
-                description={details ? t("Substitui o overlay de desempenho (MangoHud).") : undefined}
+                description={t("Substitui o overlay de desempenho (MangoHud).")}
                 checked={settings.enabled}
                 onChange={(value: boolean) => patchSettings({ enabled: value })}
               />
             </PanelSectionRow>
           </SettingsSection>
+        ) : tab === "profiles" ? (
+          <SettingsSection title={t("Detalhes do perfil")}>
+            <PanelSectionRow>
+              {selectedProfile ? (
+                <ProfileTable
+                  profile={selectedProfile}
+                  settings={settings}
+                  modelLabel={modelLabel(selectedProfile.model, t)}
+                  gameOpen={game !== null && selectedProfile.appid === game.appid}
+                />
+              ) : (
+                <div className="xh-card">
+                  <div className="xh-hint">{game ? t("Nenhum perfil salvo") : t("Abra um jogo para salvar seu perfil")}</div>
+                </div>
+              )}
+            </PanelSectionRow>
+          </SettingsSection>
+        ) : (
+          <SettingsSection title={t("Resumo")}>
+            <PanelSectionRow>
+              <ShortcutTable settings={settings} hotkey={hotkey} />
+            </PanelSectionRow>
+          </SettingsSection>
         )}>{(tab) => (<>
           {tab === "appearance" && (<>
-            <SettingsSection title={t("Aparência")}>
+            <FoldSection id="appearance" title={t("Aparência")}>
               <PanelSectionRow>
                 <DropdownItem
                   label={t("Modelo")}
@@ -305,11 +321,9 @@ export function Content() {
                   onChange={(v: number) => patchSettings({ size: v })}
                 />
               </PanelSectionRow>
-            </SettingsSection>
-          </>)}
+            </FoldSection>
 
-          {tab === "display" && (
-            <SettingsSection title={t("Tela e posição")}>
+            <FoldSection id="display" title={t("Tela e posição")}>
               <PanelSectionRow>
                 <DropdownItem
                   label={t("Resolução da tela")}
@@ -348,21 +362,21 @@ export function Content() {
               <PanelSectionRow>
                 <ToggleField
                   label={t("Calibrar escala (avançado)")}
-                  description={details ? t("A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho.") : undefined}
+                  description={t("A mira cresce a partir do centro. Use só se ela se mover ao mudar o tamanho.")}
                   checked={calibrate}
                   onChange={(value: boolean) => setCalibrate(value)}
                 />
               </PanelSectionRow>
               {calibrate && (
                 <>
-                  {details && <PanelSectionRow>
+                  <PanelSectionRow>
                     <div className="xh-card">
                       <div className="xh-card-title">{t("Como calibrar")}</div>
                       <div className="xh-hint">
                         {t("calibration_steps")}
                       </div>
                     </div>
-                  </PanelSectionRow>}
+                  </PanelSectionRow>
                   <PanelSectionRow>
                     <SliderField
                       label={t("Compensação horizontal")}
@@ -397,16 +411,14 @@ export function Content() {
                   {t("Posição final:")} {state.offset_x}, {state.offset_y}
                 </div>
               </PanelSectionRow>
-            </SettingsSection>
-          )}
+            </FoldSection>
+          </>)}
 
           {tab === "profiles" && (
-            <SettingsSection title={t("Perfis de jogo")}>
-              {details && (
-                <PanelSectionRow>
-                  <div className="xh-hint">{t("profiles_info")}</div>
-                </PanelSectionRow>
-              )}
+            <FoldSection id="profiles" title={t("Perfis de jogo")}>
+              <PanelSectionRow>
+                <div className="xh-hint">{t("profiles_info")}</div>
+              </PanelSectionRow>
               <PanelSectionRow>
                 <div className="xh-card">
                   {game ? (
@@ -476,11 +488,11 @@ export function Content() {
                   onChange={(value: boolean) => patchSettings({ auto_apply: value })}
                 />
               </PanelSectionRow>
-            </SettingsSection>
+            </FoldSection>
           )}
 
           {tab === "settings" && (<>
-            <SettingsSection title={t("Configurações")}>
+            <FoldSection id="language" title={t("Configurações")}>
               <PanelSectionRow>
                 <DropdownItem
                   label={t("Idioma")}
@@ -489,13 +501,13 @@ export function Content() {
                   onChange={(option: { data: Settings["language"] }) => patchSettings({ language: option.data })}
                 />
               </PanelSectionRow>
-            </SettingsSection>
+            </FoldSection>
 
-            <SettingsSection title={t("Atalho de botões")}>
+            <FoldSection id="shortcut" title={t("Atalho de botões")}>
               <PanelSectionRow>
                 <ToggleField
                   label={t("Ligar/desligar com 2 botões")}
-                  description={details ? t("Segure os 2 botões gravados para mostrar ou esconder a mira.") : undefined}
+                  description={t("Segure os 2 botões gravados para mostrar ou esconder a mira.")}
                   checked={hotkey.enabled}
                   onChange={(value: boolean) => patchHotkey({ hotkey_enabled: value })}
                 />
@@ -506,7 +518,6 @@ export function Content() {
                   capturing={capturing}
                   secondsLeft={secondsLeft}
                   message={captureMessage}
-                  details={details}
                 />
               </PanelSectionRow>
               <PanelSectionRow>
@@ -537,7 +548,7 @@ export function Content() {
                   onChange={(v: number) => patchHotkey({ hotkey_hold: v })}
                 />
               </PanelSectionRow>
-            </SettingsSection>
+            </FoldSection>
           </>)}
 
         </>)}</TabbedSettings>
@@ -548,16 +559,13 @@ export function Content() {
               <div className="xh-hint">{status}</div>
             </PanelSectionRow>
           )}
-          {details && (
-            <PanelSectionRow>
-              <div className="xh-hint">
-                {t("overlay_hint")}
-              </div>
-            </PanelSectionRow>
-          )}
+          <PanelSectionRow>
+            <div className="xh-hint">
+              {t("overlay_hint")}
+            </div>
+          </PanelSectionRow>
         </PanelSection>
         <footer className="xh-footer">{t("Criado por Havok")}</footer>
-        <DetailsBadge shown={details} />
       </div>
     </LanguageContext.Provider>
   );

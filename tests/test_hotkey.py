@@ -108,7 +108,8 @@ class InputTests(unittest.TestCase):
             asyncio.run(instance.save_profile("10", "Game"))
             before = dict(instance.settings["profiles"]["10"])
             state = asyncio.run(instance.rename_profile("10", "  My   profile  "))
-            self.assertEqual(state["profiles"], [{"appid": "10", "name": "My profile"}])
+            self.assertEqual([(p["appid"], p["name"]) for p in state["profiles"]], [("10", "My profile")])
+            self.assertEqual(set(state["profiles"][0]), {"appid", "name", "enabled", "model", "color", "size", "nudge_x", "nudge_y"})
             after = instance.settings["profiles"]["10"]
             self.assertEqual({k: v for k, v in after.items() if k != "name"}, {k: v for k, v in before.items() if k != "name"})
             asyncio.run(instance.rename_profile("10", "   "))
