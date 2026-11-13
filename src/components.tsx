@@ -31,7 +31,7 @@ export function FoldSection({ id, title, children }: { id: string; title: string
     <PanelSection>
       <PanelSectionRow><div className="xh-section-title">{title}</div></PanelSectionRow>
       <PanelSectionRow>
-        <DialogButton className="xh-fold" onClick={toggle} aria-expanded={!folded}>
+        <DialogButton className={"xh-fold" + (folded ? " xh-closed" : " xh-open")} onClick={toggle} aria-expanded={!folded}>
           {folded ? <FaChevronDown /> : <FaChevronUp />}
         </DialogButton>
       </PanelSectionRow>
@@ -212,6 +212,7 @@ export function SizeChips(props: { value: number; onSelect: (size: number) => vo
         <Focusable
           key={size}
           className={"xh-size" + (props.value === size ? " xh-active" : "")}
+          aria-pressed={props.value === size}
           onActivate={() => props.onSelect(size)}
         >
           {size}%

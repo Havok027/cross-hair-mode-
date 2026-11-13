@@ -357,3 +357,36 @@ test("profile table compares the saved profile with the current settings", () =>
   assert.match(text(shortcut), /150 ms/);
   assert.match(text(shortcut), /Shortcut on/);
 });
+
+test("selected state is visible on tabs, size chips and section bars, apart from focus", () => {
+  const createElement = (type, props, ...children) => ({ type, props: { ...props, children } });
+  let stored = "1";
+  const components = load("components.tsx", {
+    react: { useState: (initial) => [typeof initial === "function" ? initial() : initial, () => {}] },
+    "@decky/ui": { ConfirmModal: "ConfirmModal", DialogButton: "DialogButton", Focusable: "Focusable", PanelSection: "Section",
+      PanelSectionRow: "Row", TextField: "TextField" },
+    "react-icons/fa": { FaCheck: "Check", FaChevronDown: "Down", FaChevronUp: "Up" },
+    "./hotkey": { buttonName: () => "?" }, "./i18n": { useTranslation: () => (key) => key }, "./utils": { COLORS: [], SIZE_PRESETS: [50, 100, 150] },
+  }, { window: { SP_REACT: { createElement, Fragment: "Fragment" } },
+    localStorage: { getItem: () => stored, setItem() {} } });
+  const find = (tree, match) => collect(tree, null, match);
+
+  const closed = find(components.FoldSection({ id: "a", title: "A", children: "BODY" }), (n) => n.type === "DialogButton");
+  assert.match(closed[0].props.className, /xh-fold xh-closed/);
+  stored = "0";
+  const open = find(components.FoldSection({ id: "b", title: "B", children: "BODY" }), (n) => n.type === "DialogButton");
+  assert.match(open[0].props.className, /xh-fold xh-open/);
+
+  const chips = find(components.SizeChips({ value: 100, onSelect() {} }), (n) => /\bxh-size\b/.test(n.props.className ?? ""));
+  assert.deepEqual(chips.map((c) => c.props["aria-pressed"]), [false, true, false]);
+  assert.deepEqual(chips.map((c) => /xh-active/.test(c.props.className)), [false, true, false]);
+});
+
+test("styles give selected and focused controls different looks", () => {
+  const { STYLES } = load("styles.ts", {});
+  for (const needle of [
+    ".xh-tab.xh-selected", ".xh-tab.xh-selected::after", ".xh-tab.gpfocus",
+    ".xh-size.xh-active::before", ".xh-size.gpfocus",
+    ".xh-fold.xh-closed", ".xh-fold.xh-open", ".xh-act.gpfocus", ".xh-fold.gpfocus",
+  ]) assert.ok(STYLES.includes(needle), needle);
+});
