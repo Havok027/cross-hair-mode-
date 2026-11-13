@@ -32,12 +32,16 @@ jobs:
           fi
 
       # Permite enviar os arquivos soltos (ex.: pelo celular): o que for
-      # TypeScript vai para src/, e o repositório fica organizado em pastas.
+      # TypeScript vai para src/, os testes vão para tests/, e o repositório
+      # fica organizado em pastas.
       - name: Organizar arquivos em pastas
         run: |
-          mkdir -p src
+          mkdir -p src tests
           for f in *.ts *.tsx; do
             if [ -f "$f" ]; then mv -f "$f" src/; fi
+          done
+          for f in *.test.cjs test_*.py check_direct_updater.py; do
+            if [ -f "$f" ]; then mv -f "$f" tests/; fi
           done
           if [ -f gitignore.txt ]; then mv -f gitignore.txt .gitignore; fi
           rm -f build.yml
