@@ -68,24 +68,24 @@
 ## 🚀 Como usar
 
 1. Abra o menu do **Decky Loader** e acesse o **Crosshair Plugin**.
-2. Escolha **Português**, **English** ou **Español** no dropdown **Idioma**. A escolha é salva para as próximas aberturas.
+2. Na guia **Config.** (última da fileira), escolha **Português**, **English** ou **Español** no dropdown **Idioma**. A escolha é salva para as próximas aberturas.
 3. Na guia **Tela**, escolha a **resolução** da sua tela.
 4. Na guia **Aparência**, escolha o **modelo**, a **cor** e o **tamanho**.
 5. Ative **Mostrar crosshair**.
 6. Se a mira não estiver no centro, na guia **Tela**, use os sliders **Horizontal (X)** e **Vertical (Y)**.
-7. *(Opcional)* Com um jogo aberto, na guia **Perfis**, toque em **Salvar perfil deste jogo**.
+7. *(Opcional)* Com um jogo aberto, na guia **Aparência**, no fim da página, toque em **Salvar perfil deste jogo**.
 
-Use **L1/R1** para alternar entre as guias **Aparência**, **Tela**, **Atalho** e **Perfis**. Também é possível selecionar as guias pelo toque. A última guia fica salva. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia.
+Use **L1/R1** para alternar entre as guias **Aparência**, **Tela**, **Atalho** e **Config.** Também é possível selecionar as guias pelo toque. A última guia fica salva. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia.
 
 **O painel, seção por seção:**
 
 | Seção | O que tem |
 |---|---|
-| **Crosshair** | Idioma, resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair* |
-| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho e slider de tamanho |
+| **Crosshair** | Resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair*, logo abaixo das guias (fica oculto em **Config.**) |
+| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho, slider de tamanho e, no fim, o perfil do jogo (salvar, atualizar, excluir e aplicar ao abrir o jogo) |
 | **Tela** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
 | **Atalho** | Gravar, remover, tempo segurando e diagnóstico |
-| **Perfis** | Salvar, atualizar e excluir perfis, e aplicar ao abrir o jogo |
+| **Config.** | Idioma (Português, English ou Español) e as próximas configurações |
 
 > [!NOTE]
 > Na seção **Cor**, o slider troca a cor na hora com esquerda e direita, e a cor escolhida fica no centro do carrossel. Cima e baixo mudam de seção.

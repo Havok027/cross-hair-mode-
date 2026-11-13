@@ -3,7 +3,10 @@
 ### Novidades
 - Interface em português, inglês e espanhol, com idioma salvo e independente dos perfis de jogo.
 - Documentação nos três idiomas, com links para alternar entre os READMEs.
-- Interface inspirada no Mako, organizada em Aparência, Tela, Atalho e Perfis, com navegação por L1/R1 ou toque.
+- Interface inspirada no Mako, com as guias no topo do plugin: Aparência, Tela, Atalho e Config. Cada botão mostra o ícone em cima e o nome embaixo, e a troca é por L1/R1 ou toque.
+- Nova guia **Config.**, que recebe a escolha de idioma e as próximas configurações.
+- O perfil do jogo agora fica no fim da guia **Aparência**.
+- O resumo de estado e o interruptor *Mostrar crosshair* ficam abaixo das guias e ficam ocultos em **Config.**
 - A última guia fica salva; durante a gravação, L1/R1 podem compor o atalho e não mudam de guia.
 
 ### Correções
@@ -13,13 +16,13 @@
 - Alterações pendentes são enviadas ao fechar o painel.
 
 ### Direct Updater
-- Metadados e links de distribuição alinhados a `Havok027/crosshair-plugin`, com a versão definida em `package.json`, evitando divergências com `plugin.json`.
+- Metadados e links de distribuição alinhados a Havok027/crosshair-plugin, com a versão definida em package.json, evitando divergências com plugin.json.
 - Cada versão mantém seu ZIP original. Outro pacote exige aumentar a versão; a automação não substitui arquivos já publicados.
 - O pacote passa pelo validador original do Direct Updater antes da publicação.
 - Depois da publicação, a automação confere a seleção da release, a identidade e o SHA-256 do download pela API e pela página de arquivos do GitHub.
 
 ### Validação
-- Testes automatizados de gravação, A/B/X/Y, Select + RT, estados dos botões, tempo segurando, idiomas, persistência e navegação L1/R1.
+- Testes automatizados de gravação, A/B/X/Y, Select + RT, estados dos botões, tempo segurando, idiomas, persistência e navegação L1/R1. Os testes que citam a guia Perfis precisam ser ajustados para a nova organização.
 - O comportamento no aparelho ainda precisa ser validado dentro e fora do QAM com o layout de Steam Input usado no jogo.
 
 ### Mantido
