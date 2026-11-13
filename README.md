@@ -73,19 +73,19 @@
 4. Na guia **Aparência**, escolha o **modelo**, a **cor** e o **tamanho**.
 5. Ative **Mostrar crosshair**.
 6. Se a mira não estiver no centro, na guia **Tela**, use os sliders **Horizontal (X)** e **Vertical (Y)**.
-7. *(Opcional)* Com um jogo aberto, na guia **Aparência**, no fim da página, toque em **Salvar perfil deste jogo**.
+7. *(Opcional)* Com um jogo aberto, na guia **Perfis**, toque em **Criar perfil**.
 
-Use **L1/R1** para alternar entre as guias **Aparência**, **Tela**, **Atalho** e **Config.** Também é possível selecionar as guias pelo toque. A última guia fica salva. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia.
+Use **L1** para passar para a próxima guia: **Aparência**, **Tela**, **Perfis** e **Config.** Também é possível selecionar as guias pelo toque. Use **R1** para mostrar ou ocultar as informações de apoio, como no Mako. A última guia e a escolha do R1 ficam salvas. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia nem as informações.
 
 **O painel, seção por seção:**
 
 | Seção | O que tem |
 |---|---|
-| **Crosshair** | Resumo do estado (ativo, modelo, tamanho, cor) e o interruptor *Mostrar crosshair*, logo abaixo das guias (fica oculto em **Config.**) |
-| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho, slider de tamanho e, no fim, o perfil do jogo (salvar, atualizar, excluir e aplicar ao abrir o jogo) |
+| **Estado atual** | Tabela com estado (ativo), modelo, tamanho, cor, atalho e perfil, e o interruptor *Mostrar crosshair*, logo abaixo das guias (fica oculto em **Config.**) |
+| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho e slider de tamanho |
 | **Tela** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
-| **Atalho** | Gravar, remover, tempo segurando e diagnóstico |
-| **Config.** | Idioma (Português, English ou Español) e as próximas configurações |
+| **Perfis** | Criar (ou atualizar) o perfil do jogo aberto, escolher, renomear e excluir perfis salvos e aplicar ao abrir o jogo |
+| **Config.** | Idioma (Português, English ou Español), atalho de botões (gravar, remover, tempo segurando e diagnóstico) e as próximas configurações |
 
 > [!NOTE]
 > Na seção **Cor**, o slider troca a cor na hora com esquerda e direita, e a cor escolhida fica no centro do carrossel. Cima e baixo mudam de seção.
@@ -98,7 +98,7 @@ Ligue e desligue a mira com uma combinação de **2 botões do controle**, sem a
 
 **Como gravar:**
 
-1. Na guia **Atalho**, toque em **Gravar combinação**.
+1. Na guia **Config.**, em **Atalho de botões**, toque em **Gravar combinação**.
 2. Aperte os 2 botões **juntos** e solte (em até 12 segundos). Pode fazer com o menu aberto.
 3. A mira pisca duas vezes quando a combinação é gravada. Combinações como **Select + X** são aceitas.
 4. Pronto: apertar os 2 botões liga ou desliga a mira.
@@ -224,7 +224,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 | 💡 | Resolução automática | Detectar a tela sem escolher na lista |
 | 💡 | Mais modelos | Mira com braços e formatos novos |
 | ✅ | Português, inglês e espanhol | README com links de idioma e interface com dropdown |
-| ✅ | Interface em guias | Visual inspirado no Mako e navegação com L1/R1 |
+| ✅ | Interface em guias | Visual inspirado no Mako, com L1 para trocar de guia e R1 para mostrar ou ocultar informações |
 | 💡 | Loja do Decky | Publicar o plugin na loja oficial |
 
 > [!NOTE]
@@ -236,6 +236,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
 | Versão | Destaques |
 |:---:|---|
+| **1.7.4** | Estado atual em tabela · guia **Perfis** com criar, renomear e excluir · atalho dentro de **Config.** · R1 mostra ou oculta informações |
 | **1.7.3** | Guias no topo, com ícone e nome embaixo · nova guia **Config.** com o idioma · perfil do jogo no fim de **Aparência** |
 | **1.7.2** | Português, inglês e espanhol · guias com L1/R1 · correção de toques rápidos de A/B/X/Y |
 | **1.7** | MangoHud de antes volta ao desligar a mira · leitura em jogo ampliada (LB, RB, LT, RT, Menu e View) · atalho funciona com o menu aberto · diagnóstico do último botão lido |
@@ -274,7 +275,7 @@ Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havo
 | `src/utils.ts` | Cores, tamanhos e funções auxiliares |
 | `src/styles.ts` | CSS do painel |
 | `src/i18n.tsx` | Traduções da interface (PT/EN/ES) |
-| `src/SettingsTabs.tsx` | Guias e navegação com L1/R1 |
+| `src/SettingsTabs.tsx` | Guias, L1 para trocar de guia e R1 para mostrar ou ocultar informações |
 | `tests/` | Regressões da interface e da leitura do controle |
 | `plugin.json` e `package.json` | Identidade, versão e repositório |
 | `.github/workflows/build.yml` | Compila e publica a release |
@@ -282,7 +283,7 @@ Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havo
 
 Para compilar localmente: `pnpm install` e depois `pnpm build`.
 
-Verificações: `pnpm typecheck`, `pnpm test` e `pnpm test:backend` (requer Python 3.7+). Os testes simulam eventos; valide também Select + A/B/X/Y e Select + RT no aparelho, dentro e fora do QAM, e a navegação por L1/R1.
+Verificações: `pnpm typecheck`, `pnpm test` e `pnpm test:backend` (requer Python 3.7+). Os testes simulam eventos; valide também Select + A/B/X/Y e Select + RT no aparelho, dentro e fora do QAM, e o uso de L1/R1.
 
 </details>
 
