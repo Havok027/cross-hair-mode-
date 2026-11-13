@@ -1,33 +1,22 @@
-## Crosshair v1.7.2
+## Crosshair v1.7.3
 
 ### Novidades
-- Interface em português, inglês e espanhol, com idioma salvo e independente dos perfis de jogo.
-- Documentação nos três idiomas, com links para alternar entre os READMEs.
-- Interface inspirada no Mako, com as guias no topo do plugin: Aparência, Tela, Atalho e Config. Cada botão mostra o ícone em cima e o nome embaixo, e a troca é por L1/R1 ou toque.
-- Nova guia **Config.**, que recebe a escolha de idioma e as próximas configurações.
+- As guias ficam no topo do plugin, antes do resumo de estado e do interruptor *Mostrar crosshair*. Cada botão mostra o ícone em cima e o nome embaixo.
+- Guias reorganizadas: Aparência, Tela, Atalho e Config.
+- Nova guia **Config.**, que recebe a escolha de idioma (Português, English e Español) e as próximas configurações.
 - O perfil do jogo agora fica no fim da guia **Aparência**.
 - O resumo de estado e o interruptor *Mostrar crosshair* ficam abaixo das guias e ficam ocultos em **Config.**
-- A última guia fica salva; durante a gravação, L1/R1 podem compor o atalho e não mudam de guia.
-
-### Correções
-- Preservados os eventos de apertar e soltar que chegam juntos, evitando perder toques rápidos de A/B/X/Y, inclusive Select + X.
-- Suporte aos formatos de evento do Steam com campos alternativos e estados booleanos, numéricos ou textuais, sem interpretar "0" como botão apertado.
-- Mantida a prevenção de acionamento duplicado entre a interface e o backend.
-- Alterações pendentes são enviadas ao fechar o painel.
-
-### Direct Updater
-- Metadados e links de distribuição alinhados a Havok027/crosshair-plugin, com a versão definida em package.json, evitando divergências com plugin.json.
-- Cada versão mantém seu ZIP original. Outro pacote exige aumentar a versão; a automação não substitui arquivos já publicados.
-- O pacote passa pelo validador original do Direct Updater antes da publicação.
-- Depois da publicação, a automação confere a seleção da release, a identidade e o SHA-256 do download pela API e pela página de arquivos do GitHub.
+- L1/R1 percorrem as 4 guias. A última guia fica salva; durante a gravação, L1/R1 podem compor o atalho e não mudam de guia.
+- Documentação nos três idiomas atualizada para a nova organização.
 
 ### Validação
-- Testes automatizados de gravação, A/B/X/Y, Select + RT, estados dos botões, tempo segurando, idiomas, persistência e navegação L1/R1. Os testes que citam a guia Perfis precisam ser ajustados para a nova organização.
+- Testes automatizados de navegação por L1/R1 e do idioma ajustados para a nova organização das guias.
 - O comportamento no aparelho ainda precisa ser validado dentro e fora do QAM com o layout de Steam Input usado no jogo.
 
 ### Mantido
 - Restauração do MangoHud anterior ao desligar a mira.
 - Sete modelos, cores prontas e RGB, tamanho, escala pelo centro, calibração, posição e perfis por jogo.
+- Atalho de botões, com gravação pela interface.
 - Steam Deck, Legion Go S, Legion Go, 1080p e 4K.
 
 ### Como instalar
