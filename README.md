@@ -75,17 +75,15 @@
 6. Se a mira não estiver no centro, na guia **Tela**, use os sliders **Horizontal (X)** e **Vertical (Y)**.
 7. *(Opcional)* Com um jogo aberto, na guia **Perfis**, toque em **Criar perfil**.
 
-Use **L1** para passar para a próxima guia: **Aparência**, **Tela**, **Perfis** e **Config.** Também é possível selecionar as guias pelo toque. Use **R1** para mostrar ou ocultar as informações de apoio, como no Mako. A última guia e a escolha do R1 ficam salvas. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia nem as informações.
+Use **L1/R1** para alternar entre as guias **Aparência**, **Perfis** e **Config.** Também é possível selecionar as guias pelo toque. A última guia fica salva. Durante a gravação, L1/R1 ficam disponíveis para compor o atalho e não mudam a guia. Cada seção tem uma barra com seta que recolhe ou expande o conteúdo, e a escolha fica salva.
 
 **O painel, seção por seção:**
 
 | Seção | O que tem |
 |---|---|
-| **Estado atual** | Tabela com estado (ativo), modelo, tamanho, cor, atalho e perfil, e o interruptor *Mostrar crosshair*, logo abaixo das guias (fica oculto em **Config.**) |
-| **Aparência** | Modelo, cor (carrossel e slider ou RGB), atalhos de tamanho e slider de tamanho |
-| **Tela** | Resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
-| **Perfis** | Criar (ou atualizar) o perfil do jogo aberto, escolher, renomear e excluir perfis salvos e aplicar ao abrir o jogo |
-| **Config.** | Idioma (Português, English ou Español), atalho de botões (gravar, remover, tempo segurando e diagnóstico) e as próximas configurações |
+| **Aparência** | Tabela do estado atual (ativo, modelo, tamanho, cor, resolução e posição), interruptor *Mostrar crosshair*, modelo, cor (carrossel e slider ou RGB), atalhos e slider de tamanho e, na mesma guia, resolução, sliders X e Y, zerar ajuste e *Calibrar escala* (avançado) |
+| **Perfis** | Tabela com os detalhes do perfil escolhido (modelo, tamanho, cor, posição, mira ao aplicar e se ele é igual ao ajuste atual), criar ou atualizar o perfil do jogo aberto, renomear, excluir e aplicar ao abrir o jogo |
+| **Config.** | Tabela-resumo (idioma, combinação, tempo segurando e leitura em jogo), idioma (Português, English ou Español), atalho de botões (gravar, remover, tempo segurando e diagnóstico) e as próximas configurações |
 
 > [!NOTE]
 > Na seção **Cor**, o slider troca a cor na hora com esquerda e direita, e a cor escolhida fica no centro do carrossel. Cima e baixo mudam de seção.
@@ -224,7 +222,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 | 💡 | Resolução automática | Detectar a tela sem escolher na lista |
 | 💡 | Mais modelos | Mira com braços e formatos novos |
 | ✅ | Português, inglês e espanhol | README com links de idioma e interface com dropdown |
-| ✅ | Interface em guias | Visual inspirado no Mako, com L1 para trocar de guia e R1 para mostrar ou ocultar informações |
+| ✅ | Interface em guias | Visual inspirado no Mako, com L1/R1 para trocar de guia e seções que recolhem |
 | 💡 | Loja do Decky | Publicar o plugin na loja oficial |
 
 > [!NOTE]
@@ -236,7 +234,7 @@ Os logs do plugin ficam em `~/homebrew/logs/Crosshair/`.
 
 | Versão | Destaques |
 |:---:|---|
-| **1.7.4** | Estado atual em tabela · guia **Perfis** com criar, renomear e excluir · atalho dentro de **Config.** · R1 mostra ou oculta informações |
+| **1.7.5** | Aparência e Tela na mesma guia · seções que recolhem com seta · tabela de resumo diferente em cada guia, com os detalhes do perfil · guia **Perfis** com criar, renomear e excluir · atalho dentro de **Config.** |
 | **1.7.3** | Guias no topo, com ícone e nome embaixo · nova guia **Config.** com o idioma · perfil do jogo no fim de **Aparência** |
 | **1.7.2** | Português, inglês e espanhol · guias com L1/R1 · correção de toques rápidos de A/B/X/Y |
 | **1.7** | MangoHud de antes volta ao desligar a mira · leitura em jogo ampliada (LB, RB, LT, RT, Menu e View) · atalho funciona com o menu aberto · diagnóstico do último botão lido |
@@ -275,7 +273,7 @@ Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Havo
 | `src/utils.ts` | Cores, tamanhos e funções auxiliares |
 | `src/styles.ts` | CSS do painel |
 | `src/i18n.tsx` | Traduções da interface (PT/EN/ES) |
-| `src/SettingsTabs.tsx` | Guias, L1 para trocar de guia e R1 para mostrar ou ocultar informações |
+| `src/SettingsTabs.tsx` | Guias e navegação com L1/R1 |
 | `tests/` | Regressões da interface e da leitura do controle |
 | `plugin.json` e `package.json` | Identidade, versão e repositório |
 | `.github/workflows/build.yml` | Compila e publica a release |

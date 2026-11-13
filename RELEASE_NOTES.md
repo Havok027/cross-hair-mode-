@@ -1,14 +1,18 @@
-## Crosshair v1.7.4
+## Crosshair v1.7.5
 
 ### Novidades
-- O resumo do topo agora é uma tabela, no estilo do Mako: estado (ativo ou desligado), modelo, tamanho, cor, atalho e perfil. O interruptor *Mostrar crosshair* fica logo abaixo.
-- Menus reorganizados em Aparência, Tela, Perfis e Config.
-- A guia **Config.** reúne o idioma e o atalho de botões, que saíram de onde estavam.
-- Nova guia **Perfis**, com a seção "Perfis de jogo": lista de perfis salvos e botões com ícone para **Criar perfil**, **Renomear** e **Excluir**.
-- **Criar perfil** salva o jogo aberto e vira **Atualizar perfil** quando ele já tem perfil. Sem jogo aberto, o botão fica desativado e aparece o aviso para abrir um jogo.
+- Aparência e Tela agora ficam na mesma guia. As guias são Aparência, Perfis e Config., e L1/R1 percorrem as três.
+- Cada seção tem uma barra com seta (como no Mako) que recolhe ou expande o conteúdo. A escolha fica salva.
+- A tabela de resumo do topo muda em cada guia:
+  - **Aparência:** estado do crosshair, modelo, tamanho, cor, resolução e posição final.
+  - **Perfis:** detalhes do perfil escolhido (modelo, tamanho, cor, posição, se a mira liga ao aplicar, se a aplicação automática está ativa e se o perfil é igual ou diferente do ajuste atual). Mostra também quando é o perfil do jogo aberto.
+  - **Config.:** idioma, combinação do atalho, tempo segurando e leitura em jogo.
+- O interruptor *Mostrar crosshair* fica na guia Aparência, junto da tabela.
+- A guia **Perfis** traz a lista de perfis salvos e botões com ícone para **Criar perfil**, **Renomear** e **Excluir**.
+- **Criar perfil** salva o jogo aberto e vira **Atualizar perfil** quando ele já tem perfil. Sem jogo aberto, o botão fica desativado.
 - **Renomear** muda só o nome do perfil, sem alterar o jogo nem as configurações salvas.
-- **R1** mostra ou oculta as informações de apoio (descrições, dicas e diagnóstico), como no Mako, com o aviso flutuante no canto. A escolha fica salva.
-- **L1** passa para a próxima guia. Durante a gravação do atalho, L1 e R1 ficam livres para compor a combinação.
+- A guia **Config.** reúne o idioma e o atalho de botões.
+- As informações de apoio ficam sempre visíveis.
 - Documentação nos três idiomas atualizada.
 
 ### Direct Updater
@@ -18,8 +22,8 @@
 - Depois da publicação, a automação confere a seleção da release, a identidade e o SHA-256 do download pela API e pela página de arquivos do GitHub.
 
 ### Validação
-- Testes automatizados de navegação (L1 e R1), idioma, atalho dentro de Config., botões de perfil e renomeação no backend.
-- O comportamento no aparelho ainda precisa ser validado dentro e fora do QAM: tabela de estado, janela de renomear com o teclado do Steam, R1 e o aviso flutuante.
+- Testes automatizados de navegação por L1/R1, idioma, atalho dentro de Config., botões de perfil, renomeação no backend, tabelas de cada guia e seções que recolhem.
+- O comportamento no aparelho ainda precisa ser validado dentro e fora do QAM: barras de recolher, tabelas e a janela de renomear com o teclado do Steam.
 
 ### Mantido
 - Restauração do MangoHud anterior ao desligar a mira.

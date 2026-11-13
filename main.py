@@ -734,7 +734,19 @@ class Plugin:
                 "comp_y": cy,
                 "auto_apply": s["auto_apply"],
             },
-            "profiles": [{"appid": k, "name": v["name"]} for k, v in s["profiles"].items()],
+            "profiles": [
+                {
+                    "appid": k,
+                    "name": v["name"],
+                    "enabled": v["enabled"],
+                    "model": v["model"],
+                    "color": v["color"],
+                    "size": v["size"],
+                    "nudge_x": v["nudge_x"],
+                    "nudge_y": v["nudge_y"],
+                }
+                for k, v in s["profiles"].items()
+            ],
             "hotkey": self.hotkey_state(),
             "models": [{"id": k, "label": v["label"], "lines": v["lines"]} for k, v in MODELS.items()],
             "resolutions": [{"id": k, "label": v["label"]} for k, v in RESOLUTIONS.items()],
