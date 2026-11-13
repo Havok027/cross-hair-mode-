@@ -101,6 +101,25 @@ class InputTests(unittest.TestCase):
             profile = plugin.sanitize_profile({"language": "es"}, "Example")
             self.assertNotIn("language", profile)
 
+    def test_rename_profile_changes_only_the_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            instance = plugin.Plugin()
+            instance.settings_path = str(Path(directory) / "settings.json")
+            asyncio.run(instance.save_profile("10", "Game"))
+            before = dict(instance.settings["profiles"]["10"])
+            state = asyncio.run(instance.rename_profile("10", "  My   profile  "))
+            self.assertEqual(state["profiles"], [{"appid": "10", "name": "My profile"}])
+            after = instance.settings["profiles"]["10"]
+            self.assertEqual({k: v for k, v in after.items() if k != "name"}, {k: v for k, v in before.items() if k != "name"})
+            asyncio.run(instance.rename_profile("10", "   "))
+            asyncio.run(instance.rename_profile("99", "Unknown"))
+            self.assertEqual(list(instance.settings["profiles"]), ["10"])
+            self.assertEqual(instance.settings["profiles"]["10"]["name"], "My profile")
+            restored = plugin.Plugin()
+            restored.settings_path = instance.settings_path
+            restored.load_settings()
+            self.assertEqual(restored.settings["profiles"]["10"]["name"], "My profile")
+
 
 if __name__ == "__main__":
     unittest.main()
