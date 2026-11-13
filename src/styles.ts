@@ -3,15 +3,15 @@
 export const STYLES = `
 .xh-plugin { color: #edf8fb; }
 .xh-section-title { width: 100%; margin: 8px 0 6px; padding-bottom: 8px; text-align: center; border-bottom: 4px solid #553878; font-size: 14px; font-weight: 600; }
-.xh-tabs { display: flex; gap: 5px; width: 100%; padding: 4px 0; }
+.xh-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; padding: 4px 0; }
 .xh-tab {
-  flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 7px; padding: 10px 2px; border-radius: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; min-width: 0; padding: 9px 1px 7px; border-radius: 6px; box-sizing: border-box;
   border: 1px solid rgba(77,170,190,0.28); border-bottom: 3px solid transparent;
-  background: rgba(7,31,49,0.68); color: #aebfc5; font-size: 10px; cursor: pointer;
+  background: rgba(7,31,49,0.68); color: #aebfc5; cursor: pointer;
 }
-.xh-tab svg { font-size: 17px; }
-.xh-tab span { max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+.xh-tab svg { display: block; flex: none; width: 20px; height: 20px; }
+.xh-tab span { display: block; max-width: 100%; font-size: 10px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 .xh-tab.xh-selected { color: #edf8fb; background: #124457; border-bottom-color: #83bff0; }
 .xh-tab.gpfocus, .xh-tab:focus-visible { outline: 2px solid #52d5e8; outline-offset: 1px; background: #145669; }
 .xh-tab[aria-disabled="true"] { opacity: 0.5; }
